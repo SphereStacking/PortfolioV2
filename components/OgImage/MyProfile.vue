@@ -3,20 +3,18 @@ const { links } = useMyProfile()
 </script>
 
 <template>
-  <div
-    class="
+  <div class="
     size-full pt-10 pb-1 px-2
     bg-black
      relative top-0 left-0
-  "
-    :style="{
-      backgroundImage: `
+  " :style="{
+    backgroundImage: `
         linear-gradient(-30deg, rgba(16,152,173,0.1) 10%, rgb(16,152,173,0.4) 30%, rgb(64,169,152,0.5) 40%, rgb(111,186,130,0.4) 50%, rgba(16,152,173,0.1) 70%)
       `,
-    }">
+  }">
     <div class="flex flex-row gap-2 grow">
       <div class="flex justify-center items-center overflow-hidden w-2/5">
-        <img src="/images/icon-grow.png" alt="logo" class="object-contain w-full h-full">
+        <img src="/images/me.png" alt="logo" class="object-contain w-full h-full">
       </div>
       <div class="flex flex-col gap-2 w-3/5 my-auto">
         <h1 class="text-8xl font-black text-white mx-auto font-monomaniac-one">
@@ -47,5 +45,4 @@ const { links } = useMyProfile()
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

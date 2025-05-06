@@ -828,5 +828,25 @@
             "Vue.js"
         ],
         "link": "https://vitepress.dev/"
+    },
+    "threejs": {
+        "name": "threejs",
+        "logo": "https://go-skill-icons.vercel.app/api/icons?i=threejs",
+        "category": "ツール",
+        "tags": [
+            "3D",
+            "WebGL"
+        ],
+        "link": "https://threejs.org/"
+    },
+    "tresjs": {
+        "name": "threejs",
+        "logo": "https://tresjs.org/favicon.svg",
+        "category": "ツール",
+        "tags": [
+            "3D",
+            "WebGL"
+        ],
+        "link": "https://tresjs.org/"
     }
 }

@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     'dayjs-nuxt',
     'nuxt-og-image',
     'motion-v/nuxt',
+    '@nuxt/scripts',
   ],
   devtools: {
     enabled: true,
@@ -61,6 +62,13 @@ export default defineNuxtConfig({
       'Monomaniac+One:900',
       'Zen+Maru+Gothic:700',
     ],
+  },
+  scripts: {
+    registry: {
+      googleAnalytics: {
+        id: 'G-8BWRNH7DMP',
+      },
+    },
   },
   tres: {
     devtools: true,

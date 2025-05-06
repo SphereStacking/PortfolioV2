@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- 影のフィルター定義 -->
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="#00000033"/>
+    </filter>
+  </defs>
+  
+  <!-- 塗りつぶしリング - 右下（一番外側） -->
+  <circle cx="320" cy="220" r="50" fill="#88cc99" filter="url(#shadow)"/>
+  
+  <!-- 塗りつぶしリング - 右上 -->
+  <circle cx="270" cy="100" r="40" fill="#66ddaa" filter="url(#shadow)"/>
+  
+  <!-- 白抜きリング - 右中央 -->
+  <circle cx="340" cy="150" r="25" fill="white" stroke="#aaddbb" stroke-width="12" filter="url(#shadow)"/>
+  
+  <!-- 塗りつぶしリング - 中央（真ん中） -->
+  <circle cx="200" cy="170" r="55" fill="#bbffcc" filter="url(#shadow)"/>
+  
+  <!-- 塗りつぶしリング - 中央上 -->
+  <circle cx="170" cy="80" r="35" fill="#ddffbb" filter="url(#shadow)"/>
+  
+  <!-- 塗りつぶしリング - 左下 -->
+  <circle cx="120" cy="210" r="45" fill="#99eebb" filter="url(#shadow)"/>
+  
+  <!-- 白抜きリング - 左上 -->
+  <circle cx="80" cy="100" r="30" fill="white" stroke="#ccffdd" stroke-width="12" filter="url(#shadow)"/>
+  
+  <!-- 白抜きリング - 中央下 -->
+  <circle cx="220" cy="240" r="25" fill="white" stroke="#aaeedd" stroke-width="12" filter="url(#shadow)"/>
+  
+  <!-- 白抜きリング - 左中央 -->
+  <circle cx="50" cy="160" r="28" fill="white" stroke="#77ddcc" stroke-width="12" filter="url(#shadow)"/>
+</svg>

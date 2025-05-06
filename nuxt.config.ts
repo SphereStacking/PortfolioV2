@@ -17,6 +17,19 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
+  app: {
+    head: {
+      charset: 'utf-16',
+      viewport: 'width=device-width',
+      title: 'SphereStacking Portfolio',
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
+      htmlAttrs: {
+        lang: 'ja',
+      },
+    },
+  },
   css: ['~/assets/css/main.css'],
   colorMode: {
     // TODO: デフォルトをDarkにする いつか両方対応したい
@@ -30,6 +43,9 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: '2024-11-01',
+  nitro: {
+    minify: true,
+  },
   vite: {
     assetsInclude: ['**/*.glsl'],
   },
@@ -43,9 +59,7 @@ export default defineNuxtConfig({
       'Monomaniac+One:400',
       'Monomaniac+One:700',
       'Monomaniac+One:900',
-      'Zen+Maru+Gothic:400',
       'Zen+Maru+Gothic:700',
-      'Zen+Maru+Gothic:900',
     ],
   },
   tres: {

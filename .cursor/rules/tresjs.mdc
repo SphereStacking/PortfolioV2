@@ -1,0 +1,495 @@
+---
+description: 
+globs: **/*.js,**/*.ts,**/*.vue,**/*.html
+alwaysApply: false
+---
+---
+説明: このルールは、TresJS を用いて効率的で保守性に優れ、堅牢な 3D Web アプリケーションを開発するためのガイドラインとベストプラクティスを提供します。コード構成、パフォーマンス最適化、セキュリティ、テスト、そして高品質な開発エクスペリエンスを実現するためのよくある落とし穴といった側面を網羅しています。
+---
+
+# TresJS のベストプラクティスとコーディング標準
+
+このドキュメントでは、TresJS を用いた開発におけるベストプラクティスとコーディング標準について概説します。これらのガイドラインに従うことで、効率的で保守性に優れ、堅牢な 3D Web アプリケーションを作成できます。
+
+## ライブラリ情報:
+- 名前: tres.js
+- タグ: 3d, graphics, webgl, vue, javascript
+- 依存関係: Vue 3, Three.js
+
+## 1. コードの構成と構造
+
+### 1.1. ディレクトリ構造のベストプラクティス:
+
+適切に整理されたディレクトリ構造は、プロジェクトの保守性とスケーラビリティを向上させます。以下の構造を検討してください。
+
+```
+project-root/
+├── src/
+│   ├── components/          # Vue/Tres コンポーネント
+│   │   ├── 3d/             # 3D専用のコンポーネント
+│   │   │   ├── MyMesh.vue
+│   │   │   ├── Lighting/
+│   │   │   └── Camera/
+│   │   ├── scenes/         # シーンコンポーネント
+│   │   │   ├── MainScene.vue
+│   │   │   └── GameScene.vue
+│   │   └── ui/             # 2D UIコンポーネント
+│   │       ├── HUD.vue
+│   │       └── Menu.vue
+│   ├── composables/        # Vue composables (カスタムフック)
+│   │   ├── useRenderer.js
+│   │   ├── useControls.js
+│   │   └── useModel.js
+│   ├── models/            # 3D モデルファイル
+│   │   ├── myModel.glb
+│   │   └── ...
+│   ├── textures/          # テクスチャファイル
+│   │   ├── myTexture.jpg
+│   │   └── ...
+│   ├── stores/            # Pinia stores (状態管理)
+│   │   ├── sceneStore.js
+│   │   └── settingsStore.js
+│   ├── utils/             # ユーティリティ関数
+│   │   ├── mathUtils.js
+│   │   └── sceneUtils.js
+│   ├── App.vue           # メインアプリケーション
+│   └── main.js          # エントリーポイント
+├── public/              # 静的リソース
+├── .gitignore
+├── package.json
+└── vite.config.js      # Vite設定
+```
+
+### 1.2. ファイルの命名規則:
+- **Vueコンポーネント:** パスカルケースを使用します (例: `MyMesh.vue`)
+- **Composables:** `use` プレフィックスを付けてキャメルケースを使用します (例: `useRenderer.js`)
+- **Stores:** キャメルケースにstoreサフィックスを付けます (例: `sceneStore.js`)
+- **モデル:** キャメルケースを使用します (例: `myModel.glb`)
+- **テクスチャ:** キャメルケースを使用します (例: `myTexture.jpg`)
+- **ユーティリティ:** キャメルケースを使用します (例: `mathUtils.js`)
+
+### 1.3. TresJS コンポーネント構成:
+
+TresJSでは、宣言的なアプローチを使用してThree.jsシーンを構築します。
+
+```vue
+<!-- MainScene.vue -->
+<template>
+  <TresCanvas
+    clear-color="#82DBC5"
+    :alpha="true"
+  >
+    <TresPerspectiveCamera 
+      :position="[3, 3, 3]" 
+      :look-at="[0, 0, 0]" 
+    />
+    
+    <!-- ライティング -->
+    <TresAmbientLight :intensity="0.5" />
+    <TresDirectionalLight 
+      :position="[5, 5, 5]" 
+      :intensity="1" 
+    />
+    
+    <!-- オブジェクト -->
+    <TresMesh :position="[0, 0, 0]">
+      <TresBoxGeometry :args="[1, 1, 1]" />
+      <TresMeshStandardMaterial 
+        color="#f3f3f3" 
+      />
+    </TresMesh>
+    
+    <!-- カスタムコンポーネント -->
+    <MyCustomMesh />
+    
+    <!-- コントロール -->
+    <OrbitControls />
+  </TresCanvas>
+</template>
+
+<script setup>
+import { TresCanvas } from '@tresjs/core'
+import { OrbitControls } from '@tresjs/controls'
+import MyCustomMesh from './components/3d/MyCustomMesh.vue'
+</script>
+```
+
+### 1.4. カスタムコンポーネントの作成:
+
+```vue
+<!-- MyCustomMesh.vue -->
+<template>
+  <TresMesh 
+    ref="meshRef"
+    :position="position"
+    :rotation="rotation"
+    :scale="scale"
+    @click="handleClick"
+  >
+    <TresBoxGeometry :args="[1, 1, 1]" />
+    <TresMeshStandardMaterial 
+      :color="color" 
+      :metalness="metalness"
+      :roughness="roughness"
+    />
+  </TresMesh>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue'
+import { useRenderLoop } from '@tresjs/core'
+
+const props = defineProps({
+  position: {
+    type: Array,
+    default: () => [0, 0, 0]
+  },
+  color: {
+    type: String,
+    default: '#ffffff'
+  },
+  rotate: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['click'])
+
+const meshRef = ref()
+const rotation = ref([0, 0, 0])
+const scale = ref([1, 1, 1])
+
+// アニメーションループ
+const { onBeforeRender } = useRenderLoop()
+
+onBeforeRender(() => {
+  if (props.rotate && meshRef.value) {
+    rotation.value[1] += 0.01
+  }
+})
+
+const handleClick = (event) => {
+  emit('click', event)
+}
+
+// リアクティブなプロパティの監視
+watch(() => props.metalness, (newVal) => {
+  if (meshRef.value?.material) {
+    meshRef.value.material.metalness = newVal
+  }
+})
+</script>
+```
+
+### 1.5. Composablesの使用:
+
+```javascript
+// composables/useModel.js
+import { ref } from 'vue'
+import { useLoader } from '@tresjs/core'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
+export const useModel = (path) => {
+  const model = ref(null)
+  const loading = ref(true)
+  const error = ref(null)
+
+  const load = async () => {
+    try {
+      const { load } = useLoader(GLTFLoader)
+      const result = await load(path)
+      model.value = result.scene
+      loading.value = false
+    } catch (err) {
+      error.value = err
+      loading.value = false
+    }
+  }
+
+  load()
+
+  return {
+    model,
+    loading,
+    error
+  }
+}
+```
+
+```vue
+<!-- ModelComponent.vue -->
+<template>
+  <div v-if="loading">Loading...</div>
+  <div v-else-if="error">Error: {{ error.message }}</div>
+  <primitive 
+    v-else
+    :object="model"
+    :position="position"
+    @click="handleClick"
+  />
+</template>
+
+<script setup>
+import { useModel } from '@/composables/useModel'
+
+const props = defineProps({
+  modelPath: {
+    type: String,
+    required: true
+  },
+  position: {
+    type: Array,
+    default: () => [0, 0, 0]
+  }
+})
+
+const { model, loading, error } = useModel(props.modelPath)
+
+const handleClick = () => {
+  console.log('Model clicked!')
+}
+</script>
+```
+
+## 2. 状態管理
+
+### 2.1. Pinia Storeパターン:
+
+```javascript
+// stores/sceneStore.js
+import { defineStore } from 'pinia'
+
+export const useSceneStore = defineStore('scene', {
+  state: () => ({
+    cameraPosition: [3, 3, 3],
+    lightIntensity: 1,
+    selectedObject: null,
+    settings: {
+      postProcessing: true,
+      shadows: true,
+      backgroundColor: '#82DBC5'
+    }
+  }),
+  
+  actions: {
+    setCameraPosition(position) {
+      this.cameraPosition = position
+    },
+    
+    selectObject(object) {
+      this.selectedObject = object
+    },
+    
+    updateSettings(newSettings) {
+      this.settings = { ...this.settings, ...newSettings }
+    }
+  }
+})
+```
+
+## 3. パフォーマンス最適化
+
+### 3.1. FPS監視コンポーネント:
+
+```vue
+<!-- FPSMonitor.vue -->
+<template>
+  <div 
+    class="fps-monitor"
+    :style="{ position: 'fixed', top: '10px', left: '10px' }"
+  >
+    FPS: {{ fps }}
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { useRenderLoop } from '@tresjs/core'
+
+const fps = ref(0)
+let frameCount = 0
+let lastTime = performance.now()
+
+const { onBeforeRender } = useRenderLoop()
+
+onBeforeRender(() => {
+  frameCount++
+  const now = performance.now()
+  const elapsed = now - lastTime
+  
+  if (elapsed >= 1000) {
+    fps.value = Math.round((frameCount * 1000) / elapsed)
+    frameCount = 0
+    lastTime = now
+  }
+})
+</script>
+```
+
+### 3.2. インスタンス化によるパフォーマンス最適化:
+
+```vue
+<!-- InstancedCubes.vue -->
+<template>
+  <TresInstancedMesh
+    ref="instancedMeshRef"
+    :args="[geometry, material, count]"
+  >
+    <TresBoxGeometry :args="[0.5, 0.5, 0.5]" />
+    <TresMeshStandardMaterial :color="color" />
+  </TresInstancedMesh>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { Matrix4, Vector3 } from 'three'
+
+const props = defineProps({
+  count: {
+    type: Number,
+    default: 100
+  },
+  color: {
+    type: String,
+    default: '#ff0000'
+  }
+})
+
+const instancedMeshRef = ref()
+
+onMounted(() => {
+  const mesh = instancedMeshRef.value
+  const matrix = new Matrix4()
+  const position = new Vector3()
+  
+  for (let i = 0; i < props.count; i++) {
+    position.set(
+      Math.random() * 20 - 10,
+      Math.random() * 20 - 10,
+      Math.random() * 20 - 10
+    )
+    matrix.setPosition(position)
+    mesh.setMatrixAt(i, matrix)
+  }
+  
+  mesh.instanceMatrix.needsUpdate = true
+})
+</script>
+```
+
+## 4. デバッグとテスト
+
+### 4.1. デバッグヘルパー:
+
+```vue
+<!-- DebugScene.vue -->
+<template>
+  <TresCanvas>
+    <!-- 開発環境でのみ表示 -->
+    <template v-if="isDev">
+      <TresAxesHelper :size="5" />
+      <TresGridHelper :size="10" :divisions="10" />
+      <TresCameraHelper v-if="showCameraHelper" />
+    </template>
+    
+    <!-- メインシーン -->
+    <MyScene />
+  </TresCanvas>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const isDev = ref(import.meta.env.DEV)
+const showCameraHelper = ref(true)
+</script>
+```
+
+### 4.2. コンポーネントテスト:
+
+```javascript
+// MyMesh.test.js
+import { mount } from '@vue/test-utils'
+import { TresCanvas } from '@tresjs/core'
+import MyMesh from '@/components/3d/MyMesh.vue'
+
+describe('MyMesh', () => {
+  it('renders with correct position prop', () => {
+    const position = [1, 2, 3]
+    const wrapper = mount(TresCanvas, {
+      slots: {
+        default: '<MyMesh :position="position" />'
+      },
+      global: {
+        components: { MyMesh },
+        provide: {
+          position
+        }
+      }
+    })
+    
+    expect(wrapper.html()).toMatchSnapshot()
+  })
+})
+```
+
+## 5. 一般的なパターンとアンチパターン
+
+### 5.1. 推奨パターン:
+
+1. **Composition APIの使用**: 
+   - reusabilityのためにComposition APIを使用
+   - composablesで共通ロジックを抽出
+
+2. **プロップス駆動**:
+   - propsを使用してコンポーネントを構成可能に
+   - デフォルト値の提供
+
+3. **イベント駆動**:
+   - カスタムイベントを使用してコンポーネント間通信
+   - `emit` を使用して外部に状態変更を通知
+
+### 5.2. アンチパターン（避けるべきパターン）:
+
+1. **直接的なThree.jsオブジェクト操作**:
+   - ✗ `threeObject.position.set()`
+   - ✓ Vue reactivityを使用: `:position="[x, y, z]"`
+
+2. **過度なネスト**:
+   - 深すぎるコンポーネントネストを避ける
+   - 必要な場合はcomposablesで抽象化
+
+3. **メモリリークの原因**:
+   - リスナーの適切なクリーンアップを確保
+   - コンポーネントアンマウント時にリソースを解放
+
+```vue
+<script setup>
+import { onBeforeUnmount } from 'vue'
+
+const cleanup = () => {
+  // リソースをクリーンアップ
+}
+
+onBeforeUnmount(() => {
+  cleanup()
+})
+</script>
+```
+
+## 6. セキュリティ考慮事項
+
+1. **入力のサニタイズ**:
+   - 外部から受け取る3Dモデルのパスを検証
+   - ユーザー入力を直接シェーダーコードに渡さない
+
+2. **リソース制限**:
+   - 大きなモデルのロード制限
+   - テクスチャサイズの制限
+
+3. **クロスオリジン**:
+   - CORS設定の適切な構成
+   - 信頼できるソースからのみリソースをロード
+
+このガイドラインに従うことで、TresJSを使用した効率的で保守可能な3Dアプリケーションを構築できます。Vueの宣言的アプローチとThree.jsの強力な3D機能を組み合わせることで、より直感的で管理しやすいコードベースを実現できます。

@@ -43,7 +43,7 @@ const items = [
 <template>
   <header class="relative border-b border-gray-200 backdrop-blur-xs ">
     <!-- ヘッダー -->
-    <div class="container mx-auto h-16 sticky top-0">
+    <div class="container md:mx-auto px-2 h-16 sticky top-0">
       <div class="h-full">
         <div class="flex items-center justify-between gap-3 h-full">
           <!-- 左側 -->

@@ -32,10 +32,10 @@ const date_span = computed(() => {
 
 <template>
   <div class="flex flex-col border border-white/10 shadow-2xl shadow-zinc-950/50 backdrop-blur-sm rounded-lg group">
-    <div class="flex items-center justify-center" @click="open = !open">
+    <div class="flex items-center justify-center sticky top-16 z-10" @click="open = !open">
       <div
         :class="[
-          'border-x border-b border-white/10 border-t-transparent px-4 shadow-md backdrop-blur-md',
+          'border-x border-b border-white/10 border-t-transparent px-4 shadow-md bg-neutral-700',
           'transition-all duration-500',
           open ? 'w-2/3' : 'w-full',
           open ? 'rounded-b-lg' : 'rounded-lg',
@@ -45,7 +45,7 @@ const date_span = computed(() => {
             <span class="whitespace-nowrap text-xs w-25">
               {{ date_span }}
             </span>
-            <span class="whitespace-nowrap text-lg font-semibold text-white/90">
+            <span class="md:text-lg text-sm font-semibold text-white/90 ">
               {{ data.title }}
             </span>
           </div>

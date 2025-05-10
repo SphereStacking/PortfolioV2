@@ -45,10 +45,9 @@ const date_span = computed(() => {
       'rounded-lg border border-black/10 dark:border-white/10 shadow-2xl shadow-neutral-950/10 backdrop-blur-sm overflow-hidden ',
     ]">
     <div class="border-neutral-200 px-4 py-2">
-      <div>{{ data.career?.title }}</div>
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center justify-between gap-2 flex-col md:flex-row">
         <h1 class="flex items-center gap-2">
-          <span class="whitespace-nowrap text-lg font-semibold">
+          <span class="text-lg font-semibold ">
             {{ data.title }}
           </span>
         </h1>

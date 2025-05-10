@@ -10,7 +10,7 @@ const { data: pinnedProjects } = await useAsyncData(() => queryCollection('proje
 </script>
 
 <template>
-  <div class="container mx-auto">
+  <div class="container md:mx-auto px-2 mb-16">
     <h1 class="text-4xl font-monomaniac-one my-8 text-center">
       My Project
     </h1>

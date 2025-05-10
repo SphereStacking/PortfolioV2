@@ -13,7 +13,7 @@ const { data } = await useAsyncData(() => queryCollection('blog')
     :left="false"
     :main="{ class: 'col-span-12' }"
     :right="false">
-    <div class="container mx-auto">
+    <div class="container md:mx-auto px-2 mb-16">
       <h1 class="text-4xl font-monomaniac-one my-8 text-center">
         Blog
       </h1>

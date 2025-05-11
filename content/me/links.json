@@ -1,0 +1,20 @@
+{
+    "GitHub": {
+        "name": "GitHub",
+        "url": "https://github.com/SphereStacking",
+        "icon": "line-md:github-loop",
+        "ogImage": "/og/GitHub.svg"
+    },
+    "X": {
+        "name": "X",
+        "url": "https://x.com/SphereStacking",
+        "icon": "line-md:twitter-x",
+        "ogImage": "/og/X.svg"
+    },
+    "hollowshelfie": {
+        "name": "Hollow Shelfie",
+        "url": "https://hollowshelfie.com/@Sphere",
+        "icon": "wpf:ghost",
+        "ogImage": "/og/HollowShelfie.svg"
+    }
+}

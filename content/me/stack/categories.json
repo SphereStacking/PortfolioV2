@@ -1,0 +1,95 @@
+{
+  "language": {
+    "id": "language",
+    "name": "プログラミング言語",
+    "displayName": "言語",
+    "description": "様々なプログラミング言語",
+    "icon": "i-heroicons-code-bracket",
+    "color": "info"
+  },
+  "runtime": {
+    "id": "runtime",
+    "name": "ランタイム環境",
+    "displayName": "ランタイム",
+    "description": "プログラミング言語の実行環境と実行エンジン",
+    "icon": "i-heroicons-cpu-chip",
+    "color": "warning"
+  },
+  "ecosystem": {
+    "id": "ecosystem",
+    "name": "エコシステム",
+    "displayName": "エコシステム",
+    "description": "特定の技術を中心としたツールや拡張機能のコレクション",
+    "icon": "i-heroicons-cube",
+    "color": "secondary"
+  },
+  "framework": {
+    "id": "framework",
+    "name": "フレームワーク",
+    "displayName": "FW",
+    "description": "アプリケーション開発のための包括的な基盤",
+    "icon": "i-heroicons-squares-2x2",
+    "color": "secondary",
+    "subtypes": {
+      "frontend-framework": "フロントエンドフレームワーク",
+      "backend-framework": "バックエンドフレームワーク",
+      "fullstack-framework": "フルスタックフレームワーク"
+    }
+  },
+  "library": {
+    "id": "library",
+    "name": "ライブラリ",
+    "displayName": "ライブラリ",
+    "description": "特定の機能を提供する再利用可能なコードコレクション",
+    "icon": "i-heroicons-puzzle-piece",
+    "color": "warning"
+  },
+  "database": {
+    "id": "database",
+    "name": "データベース",
+    "displayName": "DB",
+    "description": "データの保存と管理のためのシステム",
+    "icon": "i-heroicons-database",
+    "color": "success"
+  },
+  "tool": {
+    "id": "tool",
+    "name": "開発ツール",
+    "displayName": "ツール",
+    "description": "開発プロセスを支援するツールやユーティリティ",
+    "icon": "i-heroicons-wrench-screwdriver",
+    "color": "error"
+  },
+  "infrastructure": {
+    "id": "infrastructure",
+    "name": "インフラストラクチャ",
+    "displayName": "インフラ",
+    "description": "アプリケーションの実行環境とネットワーク基盤",
+    "icon": "i-heroicons-server",
+    "color": "primary"
+  },
+  "service": {
+    "id": "service",
+    "name": "サービス",
+    "displayName": "サービス",
+    "description": "SaaS、PaaS、マネージドサービスなど",
+    "icon": "i-heroicons-cloud-arrow-up",
+    "color": "indigo"
+  },
+  "cms": {
+    "id": "cms",
+    "name": "コンテンツ管理システム",
+    "displayName": "CMS",
+    "description": "コンテンツの作成・管理・公開を支援するシステム",
+    "icon": "i-heroicons-newspaper",
+    "color": "success"
+  },
+  "api": {
+    "id": "api",
+    "name": "APIと通信",
+    "displayName": "API",
+    "description": "アプリケーション間のデータ交換と機能連携",
+    "icon": "i-heroicons-globe-alt",
+    "color": "info"
+  }
+}

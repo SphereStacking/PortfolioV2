@@ -1,0 +1,34 @@
+{
+  "name": "Sphere / まんまる",
+  "profileImagePath": "/images/me.png",
+  "description": [
+    {
+      "text": "Fullstack",
+      "class": "line-through"
+    },
+    {
+      "text": " Web Engineer"
+    }
+  ],
+  "credit": "© 2024 Sphere. All rights reserved.",
+  "links": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/SphereStacking",
+      "icon": "line-md:github-loop",
+      "ogImage": "/og/GitHub.svg"
+    },
+    {
+      "name": "X",
+      "url": "https://x.com/SphereStacking",
+      "icon": "line-md:twitter-x",
+      "ogImage": "/og/X.svg"
+    },
+    {
+      "name": "Hollow Shelfie",
+      "url": "https://hollowshelfie.com/@Sphere",
+      "icon": "wpf:ghost",
+      "ogImage": "/og/HollowShelfie.svg"
+    }
+  ]
+}

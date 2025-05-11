@@ -41,7 +41,7 @@ const date_span = computed(() => {
   <div
     :id="data.title"
     :class="[
-      'group relative flex cursor-pointer flex-col gap-1',
+      'group relative flex cursor-pointer flex-col gap-1 bg-zinc-900',
       'rounded-lg border border-black/10 dark:border-white/10 shadow-2xl shadow-neutral-950/10 backdrop-blur-sm overflow-hidden ',
     ]">
     <div class="border-neutral-200 px-4 py-2">

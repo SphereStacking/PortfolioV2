@@ -9,14 +9,13 @@ const { data } = await useAsyncData(() => queryCollection('blog')
 </script>
 
 <template>
-  <ThreeColumnLayout
-    :left="false"
-    :main="{ class: 'col-span-12' }"
-    :right="false">
-    <div class="container md:mx-auto px-2 mb-16">
-      <h1 class="text-4xl font-monomaniac-one my-8 text-center">
+  <div class="min-h-screen pb-16">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-emerald-800 via-teal-500 to-green-200' }">
+      <template #title>
         Blog
-      </h1>
+      </template>
+    </PageHeader>
+    <div class="container md:mx-auto px-2 mb-16 mt-8">
       <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <li
           v-for="(post, index) in data"
@@ -31,7 +30,7 @@ const { data } = await useAsyncData(() => queryCollection('blog')
         </li>
       </ul>
     </div>
-  </ThreeColumnLayout>
+  </div>
 </template>
 
 <style scoped>

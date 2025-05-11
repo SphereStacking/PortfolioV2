@@ -35,7 +35,7 @@ const date_span = computed(() => {
     <div class="flex items-center justify-center sticky top-16 z-10" @click="open = !open">
       <div
         :class="[
-          'border-x border-b border-white/10 border-t-transparent px-4 shadow-md bg-neutral-700',
+          'border-x border-b border-white/10 border-t-transparent px-4 shadow-md bg-zinc-800',
           'transition-all duration-500',
           open ? 'w-2/3' : 'w-full',
           open ? 'rounded-b-lg' : 'rounded-lg',

@@ -1,0 +1,965 @@
+{
+  "javascript": {
+    "name": "JavaScript",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=javascript",
+    "category": "language",
+    "tags": [
+      "frontend",
+      "backend",
+      "web"
+    ],
+    "link": "https://ja.wikipedia.org/wiki/JavaScript",
+    "class": null,
+    "proficiency": 5
+  },
+  "typescript": {
+    "name": "TypeScript",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=typescript",
+    "category": "language",
+    "tags": [
+      "frontend",
+      "backend",
+      "web"
+    ],
+    "link": "https://www.typescriptlang.org/",
+    "class": null,
+    "proficiency": 4
+  },
+  "php": {
+    "name": "PHP",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=php",
+    "category": "language",
+    "tags": [
+      "backend",
+      "web"
+    ],
+    "link": "https://www.php.net/",
+    "class": null,
+    "proficiency": 5
+  },
+  "cs": {
+    "name": "C#",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=cs",
+    "category": "language",
+    "tags": [
+      "backend",
+      "desktop",
+      "dotnet"
+    ],
+    "link": "https://learn.microsoft.com/ja-jp/dotnet/csharp/",
+    "class": null
+  },
+  "cpp": {
+    "name": "C++",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=cpp",
+    "category": "language",
+    "tags": [
+      "server",
+      "desktop"
+    ],
+    "link": "https://isocpp.org/",
+    "class": null
+  },
+  "html": {
+    "name": "HTML",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=html",
+    "category": "language",
+    "tags": [
+      "frontend",
+      "web",
+      "ui"
+    ],
+    "link": "https://developer.mozilla.org/ja/docs/Web/HTML",
+    "class": null
+  },
+  "css": {
+    "name": "CSS",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=css",
+    "category": "language",
+    "tags": [
+      "frontend",
+      "web",
+      "ui"
+    ],
+    "link": "https://developer.mozilla.org/ja/docs/Web/CSS",
+    "class": null
+  },
+  "python": {
+    "name": "Python",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=python",
+    "category": "language",
+    "tags": [
+      "backend",
+      "data",
+      "server",
+      "ai"
+    ],
+    "link": "https://www.python.org/",
+    "class": null
+  },
+  "go": {
+    "name": "Go",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=golang",
+    "category": "language",
+    "tags": [
+      "backend",
+      "server"
+    ],
+    "link": "https://go.dev/",
+    "class": null
+  },
+  "nodejs": {
+    "name": "Node.js",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=nodejs",
+    "category": "runtime",
+    "tags": [
+      "backend",
+      "server",
+      "javascript"
+    ],
+    "link": "https://nodejs.org/",
+    "class": null
+  },
+  "vue": {
+    "name": "Vue.js",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=vuejs",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "frontend",
+      "web",
+      "vue"
+    ],
+    "link": "https://vuejs.org/",
+    "class": null,
+    "proficiency": 5
+  },
+  "nuxt": {
+    "name": "Nuxt",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=nuxtjs",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "frontend",
+      "web",
+      "vue",
+      "nuxt"
+    ],
+    "link": "https://nuxt.com/",
+    "class": null,
+    "proficiency": 5
+  },
+  "angular": {
+    "name": "Angular",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=angular",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "frontend",
+      "web"
+    ],
+    "link": "https://angular.io/",
+    "class": null
+  },
+  "tailwind": {
+    "name": "TailwindCSS",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=tailwindcss",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "ui",
+      "web",
+      "frontend",
+      "tailwind"
+    ],
+    "link": "https://tailwindcss.com/",
+    "class": null,
+    "proficiency": 4
+  },
+  "laravel": {
+    "name": "Laravel",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=laravel",
+    "category": "framework",
+    "subtype": "backend-framework",
+    "tags": [
+      "backend",
+      "web",
+      "laravel",
+      "php"
+    ],
+    "link": "https://laravel.com/",
+    "class": null,
+    "proficiency": 5
+  },
+  "fuelphp": {
+    "name": "FuelPHP",
+    "logo": "http://fuelphp.jp/common/images/drops.png",
+    "category": "framework",
+    "subtype": "backend-framework",
+    "tags": [
+      "backend",
+      "web",
+      "php"
+    ],
+    "link": "https://fuelphp.com/",
+    "class": "bg-[#242938] p-2 rounded-lg"
+  },
+  "dotnet": {
+    "name": ".NET",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=dotnet",
+    "category": "framework",
+    "subtype": "fullstack-framework",
+    "tags": [
+      "backend",
+      "web",
+      "desktop",
+      "dotnet"
+    ],
+    "link": "https://dotnet.microsoft.com/",
+    "class": null
+  },
+  "wordpress": {
+    "name": "WordPress",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=wordpress",
+    "category": "cms",
+    "tags": [
+      "web",
+      "backend",
+      "cms",
+      "php"
+    ],
+    "link": "https://ja.wordpress.org/",
+    "class": null
+  },
+  "wpf": {
+    "name": "WPF",
+    "logo": "https://img.shields.io/badge/wpf-8A2BE2",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "desktop",
+      "ui",
+      "dotnet"
+    ],
+    "link": "https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/",
+    "class": null
+  },
+  "winui": {
+    "name": "WinUI",
+    "logo": "https://raw.githubusercontent.com/microsoft/microsoft-ui-xaml/35c590bb28841eb9d466624bb828c78b939d4312/docs/images/winuiLogo.svg",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "desktop",
+      "ui",
+      "dotnet"
+    ],
+    "link": "https://github.com/microsoft/microsoft-ui-xaml",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "vitepress": {
+    "name": "VitePress",
+    "logo": "https://vitepress.dev/vitepress-logo-mini.svg",
+    "category": "framework",
+    "subtype": "frontend-framework",
+    "tags": [
+      "frontend",
+      "documentation",
+      "vue",
+      "static-site"
+    ],
+    "link": "https://vitepress.dev/",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "google-apps-script": {
+    "name": "Google Apps Script",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=googleappsscript",
+    "category": "framework",
+    "subtype": "backend-framework",
+    "tags": [
+      "backend",
+      "web",
+      "automation",
+      "javascript"
+    ],
+    "link": "https://developers.google.com/apps-script",
+    "class": null
+  },
+  "nuxt-content": {
+    "name": "Nuxt Content",
+    "logo": "https://img.shields.io/badge/Content-242938?logo=nuxt&style=flat-square",
+    "category": "ecosystem",
+    "tags": [
+      "frontend",
+      "web",
+      "vue",
+      "nuxt",
+      "documentation"
+    ],
+    "link": "https://content.nuxtjs.org/",
+    "class": "rounded-lg"
+  },
+  "nuxt-ui": {
+    "name": "Nuxt UI",
+    "logo": "https://img.shields.io/badge/UI-242938?logo=nuxt&style=flat-square",
+    "category": "ecosystem",
+    "tags": [
+      "frontend",
+      "web",
+      "ui",
+      "vue",
+      "nuxt"
+    ],
+    "link": "https://ui.nuxt.com/",
+    "class": "rounded-lg"
+  },
+  "laravel-forge": {
+    "name": "Laravel Forge",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=forge",
+    "category": "service",
+    "tags": [
+      "laravel",
+      "deployment",
+      "server"
+    ],
+    "link": "https://forge.laravel.com/",
+    "class": null
+  },
+  "laravel-sail": {
+    "name": "Laravel Sail",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=sail",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "containerization",
+      "development"
+    ],
+    "link": "https://github.com/laravel/sail",
+    "class": null
+  },
+  "laravel-jetstream": {
+    "name": "Laravel Jetstream",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=jetstream",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "auth",
+      "web",
+      "frontend"
+    ],
+    "link": "https://jetstream.laravel.com/",
+    "class": null
+  },
+  "laravel-inertia": {
+    "name": "Laravel Inertia",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=inertia",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "frontend",
+      "backend",
+      "web"
+    ],
+    "link": "https://inertiajs.com/",
+    "class": null
+  },
+  "laravel-scout": {
+    "name": "Laravel Scout",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=scout",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "data",
+      "search"
+    ],
+    "link": "https://github.com/laravel/scout",
+    "class": null
+  },
+  "laravel-socialite": {
+    "name": "Laravel Socialite",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=socialite",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "auth",
+      "web"
+    ],
+    "link": "https://github.com/laravel/socialite",
+    "class": null
+  },
+  "laravel-telescope": {
+    "name": "Laravel Telescope",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=telescope",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "testing",
+      "monitoring",
+      "development"
+    ],
+    "link": "https://github.com/laravel/telescope",
+    "class": null
+  },
+  "laravel-pint": {
+    "name": "Laravel Pint",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=pint",
+    "category": "ecosystem",
+    "tags": [
+      "laravel",
+      "testing",
+      "development",
+      "code-quality"
+    ],
+    "link": null,
+    "class": null
+  },
+  "vuetify": {
+    "name": "Vuetify",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=vuetify",
+    "category": "library",
+    "tags": [
+      "ui",
+      "web",
+      "vue",
+      "frontend"
+    ],
+    "link": "https://vuetifyjs.com/",
+    "class": null
+  },
+  "bootstrap": {
+    "name": "Bootstrap",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=bootstrap",
+    "category": "library",
+    "tags": [
+      "ui",
+      "web",
+      "frontend"
+    ],
+    "link": "https://getbootstrap.com/",
+    "class": null
+  },
+  "vueuse": {
+    "name": "VueUse",
+    "logo": "https://cdn.svgporn.com/logos/vueuse.svg",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "vue"
+    ],
+    "link": "https://vueuse.org/",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "aggrid": {
+    "name": "ag-grid",
+    "logo": "https://blog.ag-grid.com/content/images/2021/11/200pxArtboard-5.png",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "data",
+      "ui"
+    ],
+    "link": "https://www.ag-grid.com/",
+    "class": null
+  },
+  "chartjs": {
+    "name": "Chart.js",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=chartjs",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "data",
+      "visualization"
+    ],
+    "link": "https://www.chartjs.org/",
+    "class": null
+  },
+  "swiperjs": {
+    "name": "Swiper.js",
+    "logo": "https://swiperjs.com/images/swiper-logo.svg",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "ui"
+    ],
+    "link": "https://swiperjs.com/",
+    "class": null
+  },
+  "fullcalendar": {
+    "name": "FullCalendar",
+    "logo": "https://raw.githubusercontent.com/fullcalendar/fullcalendar-docs/refs/heads/main/src/styles/images/logo-64x64.png",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "ui",
+      "data"
+    ],
+    "link": "https://fullcalendar.io/",
+    "class": null
+  },
+  "tiptap": {
+    "name": "TipTap",
+    "logo": "https://raw.githubusercontent.com/ueberdosis/tiptap-docs/refs/heads/main/public/assets/images/tiptap-logo.png",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "ui",
+      "editor"
+    ],
+    "link": "https://tiptap.dev/",
+    "class": null
+  },
+  "daisyui": {
+    "name": "DaisyUI",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=daisyui",
+    "category": "library",
+    "tags": [
+      "ui",
+      "frontend",
+      "tailwind"
+    ],
+    "link": "https://daisyui.com/",
+    "class": null
+  },
+  "threejs": {
+    "name": "Three.js",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=threejs",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "3d",
+      "graphics"
+    ],
+    "link": "https://threejs.org/",
+    "class": null
+  },
+  "tresjs": {
+    "name": "Tres.js",
+    "logo": "https://tresjs.org/favicon.svg",
+    "category": "library",
+    "tags": [
+      "frontend",
+      "web",
+      "3d",
+      "graphics",
+      "vue"
+    ],
+    "link": "https://tresjs.org/",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "postgresql": {
+    "name": "PostgreSQL",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=postgresql",
+    "category": "database",
+    "tags": [
+      "backend",
+      "data",
+      "storage"
+    ],
+    "link": "https://www.postgresql.org/",
+    "class": null
+  },
+  "sqlserver": {
+    "name": "SQL Server",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=sqlserver",
+    "category": "database",
+    "tags": [
+      "backend",
+      "data",
+      "storage",
+      "dotnet"
+    ],
+    "link": "https://www.microsoft.com/ja-jp/sql-server",
+    "class": null
+  },
+  "prettier": {
+    "name": "Prettier",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=prettier",
+    "category": "tool",
+    "tags": [
+      "development",
+      "code-quality",
+      "javascript"
+    ],
+    "link": "https://prettier.io/",
+    "class": null
+  },
+  "eslint": {
+    "name": "ESLint",
+    "logo": "https://cdn.svgporn.com/logos/eslint.svg",
+    "category": "tool",
+    "tags": [
+      "testing",
+      "code-quality",
+      "javascript"
+    ],
+    "link": "https://eslint.org/",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "phpstan": {
+    "name": "PHPStan",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=phpstan",
+    "category": "tool",
+    "tags": [
+      "testing",
+      "code-quality",
+      "php"
+    ],
+    "link": "https://phpstan.org/",
+    "class": null
+  },
+  "cursor": {
+    "name": "Cursor",
+    "logo": "https://mintlify.s3-us-west-1.amazonaws.com/cursor/images/logo/app-logo.svg",
+    "category": "tool",
+    "tags": [
+      "development",
+      "code-editor",
+      "ai"
+    ],
+    "link": "https://www.cursor.com/",
+    "class": null
+  },
+  "vscode": {
+    "name": "VSCode",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=vscode",
+    "category": "tool",
+    "tags": [
+      "development",
+      "code-editor"
+    ],
+    "link": "https://code.visualstudio.com/",
+    "class": null
+  },
+  "visualstudio": {
+    "name": "Visual Studio",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=visualstudio",
+    "category": "tool",
+    "tags": [
+      "development",
+      "code-editor",
+      "dotnet"
+    ],
+    "link": "https://visualstudio.microsoft.com/",
+    "class": null
+  },
+  "phpstorm": {
+    "name": "PhpStorm",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=phpstorm",
+    "category": "tool",
+    "tags": [
+      "development",
+      "code-editor",
+      "php"
+    ],
+    "link": "https://www.jetbrains.com/phpstorm/",
+    "class": null
+  },
+  "slack": {
+    "name": "Slack",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=slack",
+    "category": "tool",
+    "tags": [
+      "communication",
+      "collaboration"
+    ],
+    "link": "https://slack.com/",
+    "class": null
+  },
+  "notion": {
+    "name": "Notion",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=notion",
+    "category": "tool",
+    "tags": [
+      "documentation",
+      "collaboration"
+    ],
+    "link": "https://www.notion.so/",
+    "class": null
+  },
+  "jira": {
+    "name": "Jira",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=jira",
+    "category": "tool",
+    "tags": [
+      "project-management",
+      "collaboration"
+    ],
+    "link": "https://www.atlassian.com/ja/software/jira",
+    "class": null
+  },
+  "github": {
+    "name": "GitHub",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=github",
+    "category": "service",
+    "tags": [
+      "version-control",
+      "deployment",
+      "collaboration",
+      "ci-cd"
+    ],
+    "link": "https://github.com/",
+    "class": null
+  },
+  "gitlab": {
+    "name": "GitLab",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=gitlab",
+    "category": "service",
+    "tags": [
+      "version-control",
+      "deployment",
+      "collaboration",
+      "ci-cd"
+    ],
+    "link": "https://gitlab.com/",
+    "class": null
+  },
+  "githubactions": {
+    "name": "GitHub Actions",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=githubactions",
+    "category": "service",
+    "tags": [
+      "testing",
+      "deployment",
+      "ci-cd"
+    ],
+    "link": "https://github.com/features/actions",
+    "class": null
+  },
+  "sentry": {
+    "name": "Sentry",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=sentry",
+    "category": "service",
+    "tags": [
+      "monitoring",
+      "error-tracking",
+      "debugging"
+    ],
+    "link": "https://sentry.io/",
+    "class": null
+  },
+  "meilisearch": {
+    "name": "Meilisearch",
+    "logo": "https://cdn.svgporn.com/logos/meilisearch.svg",
+    "category": "service",
+    "tags": [
+      "backend",
+      "search",
+      "data"
+    ],
+    "link": "https://www.meilisearch.com/",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "google-analytics": {
+    "name": "Google Analytics",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=googleanalytics",
+    "category": "service",
+    "tags": [
+      "monitoring",
+      "analytics",
+      "data"
+    ],
+    "link": "https://analytics.google.com/",
+    "class": null
+  },
+  "slidev": {
+    "name": "Slidev",
+    "logo": "https://cdn.svgporn.com/logos/slidev.svg",
+    "category": "tool",
+    "tags": [
+      "presentation",
+      "frontend",
+      "vue"
+    ],
+    "link": null,
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "rollupjs": {
+    "name": "Rollup.js",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=rollupjs",
+    "category": "tool",
+    "tags": [
+      "bundler",
+      "javascript",
+      "development"
+    ],
+    "link": "https://rollupjs.org/",
+    "class": null
+  },
+  "vite": {
+    "name": "Vite",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=vite",
+    "category": "tool",
+    "tags": [
+      "bundler",
+      "development",
+      "frontend",
+      "vue"
+    ],
+    "link": "https://vitejs.dev/",
+    "class": null
+  },
+  "cloudflare": {
+    "name": "Cloudflare",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=cloudflare",
+    "category": "service",
+    "tags": [
+      "performance",
+      "security",
+      "cdn",
+      "edge"
+    ],
+    "link": "https://www.cloudflare.com/",
+    "class": null
+  },
+  "aws": {
+    "name": "AWS",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=aws",
+    "category": "service",
+    "tags": [
+      "server",
+      "cloud",
+      "deployment",
+      "aws"
+    ],
+    "link": "https://aws.amazon.com/",
+    "class": null
+  },
+  "aws-sqs": {
+    "name": "AWS SQS",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=sqs",
+    "category": "service",
+    "tags": [
+      "backend",
+      "cloud",
+      "messaging",
+      "aws"
+    ],
+    "link": "https://aws.amazon.com/sqs/",
+    "class": null
+  },
+  "aws-lambda": {
+    "name": "AWS Lambda",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=lambda",
+    "category": "service",
+    "tags": [
+      "backend",
+      "cloud",
+      "serverless",
+      "aws"
+    ],
+    "link": "https://aws.amazon.com/lambda/",
+    "class": null
+  },
+  "digitalocean": {
+    "name": "Digital Ocean",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=digitalocean",
+    "category": "service",
+    "tags": [
+      "server",
+      "cloud",
+      "deployment"
+    ],
+    "link": "https://www.digitalocean.com/",
+    "class": null
+  },
+  "nginx": {
+    "name": "Nginx",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=nginx",
+    "category": "infrastructure",
+    "tags": [
+      "server",
+      "web-server",
+      "performance"
+    ],
+    "link": "https://www.nginx.com/",
+    "class": null
+  },
+  "docker": {
+    "name": "Docker",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=docker",
+    "category": "infrastructure",
+    "tags": [
+      "containerization",
+      "deployment",
+      "development"
+    ],
+    "link": "https://www.docker.com/",
+    "class": null
+  },
+  "windows": {
+    "name": "Windows",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=windows",
+    "category": "infrastructure",
+    "tags": [
+      "desktop",
+      "os"
+    ],
+    "link": "https://www.microsoft.com/ja-jp/windows",
+    "class": null
+  },
+  "linux": {
+    "name": "Linux",
+    "logo": "https://go-skill-icons.vercel.app/api/icons?i=linux",
+    "category": "infrastructure",
+    "tags": [
+      "server",
+      "os"
+    ],
+    "link": "https://www.linuxfoundation.org/",
+    "class": null
+  },
+  "websocket": {
+    "name": "WebSocket",
+    "logo": "https://cdn.svgporn.com/logos/websocket.svg",
+    "category": "api",
+    "tags": [
+      "realtime",
+      "web",
+      "communication"
+    ],
+    "link": "https://developer.mozilla.org/ja/docs/Web/API/WebSockets_API",
+    "class": "bg-gray-300 p-2 rounded-lg"
+  },
+  "google-maps-api": {
+    "name": "Google Maps API",
+    "logo": "https://cdn.svgporn.com/logos/google-maps.svg",
+    "category": "api",
+    "tags": [
+      "maps",
+      "location",
+      "frontend"
+    ],
+    "link": "https://developers.google.com/maps",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  },
+  "sendgrid": {
+    "name": "SendGrid",
+    "logo": "https://cdn.svgporn.com/logos/sendgrid-icon.svg",
+    "category": "service",
+    "tags": [
+      "email",
+      "notification",
+      "service"
+    ],
+    "link": "https://sendgrid.com/",
+    "class": "bg-[#242938] p-2 rounded-lg"
+  },
+  "openapi": {
+    "name": "OpenAPI",
+    "logo": "https://cdn.svgporn.com/logos/openapi-icon.svg",
+    "category": "api",
+    "tags": [
+      "documentation",
+      "specification",
+      "backend"
+    ],
+    "link": "https://www.openapis.org/",
+    "class": "bg-[#242938] p-1 rounded-lg"
+  }
+}

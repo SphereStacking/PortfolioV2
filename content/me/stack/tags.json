@@ -1,0 +1,503 @@
+[
+  {
+    "id": "frontend",
+    "name": "フロントエンド",
+    "color": "primary",
+    "icon": "i-heroicons-window",
+    "category": "role"
+  },
+  {
+    "id": "backend",
+    "name": "バックエンド",
+    "color": "neutral",
+    "icon": "i-heroicons-server",
+    "category": "role"
+  },
+  {
+    "id": "fullstack",
+    "name": "フルスタック",
+    "color": "secondary",
+    "icon": "i-heroicons-squares-2x2",
+    "category": "role"
+  },
+  {
+    "id": "devops",
+    "name": "DevOps",
+    "color": "info",
+    "icon": "i-heroicons-cog-6-tooth",
+    "category": "role"
+  },
+  {
+    "id": "web",
+    "name": "Web",
+    "color": "primary",
+    "icon": "i-heroicons-globe-alt",
+    "category": "platform"
+  },
+  {
+    "id": "desktop",
+    "name": "デスクトップ",
+    "color": "success",
+    "icon": "i-heroicons-computer-desktop",
+    "category": "platform"
+  },
+  {
+    "id": "mobile",
+    "name": "モバイル",
+    "color": "error",
+    "icon": "i-heroicons-device-phone-mobile",
+    "category": "platform"
+  },
+  {
+    "id": "server",
+    "name": "サーバー",
+    "color": "warning",
+    "icon": "i-heroicons-server-stack",
+    "category": "platform"
+  },
+  {
+    "id": "cloud",
+    "name": "クラウド",
+    "color": "primary",
+    "icon": "i-heroicons-cloud",
+    "category": "platform"
+  },
+  {
+    "id": "edge",
+    "name": "エッジ",
+    "color": "indigo",
+    "icon": "i-heroicons-globe-europe-africa",
+    "category": "platform"
+  },
+  {
+    "id": "serverless",
+    "name": "サーバーレス",
+    "color": "primary",
+    "icon": "i-heroicons-cloud-arrow-up",
+    "category": "platform"
+  },
+  {
+    "id": "ui",
+    "name": "UI/UX",
+    "color": "secondary",
+    "icon": "i-heroicons-rectangle-group",
+    "category": "function",
+    "subTags": [
+      "responsive",
+      "accessibility",
+      "animation"
+    ]
+  },
+  {
+    "id": "responsive",
+    "name": "レスポンシブ",
+    "color": "secondary",
+    "icon": "i-heroicons-device-phone-mobile",
+    "category": "function",
+    "parentTag": "ui"
+  },
+  {
+    "id": "accessibility",
+    "name": "アクセシビリティ",
+    "color": "primary",
+    "icon": "i-heroicons-eye",
+    "category": "function",
+    "parentTag": "ui"
+  },
+  {
+    "id": "animation",
+    "name": "アニメーション",
+    "color": "warning",
+    "icon": "i-heroicons-play",
+    "category": "function",
+    "parentTag": "ui"
+  },
+  {
+    "id": "data",
+    "name": "データ処理",
+    "color": "info",
+    "icon": "i-heroicons-circle-stack",
+    "category": "function",
+    "subTags": [
+      "storage",
+      "analytics",
+      "visualization",
+      "search"
+    ]
+  },
+  {
+    "id": "storage",
+    "name": "ストレージ",
+    "color": "secondary",
+    "icon": "i-heroicons-archive-box",
+    "category": "function",
+    "parentTag": "data"
+  },
+  {
+    "id": "analytics",
+    "name": "アナリティクス",
+    "color": "primary",
+    "icon": "i-heroicons-presentation-chart-line",
+    "category": "function",
+    "parentTag": "data"
+  },
+  {
+    "id": "visualization",
+    "name": "データ可視化",
+    "color": "info",
+    "icon": "i-heroicons-chart-pie",
+    "category": "function",
+    "parentTag": "data"
+  },
+  {
+    "id": "search",
+    "name": "検索",
+    "color": "secondary",
+    "icon": "i-heroicons-magnifying-glass",
+    "category": "function",
+    "parentTag": "data"
+  },
+  {
+    "id": "security",
+    "name": "セキュリティ",
+    "color": "error",
+    "icon": "i-heroicons-shield-check",
+    "category": "function",
+    "subTags": [
+      "auth",
+      "encryption"
+    ]
+  },
+  {
+    "id": "auth",
+    "name": "認証",
+    "color": "warning",
+    "icon": "i-heroicons-key",
+    "category": "function",
+    "parentTag": "security"
+  },
+  {
+    "id": "encryption",
+    "name": "暗号化",
+    "color": "neutral",
+    "icon": "i-heroicons-lock-closed",
+    "category": "function",
+    "parentTag": "security"
+  },
+  {
+    "id": "performance",
+    "name": "パフォーマンス",
+    "color": "warning",
+    "icon": "i-heroicons-bolt",
+    "category": "function",
+    "subTags": [
+      "optimization",
+      "caching"
+    ]
+  },
+  {
+    "id": "optimization",
+    "name": "最適化",
+    "color": "success",
+    "icon": "i-heroicons-arrows-pointing-in",
+    "category": "function",
+    "parentTag": "performance"
+  },
+  {
+    "id": "caching",
+    "name": "キャッシュ",
+    "color": "info",
+    "icon": "i-heroicons-clock",
+    "category": "function",
+    "parentTag": "performance"
+  },
+  {
+    "id": "communication",
+    "name": "通信",
+    "color": "success",
+    "icon": "i-heroicons-chat-bubble-left-right",
+    "category": "function",
+    "subTags": [
+      "realtime",
+      "messaging",
+      "api"
+    ]
+  },
+  {
+    "id": "realtime",
+    "name": "リアルタイム",
+    "color": "primary",
+    "icon": "i-heroicons-clock",
+    "category": "function",
+    "parentTag": "communication"
+  },
+  {
+    "id": "messaging",
+    "name": "メッセージング",
+    "color": "info",
+    "icon": "i-heroicons-envelope",
+    "category": "function",
+    "parentTag": "communication"
+  },
+  {
+    "id": "api",
+    "name": "API",
+    "color": "success",
+    "icon": "i-heroicons-arrow-path",
+    "category": "function",
+    "parentTag": "communication"
+  },
+  {
+    "id": "state-management",
+    "name": "状態管理",
+    "color": "warning",
+    "icon": "i-heroicons-arrow-path",
+    "category": "function"
+  },
+  {
+    "id": "i18n",
+    "name": "国際化",
+    "color": "info",
+    "icon": "i-heroicons-globe-alt",
+    "category": "function"
+  },
+  {
+    "id": "3d",
+    "name": "3D",
+    "color": "error",
+    "icon": "i-heroicons-cube-transparent",
+    "category": "function"
+  },
+  {
+    "id": "graphics",
+    "name": "グラフィックス",
+    "color": "success",
+    "icon": "i-heroicons-photo",
+    "category": "function"
+  },
+  {
+    "id": "containerization",
+    "name": "コンテナ化",
+    "color": "secondary",
+    "icon": "i-heroicons-cube",
+    "category": "function"
+  },
+  {
+    "id": "laravel",
+    "name": "Laravel",
+    "color": "error",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "vue",
+    "name": "Vue.js",
+    "color": "success",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "dotnet",
+    "name": ".NET",
+    "color": "primary",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "aws",
+    "name": "AWS",
+    "color": "warning",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "nuxt",
+    "name": "Nuxt.js",
+    "color": "success",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "react",
+    "name": "React",
+    "color": "info",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "php",
+    "name": "PHP",
+    "color": "indigo",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "javascript",
+    "name": "JavaScript",
+    "color": "yellow",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "tailwind",
+    "name": "Tailwind",
+    "color": "cyan",
+    "icon": "i-heroicons-cube",
+    "category": "ecosystem"
+  },
+  {
+    "id": "design",
+    "name": "設計",
+    "color": "primary",
+    "icon": "i-heroicons-pencil-square",
+    "category": "phase"
+  },
+  {
+    "id": "development",
+    "name": "開発",
+    "color": "success",
+    "icon": "i-heroicons-code-bracket",
+    "category": "phase",
+    "subTags": [
+      "implementation",
+      "code-quality",
+      "code-editor"
+    ]
+  },
+  {
+    "id": "implementation",
+    "name": "実装",
+    "color": "success",
+    "icon": "i-heroicons-code-bracket",
+    "category": "phase",
+    "parentTag": "development"
+  },
+  {
+    "id": "code-quality",
+    "name": "コード品質",
+    "color": "primary",
+    "icon": "i-heroicons-sparkles",
+    "category": "phase",
+    "parentTag": "development"
+  },
+  {
+    "id": "code-editor",
+    "name": "コードエディタ",
+    "color": "secondary",
+    "icon": "i-heroicons-document-text",
+    "category": "phase",
+    "parentTag": "development"
+  },
+  {
+    "id": "testing",
+    "name": "テスト",
+    "color": "error",
+    "icon": "i-heroicons-check-circle",
+    "category": "phase"
+  },
+  {
+    "id": "deployment",
+    "name": "デプロイ",
+    "color": "warning",
+    "icon": "i-heroicons-arrow-up-on-square",
+    "category": "phase"
+  },
+  {
+    "id": "monitoring",
+    "name": "監視",
+    "color": "secondary",
+    "icon": "i-heroicons-chart-bar",
+    "category": "phase"
+  },
+  {
+    "id": "maintenance",
+    "name": "保守",
+    "color": "primary",
+    "icon": "i-heroicons-wrench",
+    "category": "phase"
+  },
+  {
+    "id": "ci-cd",
+    "name": "CI/CD",
+    "color": "error",
+    "icon": "i-heroicons-arrow-path-rounded-square",
+    "category": "phase"
+  },
+  {
+    "id": "ecommerce",
+    "name": "Eコマース",
+    "color": "success",
+    "icon": "i-heroicons-shopping-cart",
+    "category": "domain"
+  },
+  {
+    "id": "finance",
+    "name": "金融",
+    "color": "info",
+    "icon": "i-heroicons-banknotes",
+    "category": "domain"
+  },
+  {
+    "id": "education",
+    "name": "教育",
+    "color": "secondary",
+    "icon": "i-heroicons-academic-cap",
+    "category": "domain"
+  },
+  {
+    "id": "healthcare",
+    "name": "医療",
+    "color": "error",
+    "icon": "i-heroicons-heart",
+    "category": "domain"
+  },
+  {
+    "id": "entertainment",
+    "name": "エンターテイメント",
+    "color": "warning",
+    "icon": "i-heroicons-film",
+    "category": "domain"
+  },
+  {
+    "id": "ai",
+    "name": "AI/機械学習",
+    "color": "secondary",
+    "icon": "i-heroicons-cpu-chip",
+    "category": "domain"
+  },
+  {
+    "id": "version-control",
+    "name": "バージョン管理",
+    "color": "warning",
+    "icon": "i-heroicons-arrow-path",
+    "category": "function"
+  },
+  {
+    "id": "collaboration",
+    "name": "コラボレーション",
+    "color": "info",
+    "icon": "i-heroicons-user-group",
+    "category": "function"
+  },
+  {
+    "id": "project-management",
+    "name": "プロジェクト管理",
+    "color": "warning",
+    "icon": "i-heroicons-clipboard-document-list",
+    "category": "function"
+  },
+  {
+    "id": "documentation",
+    "name": "ドキュメント",
+    "color": "neutral",
+    "icon": "i-heroicons-document-text",
+    "category": "function"
+  },
+  {
+    "id": "bundler",
+    "name": "バンドラー",
+    "color": "warning",
+    "icon": "i-heroicons-archive-box-arrow-down",
+    "category": "function"
+  }
+]

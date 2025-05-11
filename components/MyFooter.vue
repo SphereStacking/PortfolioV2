@@ -2,7 +2,7 @@
 const { credit, links } = useMyProfile()
 
 const pages = {
-  Links: Object.values(links).map(link => ({
+  Links: links.map(link => ({
     component: 'NuxtLink',
     url: link.url,
     label: link.name,
@@ -16,7 +16,7 @@ const pages = {
 
 <template>
   <footer class="space-y-4 bg-base-300 p-4 text-center">
-    <div class="mx-auto grid max-w-4xl  grid-cols-2 gap-2 md:grid-cols-6 md:gap-12">
+    <div class="mx-auto grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-6 md:gap-12">
       <AppMark class="col-span-3 row-span-full h-14 md:col-span-1" />
       <div v-for="(items, section) in pages" :key="section" class="text-left">
         <p class="text-lg font-bold">
@@ -25,7 +25,9 @@ const pages = {
         <ul class="list-none">
           <li v-for="link in items" :key="link.url">
             <component
-              :is="link.component" :to="link.url" class="text-sm hover:underline"
+              :is="link.component"
+              :to="link.url"
+              class="text-sm hover:underline"
               :target="link.target">
               {{ link.label }}
             </component>

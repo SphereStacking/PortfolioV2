@@ -20,21 +20,25 @@ const careersWithProjects = computed(() => {
 </script>
 
 <template>
-  <div class="container mx-auto">
-    <h1 class="text-4xl font-monomaniac-one my-8 text-center">
-      Career
-    </h1>
-    <ul class="grid grid-cols-1 gap-8">
-      <li
-        v-for="(career, index) in careersWithProjects"
-        :key="career.id">
-        <motion.ul
-          :initial="{ opacity: 0, y: 20 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.5, delay: index * 0.1 }">
-          <CareerCard :data="career" />
-        </motion.ul>
-      </li>
-    </ul>
+  <div class="min-h-screen pb-16">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-green-800 via-green-500 to-green-200' }">
+      <template #title>
+        Career
+      </template>
+    </PageHeader>
+    <div class="container md:mx-auto px-2 mb-16 mt-8">
+      <ul class="grid grid-cols-1 gap-8">
+        <li
+          v-for="(career, index) in careersWithProjects"
+          :key="career.id">
+          <motion.ul
+            :initial="{ opacity: 0, y: 20 }"
+            :animate="{ opacity: 1, y: 0 }"
+            :transition="{ duration: 0.5, delay: index * 0.1 }">
+            <CareerCard :data="career" />
+          </motion.ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>

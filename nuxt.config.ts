@@ -1,16 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineNuxtConfig({
   modules: [
     '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/icon',
     '@nuxt/image',
-    '@nuxt/ui',
     '@tresjs/nuxt',
     'dayjs-nuxt',
     'nuxt-og-image',
     'motion-v/nuxt',
     '@nuxt/scripts',
+    'shadcn-nuxt',
   ],
   devtools: {
     enabled: true,
@@ -31,11 +33,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  css: ['~/assets/css/main.css'],
-  colorMode: {
-    // TODO: デフォルトをDarkにする いつか両方対応したい
-    preference: 'dark',
-  },
+  css: ['~/assets/css/tailwind.css'],
   content: {
     // TODO: ホットリロードのエラー問題(https://github.com/nuxt/nuxt/issues/15201)が発生しているため、一旦無効化
     // https://content.nuxt.com/docs/getting-started/configuration#watch
@@ -49,6 +47,9 @@ export default defineNuxtConfig({
   },
   vite: {
     assetsInclude: ['**/*.glsl'],
+    plugins: [
+      tailwindcss(),
+    ],
   },
   eslint: {
     config: {
@@ -69,6 +70,17 @@ export default defineNuxtConfig({
         id: 'G-8BWRNH7DMP',
       },
     },
+  },
+  shadcn: {
+    /**
+     * Prefix for all the imported component
+     */
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * @default "./components/ui"
+     */
+    componentDir: './components/ui',
   },
   tres: {
     devtools: true,

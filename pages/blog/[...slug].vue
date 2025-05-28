@@ -62,7 +62,7 @@ const links = computed(() => {
         :initial="{ opacity: 0, y: 20 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.5, delay: 0 }" class="mt-2">
-        <UBreadcrumb :items="items" />
+        <Breadcrumb :items="items" />
       </motion.div>
       <motion.h1
         id="top"
@@ -75,7 +75,7 @@ const links = computed(() => {
         :initial="{ opacity: 0, y: 20 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.5, delay: 0.2 }" class="flex items-center gap-2">
-        <UBadge v-for="tag in page?.tags" :key="tag" :label="tag" />
+        <Badge v-for="tag in page?.tags" :key="tag" :label="tag" />
       </motion.div>
       <motion.div
         :initial="{ opacity: 0, y: 20 }"

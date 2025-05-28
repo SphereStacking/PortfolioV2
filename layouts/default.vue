@@ -13,7 +13,7 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col relative">
+  <div class="min-h-screen flex flex-col relative bg-background">
     <!-- ヘッダー -->
     <MyHeader class="sticky top-0 z-50" />
 
@@ -23,6 +23,6 @@ useHead({
     </main>
 
     <!-- フッター -->
-    <MyFooter class="bg-black" />
+    <MyFooter class="bg-background" />
   </div>
 </template>

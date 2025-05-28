@@ -16,12 +16,12 @@ const component = computed(() => {
 </script>
 
 <template>
-  <UTooltip v-if="stackData?.logo" :text="stackData?.name">
+  <Tooltip v-if="stackData?.logo" :text="stackData?.name">
     <component :is="component" :to="stackData?.link" target="_blank">
       <img
         v-bind="$attrs"
         :src="stackData?.logo"
         :class="stackData?.class">
     </component>
-  </UTooltip>
+  </Tooltip>
 </template>

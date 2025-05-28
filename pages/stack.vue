@@ -29,7 +29,7 @@ const {
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-teal-800 via-teal-500 to-teal-200' }">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-teal-800/70 via-teal-500/70 to-teal-200/80' }">
       <template #title>
         My Tech Stack
       </template>
@@ -39,66 +39,44 @@ const {
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">
-          <UInput
+          <Input
             v-model="searchQuery"
             placeholder="技術名やタグで検索..."
-            icon="i-heroicons-magnifying-glass"
-            size="lg"
-            class="w-full shadow-lg rounded-full border-0 transition-all">
-            <template #trailing>
-              <div class="flex items-center">
-                <Icon v-if="isLoading" name="i-heroicons-arrow-path" class="animate-spin mr-2 text-gray-400" />
-                <UButton
-                  v-if="searchQuery || selectedType"
-                  size="sm"
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-x-mark"
-                  @click="resetFilters" />
-              </div>
-            </template>
-          </UInput>
+            variant="outline"
+            size="lg" />
+          <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
+            <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
+            <Button
+              v-if="searchQuery || selectedType"
+              variant="outline" size="xs" rounded="full"
+              @click="resetFilters">
+              <Icon name="heroicons:x-mark" />
+            </Button>
+          </div>
         </div>
       </template>
     </PageHeader>
     <div class="container mx-auto px-4 -mt-8 relative z-10">
-      <!-- 技術タイプとソートオプション -->
-      <div class="rounded-xl shadow-lg p-4 mb-8 bg-zinc-900">
+      <Card class="p-4 mb-8 flex flex-wrap gap-2">
         <!-- タイプフィルター -->
         <div class="flex flex-wrap gap-2">
           <!-- すべて表示ボタン -->
-          <UButton
-            :color="techCount === totalTechCount ? 'primary' : 'neutral'"
-            :variant="techCount === totalTechCount ? 'solid' : 'ghost'"
-            class="rounded-full whitespace-nowrap"
-            @click="resetFilters">
-            <UIcon name="i-heroicons-eye" class="mr-1" />
+          <Button variant="outline" @click="resetFilters">
+            <Icon name="heroicons:eye" />
             すべて
-            <UBadge
-              :color="techCount === totalTechCount ? 'primary' : 'neutral'"
-              :variant="techCount === totalTechCount ? 'solid' : 'soft'"
-              class="ml-2">
-              {{ totalTechCount }}
-            </UBadge>
-          </UButton>
-          <UButton
+            <Badge>{{ totalTechCount }}</Badge>
+          </Button>
+          <Button
             v-for="type in techTypes"
             :key="type.id"
-            :color="selectedType === type.id ? 'primary' : 'neutral'"
-            :variant="selectedType === type.id ? 'solid' : 'ghost'"
-            class="rounded-full whitespace-nowrap"
+            variant="outline"
             @click="setTechType(type.id)">
-            <UIcon :name="type.icon" class="mr-1" />
+            <Icon :name="type.icon" />
             {{ type.name }}
-            <UBadge
-              :color="selectedType === type.id ? 'primary' : 'neutral'"
-              :variant="selectedType === type.id ? 'solid' : 'soft'"
-              class="ml-2">
-              {{ techCountByType[type.id] || 0 }}
-            </UBadge>
-          </UButton>
+            <Badge>{{ techCountByType[type.id] || 0 }}</Badge>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       <!-- 技術スタック一覧 -->
       <AsyncStateView
@@ -109,18 +87,16 @@ const {
         </template>
         <template #fallback>
           <div class="text-center py-16 rounded-xl shadow-lg mt-6">
-            <UIcon name="i-heroicons-magnifying-glass" class="text-6xl text-gray-300 dark:text-gray-600 mx-auto mb-6" />
-            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+            <Icon name="heroicons:magnifying-glass" class="text-6xl mx-auto mb-6" />
+            <h3 class="text-xl font-bold mb-2">
               該当する技術が見つかりませんでした
             </h3>
-            <p class="text-gray-500 mb-8 max-w-md mx-auto">
+            <p class="mb-8 max-w-md mx-auto">
               「{{ debouncedSearch }}」に一致する技術やタグは見つかりませんでした。検索条件を変更してみてください。
             </p>
-            <UButton
-              variant="solid" color="primary"
-              @click="resetFilters">
+            <Button variant="default" color="primary" @click="resetFilters">
               フィルターをリセット
-            </UButton>
+            </Button>
           </div>
         </template>
         <template #default>
@@ -131,9 +107,7 @@ const {
               :animate="{ opacity: 1, y: 0 }"
               :transition="{ duration: 0.5, delay: index * 0.05 }"
               class="size-full">
-              <UCard
-
-                class="group size-full hover:shadow-xl transition-all duration-300 overflow-hidden border-0 bg-zinc-900">
+              <Card class="group size-full gap-2 p-4">
                 <NuxtLink
                   :to="tech.link ?? '#'"
                   target="_blank"
@@ -142,31 +116,30 @@ const {
                     class="w-14 h-14 rounded-lg flex items-center justify-center overflow-hidden">
                     <SkillIcon :stack="tech.id" />
                   </div>
-                  <div>
-                    <h3 class="text-xl font-bold flex items-center group-hover:text-primary-500 transition-colors">
+                  <div class="space-y-2">
+                    <CardTitle>
                       {{ tech.name }}
-                    </h3>
-                    <div class="text-xs text-gray-500 mt-1 flex items-center">
-                      <UIcon :name="techTypes.find(t => t.id === getTechType(tech))?.icon || 'i-heroicons-code-bracket'" class="mr-1" />
+                    </CardTitle>
+                    <CardDescription>
+                      <Icon :name="techTypes.find(t => t.id === getTechType(tech))?.icon || 'heroicons:code-bracket'" class="mr-1" />
                       {{ techTypes.find(t => t.id === getTechType(tech))?.name || '技術' }}
-                    </div>
+                    </CardDescription>
                   </div>
                 </NuxtLink>
-
                 <!-- タグ一覧 -->
                 <div v-if="tech.tags && tech.tags.length > 0" class="mt-4">
                   <div class="flex flex-wrap gap-2">
-                    <UBadge
+                    <Badge
                       v-for="tagId in tech.tags"
                       :key="tagId"
                       :color="getTag(tagId)?.color || 'neutral'"
-                      variant="soft"
+                      variant="outline"
                       size="sm">
                       {{ getTag(tagId)?.name }}
-                    </UBadge>
+                    </Badge>
                   </div>
                 </div>
-              </UCard>
+              </Card>
             </motion.div>
           </div>
         </template>

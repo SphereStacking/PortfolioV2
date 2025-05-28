@@ -1,7 +1,7 @@
 <template>
-  <UApp>
+  <TooltipProvider>
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-  </UApp>
+  </TooltipProvider>
 </template>

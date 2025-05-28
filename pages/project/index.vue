@@ -11,7 +11,7 @@ const { data: pinnedProjects } = await useAsyncData(() => queryCollection('proje
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-lime-800 via-lime-500 to-lime-200' }">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-lime-800/70 via-lime-500/70 to-lime-200/70' }">
       <template #title>
         My Project
       </template>

@@ -13,7 +13,24 @@ const careersWithProjects = computed(() => {
   return careers.value?.map((career) => {
     return {
       ...career,
-      projects: projects.value?.filter(project => project.career_unique_code === career.unique_code),
+      projects: projects.value?.filter(project => project.career_unique_code === career.unique_code)
+        .map(project => ({
+          id: project.id,
+          title: project.title,
+          description: project.description,
+          status: project.status,
+          tags: project.tags,
+          icon: project.icon,
+          period_start: project.period_start,
+          period_end: project.period_end,
+          pinned: project.pinned,
+          stacks: project.stacks,
+          overview: project.overview,
+          tasks: project.tasks,
+          team: project.team,
+          role: project.role,
+          links: project.links,
+        })) || [],
     }
   })
 })
@@ -21,7 +38,7 @@ const careersWithProjects = computed(() => {
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-green-800 via-green-500 to-green-200' }">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-green-800/70 via-green-500/70 to-green-200/70' }">
       <template #title>
         Career
       </template>

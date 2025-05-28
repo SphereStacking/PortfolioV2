@@ -31,11 +31,11 @@ const date_span = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col border border-white/10 shadow-2xl shadow-zinc-950/50 backdrop-blur-sm rounded-lg group">
+  <div class="flex flex-col border  shadow-xl backdrop-blur-sm rounded-lg group">
     <div class="flex items-center justify-center sticky top-16 z-10" @click="open = !open">
       <div
         :class="[
-          'border-x border-b border-white/10 border-t-transparent px-4 shadow-md bg-zinc-800',
+          'border-x border-b border-t-transparent px-4 ',
           'transition-all duration-500',
           open ? 'w-2/3' : 'w-full',
           open ? 'rounded-b-lg' : 'rounded-lg',
@@ -56,7 +56,7 @@ const date_span = computed(() => {
               open ? '-rotate-135' : 'rotate-0',
               open ? 'group-hover:bg-error-500' : 'group-hover:bg-primary-500',
             ]">
-            <UIcon
+            <Icon
               name="mdi:plus"
               size="sm" />
           </div>

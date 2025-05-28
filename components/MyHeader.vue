@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MyNavigation from './project/MyNavigation.vue'
 import ColorModeDropdown from './modules/colorMode/ColorModeDropdown.vue'
+import ProfileLinksDropdown from './ProfileLinksDropdown.vue'
 </script>
 
 <template>
@@ -20,6 +21,7 @@ import ColorModeDropdown from './modules/colorMode/ColorModeDropdown.vue'
           <!-- 右側 -->
           <div class="flex items-center justify-end lg:flex-1 gap-1.5">
             <ColorModeDropdown />
+            <ProfileLinksDropdown />
           </div>
         </div>
       </div>

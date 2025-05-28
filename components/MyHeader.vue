@@ -1,39 +1,6 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
-
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const isOpen = ref(props.modelValue)
-
-// モデル値の変更を監視
-watch(() => props.modelValue, (newValue) => {
-  isOpen.value = newValue
-})
-
-// 内部状態が変更されたときにイベントを発生
-watch(isOpen, (newValue) => {
-  emit('update:modelValue', newValue)
-})
-
-const items = [
-  { label: 'Blog', to: '/blog' },
-
-  {
-    label: 'Me',
-    children: [
-      { label: 'Career', to: '/career' },
-      { label: 'Stack', to: '/stack' },
-    ],
-  },
-  { label: 'Project', to: '/project' },
-]
+import MyNavigation from './project/MyNavigation.vue'
+import ColorModeDropdown from './modules/colorMode/ColorModeDropdown.vue'
 </script>
 
 <template>
@@ -48,12 +15,11 @@ const items = [
           </div>
 
           <!-- 中央 -->
-          <div class="flex">
-          </div>
+          <MyNavigation />
 
           <!-- 右側 -->
           <div class="flex items-center justify-end lg:flex-1 gap-1.5">
-            <UNavigationMenu :items="items" class="font-monomaniac-one text-lg" />
+            <ColorModeDropdown />
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     'motion-v/nuxt',
     '@nuxt/scripts',
     'shadcn-nuxt',
+    '@nuxt/fonts',
   ],
   devtools: {
     enabled: true,

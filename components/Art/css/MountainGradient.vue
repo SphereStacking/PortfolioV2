@@ -1,25 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 
-defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
-  style: {
-    type: Object,
-    default: () => ({}),
-  },
-})
-
 // 山の形状（SVG）
 const mountainMasks = {
   mountain1: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Cpath d="M0,100 L20,60 L40,80 L60,40 L80,70 L100,30 L100,100 Z" fill="%23000000"/%3E%3C/svg%3E',
@@ -124,8 +105,7 @@ const waterfall = ref({
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
-    :style="style">
+    :class="['relative overflow-hidden rounded-lg size-full']">
     <div class="absolute inset-0 mountain-background"></div>
 
     <!-- 雲 -->

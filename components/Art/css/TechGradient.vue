@@ -62,7 +62,7 @@ onBeforeUnmount(() => {
   if (intervalId) clearInterval(intervalId)
 })
 
-// データストリーム
+// データストリーム（最適化: 固定配置）
 const dataStreams = ref([
   {
     id: 1,
@@ -191,40 +191,42 @@ const dataStreams = ref([
   animation: glitch-flicker 2s linear infinite;
   text-shadow: 0 0 2px currentColor;
   pointer-events: none;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 @keyframes glitch-flicker {
   0%, 100% {
-    opacity: var(--opacity);
-    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
   }
   10% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.1) skew(5deg);
+    transform: translate(-50%, -50%) scale(1.1) skew(5deg) translateZ(0);
   }
   20% {
-    opacity: var(--opacity);
-    transform: translate(-48%, -50%) scale(1);
+    opacity: 0.6;
+    transform: translate(-48%, -50%) scale(1) translateZ(0);
   }
   30% {
     opacity: 0.1;
-    transform: translate(-50%, -48%) scale(0.9);
+    transform: translate(-50%, -48%) scale(0.9) translateZ(0);
   }
   40% {
-    opacity: var(--opacity);
-    transform: translate(-52%, -50%) scale(1);
+    opacity: 0.6;
+    transform: translate(-52%, -50%) scale(1) translateZ(0);
   }
   50% {
     opacity: 0;
   }
   60% {
-    opacity: var(--opacity);
-    transform: translate(-50%, -52%) scale(1.05);
+    opacity: 0.6;
+    transform: translate(-50%, -52%) scale(1.05) translateZ(0);
   }
   90% {
     opacity: 0.2;
-    transform: translate(-50%, -50%) scale(1) skew(-5deg);
+    transform: translate(-50%, -50%) scale(1) skew(-5deg) translateZ(0);
   }
 }
 
@@ -233,6 +235,9 @@ const dataStreams = ref([
   position: absolute;
   background: linear-gradient(to right, transparent, #0ea5e9, transparent);
   animation: stream-flow 3s linear infinite;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .data-stream-v {
@@ -245,9 +250,17 @@ const dataStreams = ref([
 }
 
 @keyframes stream-flow {
-  from { opacity: 0; transform: scale(0, 1); }
-  50% { opacity: 0.8; }
-  to { opacity: 0; transform: scale(1, 1); }
+  from { 
+    opacity: 0; 
+    transform: scale(0, 1) translateZ(0); 
+  }
+  50% { 
+    opacity: 0.8; 
+  }
+  to { 
+    opacity: 0; 
+    transform: scale(1, 1) translateZ(0); 
+  }
 }
 
 /* スキャンライン */
@@ -262,6 +275,9 @@ const dataStreams = ref([
     );
   animation: scan 8s linear infinite;
   pointer-events: none;
+  transform: translateZ(0);
+  will-change: background-position;
+  backface-visibility: hidden;
 }
 
 @keyframes scan {
@@ -275,6 +291,9 @@ const dataStreams = ref([
   background-image:
     repeating-radial-gradient(circle at 0 0, transparent 0, #ffffff 1px, transparent 2px, transparent 3px);
   animation: noise-anim 0.2s steps(10) infinite;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 @keyframes noise-anim {

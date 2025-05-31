@@ -1,83 +1,79 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 
-// Mouse interaction
-const mouseX = ref(0)
-const mouseY = ref(0)
+defineProps({
+  style: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 
-const handleMouseMove = (e) => {
-  const rect = e.currentTarget.getBoundingClientRect()
-  mouseX.value = (e.clientX - rect.left) / rect.width - 0.5
-  mouseY.value = (e.clientY - rect.top) / rect.height - 0.5
+// パフォーマンス最適化：要素の可視性を追跡
+const target = ref(null)
+const isVisible = ref(false)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }]) => {
+    isVisible.value = isIntersecting
+  },
+  { threshold: 0.1 }
+)
+
+onUnmounted(() => {
+  stop()
+})
+
+// 星の数を固定値で管理（CSSで制御）
+const starCounts = {
+  far: 20,
+  mid: 15,
+  near: 10,
+  shooting: 3
 }
 </script>
 
 <template>
-  <div class="relative h-64 w-full overflow-hidden rounded-lg cosmos-container" @mousemove="handleMouseMove">
+  <div
+    ref="target"
+    class="relative size-full overflow-hidden rounded-lg cosmos-container">
     <!-- Deep Space Background -->
     <div class="absolute inset-0 cosmos-background"></div>
     <div class="absolute inset-0 cosmos-shadow"></div>
 
-    <!-- Parallax Star Layers -->
+    <!-- Parallax Star Layers - CSSで制御 -->
     <!-- Far stars layer -->
     <div
-      class="absolute inset-0 star-layer"
-      :style="{
-        transform: `translate(${mouseX * 10}px, ${mouseY * 10}px)`,
-      }">
+      v-if="isVisible"
+      class="absolute inset-0 star-layer star-layer-far">
       <div
-        v-for="(_, i) in 80"
+        v-for="i in starCounts.far"
         :key="`far-${i}`"
-        class="absolute rounded-full bg-white star-far"
-        :style="{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          width: `${Math.random() * 1.5 + 0.5}px`,
-          height: `${Math.random() * 1.5 + 0.5}px`,
-          opacity: Math.random() * 0.6 + 0.2,
-          animationDelay: `${Math.random() * 10}s`,
-        }"></div>
+        :class="`star-far star-${i}`"
+        :style="`--star-index: ${i}`"></div>
     </div>
 
     <!-- Mid stars layer -->
     <div
-      class="absolute inset-0 star-layer"
-      :style="{
-        transform: `translate(${mouseX * 20}px, ${mouseY * 20}px)`,
-      }">
+      v-if="isVisible"
+      class="absolute inset-0 star-layer star-layer-mid">
       <div
-        v-for="(_, i) in 40"
+        v-for="i in starCounts.mid"
         :key="`mid-${i}`"
-        class="absolute rounded-full bg-white star-mid"
-        :style="{
-          'top': `${Math.random() * 100}%`,
-          'left': `${Math.random() * 100}%`,
-          'width': `${Math.random() * 2 + 1}px`,
-          'height': `${Math.random() * 2 + 1}px`,
-          'opacity': Math.random() * 0.8 + 0.4,
-          'animationDelay': `${Math.random() * 8}s`,
-          '--glow-color': ['#ffffff', '#ffeaa7', '#74b9ff', '#a29bfe'][Math.floor(Math.random() * 4)],
-        }"></div>
+        :class="`star-mid star-${i} star-color-${i % 4}`"
+        :style="`--star-index: ${i}`"></div>
     </div>
 
     <!-- Near stars layer -->
     <div
-      class="absolute inset-0 star-layer"
-      :style="{
-        transform: `translate(${mouseX * 40}px, ${mouseY * 40}px)`,
-      }">
+      v-if="isVisible"
+      class="absolute inset-0 star-layer star-layer-near">
       <div
-        v-for="(_, i) in 20"
+        v-for="i in starCounts.near"
         :key="`near-${i}`"
-        class="absolute rounded-full bg-white star-near"
-        :style="{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          width: `${Math.random() * 3 + 2}px`,
-          height: `${Math.random() * 3 + 2}px`,
-          opacity: 1,
-          animationDelay: `${Math.random() * 6}s`,
-        }"></div>
+        :class="`star-near star-${i}`"
+        :style="`--star-index: ${i}`"></div>
     </div>
 
     <!-- Aurora Effect -->
@@ -87,16 +83,13 @@ const handleMouseMove = (e) => {
       <div class="aurora aurora-3"></div>
     </div>
 
-    <!-- Multiple Shooting Stars -->
+    <!-- Multiple Shooting Stars - CSSで制御 -->
     <div
-      v-for="i in 5" :key="`shooting-${i}`"
-      class="absolute shooting-star"
-      :style="{
-        'top': `${Math.random() * 50}%`,
-        'left': `${Math.random() * 30 - 30}%`,
-        'animationDelay': `${i * 2 + Math.random() * 3}s`,
-        '--star-length': `${60 + Math.random() * 40}px`,
-      }"></div>
+      v-for="i in starCounts.shooting"
+      v-if="isVisible"
+      :key="`shooting-${i}`"
+      :class="`shooting-star shooting-${i}`"
+      :style="`--star-index: ${i}`"></div>
 
     <!-- Enhanced Nebula -->
     <div class="absolute inset-0 nebula-container">
@@ -110,14 +103,16 @@ const handleMouseMove = (e) => {
 
     <!-- Content -->
     <div class="absolute inset-0 flex items-center justify-center z-10">
-      <h3 class="text-white text-2xl font-bold cosmos-text">
-        <span class="cosmos-letter" style="--delay: 0">C</span>
-        <span class="cosmos-letter" style="--delay: 1">O</span>
-        <span class="cosmos-letter" style="--delay: 2">S</span>
-        <span class="cosmos-letter" style="--delay: 3">M</span>
-        <span class="cosmos-letter" style="--delay: 4">O</span>
-        <span class="cosmos-letter" style="--delay: 5">S</span>
-      </h3>
+      <slot>
+        <h3 class="text-white text-2xl font-bold cosmos-text">
+          <span class="cosmos-letter" style="--delay: 0">C</span>
+          <span class="cosmos-letter" style="--delay: 1">O</span>
+          <span class="cosmos-letter" style="--delay: 2">S</span>
+          <span class="cosmos-letter" style="--delay: 3">M</span>
+          <span class="cosmos-letter" style="--delay: 4">O</span>
+          <span class="cosmos-letter" style="--delay: 5">S</span>
+        </h3>
+      </slot>
     </div>
   </div>
 </template>
@@ -127,6 +122,9 @@ const handleMouseMove = (e) => {
 .cosmos-container {
   background: #000814;
   perspective: 1000px;
+  /* GPU加速を有効化 */
+  transform: translateZ(0);
+  will-change: auto;
 }
 
 /* Deep Space Background */
@@ -140,11 +138,11 @@ const handleMouseMove = (e) => {
 
 @keyframes cosmos-pulse {
   0%, 100% {
-    transform: scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.05) rotate(1deg);
+    transform: translate3d(0, 0, 0) scale(1.05);
     opacity: 0.9;
   }
 }
@@ -161,27 +159,116 @@ const handleMouseMove = (e) => {
 /* Parallax Star Layers */
 .star-layer {
   will-change: transform;
-  transition: transform 0.1s ease-out;
+  transform: translateZ(0);
 }
 
+/* パララックス効果 */
+.star-layer-far:hover { transform: translate3d(5px, 5px, 0); }
+.star-layer-mid:hover { transform: translate3d(10px, 10px, 0); }
+.star-layer-near:hover { transform: translate3d(20px, 20px, 0); }
+
+/* 星の基本スタイル */
+.star-far, .star-mid, .star-near {
+  position: absolute;
+  border-radius: 50%;
+  background-color: white;
+}
+
+/* 遠い星 */
 .star-far {
+  width: 1px;
+  height: 1px;
+  opacity: 0.5;
   animation: twinkle-slow 6s ease-in-out infinite;
   filter: blur(0.5px);
+  animation-delay: calc(var(--star-index) * 0.5s);
 }
 
+/* 各星の位置を固定（遠い星） */
+.star-far.star-1 { top: 10%; left: 15%; }
+.star-far.star-2 { top: 20%; left: 80%; width: 1.5px; height: 1.5px; }
+.star-far.star-3 { top: 35%; left: 25%; }
+.star-far.star-4 { top: 40%; left: 60%; width: 0.8px; height: 0.8px; }
+.star-far.star-5 { top: 55%; left: 40%; }
+.star-far.star-6 { top: 70%; left: 70%; width: 1.2px; height: 1.2px; }
+.star-far.star-7 { top: 15%; left: 45%; }
+.star-far.star-8 { top: 80%; left: 20%; }
+.star-far.star-9 { top: 25%; left: 55%; width: 1.3px; height: 1.3px; }
+.star-far.star-10 { top: 50%; left: 85%; }
+.star-far.star-11 { top: 65%; left: 10%; }
+.star-far.star-12 { top: 30%; left: 90%; width: 0.7px; height: 0.7px; }
+.star-far.star-13 { top: 85%; left: 50%; }
+.star-far.star-14 { top: 5%; left: 30%; }
+.star-far.star-15 { top: 45%; left: 5%; width: 1.4px; height: 1.4px; }
+.star-far.star-16 { top: 75%; left: 85%; }
+.star-far.star-17 { top: 90%; left: 65%; }
+.star-far.star-18 { top: 60%; left: 25%; width: 0.9px; height: 0.9px; }
+.star-far.star-19 { top: 12%; left: 72%; }
+.star-far.star-20 { top: 95%; left: 35%; }
+
+/* 中間の星 */
 .star-mid {
+  width: 2px;
+  height: 2px;
+  opacity: 0.7;
   animation: twinkle 4s ease-in-out infinite;
-  box-shadow: 0 0 2px var(--glow-color, #ffffff);
+  animation-delay: calc(var(--star-index) * 0.4s);
 }
 
+/* 色のバリエーション */
+.star-color-0 { box-shadow: 0 0 2px #ffffff; }
+.star-color-1 { box-shadow: 0 0 2px #ffeaa7; }
+.star-color-2 { box-shadow: 0 0 2px #74b9ff; }
+.star-color-3 { box-shadow: 0 0 2px #a29bfe; }
+
+/* 各星の位置を固定（中間の星） */
+.star-mid.star-1 { top: 8%; left: 22%; }
+.star-mid.star-2 { top: 18%; left: 68%; width: 2.5px; height: 2.5px; }
+.star-mid.star-3 { top: 28%; left: 35%; }
+.star-mid.star-4 { top: 38%; left: 82%; width: 1.8px; height: 1.8px; }
+.star-mid.star-5 { top: 48%; left: 12%; }
+.star-mid.star-6 { top: 58%; left: 55%; width: 2.2px; height: 2.2px; }
+.star-mid.star-7 { top: 68%; left: 28%; }
+.star-mid.star-8 { top: 78%; left: 75%; }
+.star-mid.star-9 { top: 22%; left: 42%; width: 2.3px; height: 2.3px; }
+.star-mid.star-10 { top: 42%; left: 92%; }
+.star-mid.star-11 { top: 62%; left: 8%; }
+.star-mid.star-12 { top: 32%; left: 62%; width: 1.7px; height: 1.7px; }
+.star-mid.star-13 { top: 72%; left: 48%; }
+.star-mid.star-14 { top: 12%; left: 88%; }
+.star-mid.star-15 { top: 52%; left: 32%; width: 2.4px; height: 2.4px; }
+
+/* 近い星 */
 .star-near {
+  width: 3px;
+  height: 3px;
+  opacity: 1;
   animation: twinkle-fast 2s ease-in-out infinite;
   box-shadow: 0 0 4px #ffffff, 0 0 8px rgba(255, 255, 255, 0.5);
+  animation-delay: calc(var(--star-index) * 0.3s);
 }
 
+/* 各星の位置を固定（近い星） */
+.star-near.star-1 { top: 15%; left: 30%; width: 3.5px; height: 3.5px; }
+.star-near.star-2 { top: 25%; left: 75%; }
+.star-near.star-3 { top: 45%; left: 20%; width: 2.8px; height: 2.8px; }
+.star-near.star-4 { top: 55%; left: 65%; }
+.star-near.star-5 { top: 75%; left: 40%; width: 3.2px; height: 3.2px; }
+.star-near.star-6 { top: 35%; left: 85%; }
+.star-near.star-7 { top: 65%; left: 15%; width: 2.5px; height: 2.5px; }
+.star-near.star-8 { top: 85%; left: 55%; }
+.star-near.star-9 { top: 20%; left: 50%; width: 3.3px; height: 3.3px; }
+.star-near.star-10 { top: 50%; left: 90%; }
+
 @keyframes twinkle {
-  0%, 100% { opacity: var(--opacity, 1); transform: scale(1); }
-  50% { opacity: 0.3; transform: scale(0.8); }
+  0%, 100% {
+    opacity: var(--opacity, 1);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale(0.8);
+  }
 }
 
 @keyframes twinkle-slow {
@@ -190,201 +277,244 @@ const handleMouseMove = (e) => {
 }
 
 @keyframes twinkle-fast {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  25% { opacity: 0.6; transform: scale(1.2); }
-  50% { opacity: 1; transform: scale(0.9); }
-  75% { opacity: 0.8; transform: scale(1.1); }
+  0%, 100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  25% {
+    opacity: 0.6;
+    transform: translate3d(0, 0, 0) scale(1.2);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(0.9);
+  }
+  75% {
+    opacity: 0.8;
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
 }
 
 /* Aurora Effect */
 .aurora-container {
-  filter: blur(40px);
   opacity: 0.6;
-  mix-blend-mode: screen;
 }
 
 .aurora {
   position: absolute;
-  width: 200%;
-  height: 60%;
-  top: -30%;
-  left: -50%;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .aurora-1 {
-  background: linear-gradient(45deg, transparent, #00ff88, #00ffff, transparent);
-  animation: aurora-wave 15s ease-in-out infinite;
+  background: linear-gradient(45deg, transparent 30%, rgba(52, 211, 153, 0.4) 50%, transparent 70%);
+  animation: aurora-flow1 15s ease-in-out infinite;
 }
 
 .aurora-2 {
-  background: linear-gradient(-45deg, transparent, #ff006e, #8338ec, transparent);
-  animation: aurora-wave 20s ease-in-out infinite reverse;
-  animation-delay: 5s;
+  background: linear-gradient(-45deg, transparent 40%, rgba(139, 92, 246, 0.3) 60%, transparent 80%);
+  animation: aurora-flow2 18s ease-in-out infinite reverse;
 }
 
 .aurora-3 {
-  background: linear-gradient(60deg, transparent, #3a86ff, #7209b7, transparent);
-  animation: aurora-wave 25s ease-in-out infinite;
-  animation-delay: 10s;
+  background: linear-gradient(90deg, transparent 20%, rgba(236, 72, 153, 0.3) 50%, transparent 80%);
+  animation: aurora-flow3 12s ease-in-out infinite;
 }
 
-@keyframes aurora-wave {
+@keyframes aurora-flow1 {
   0%, 100% {
-    transform: translateX(-50%) translateY(0) scaleY(1) rotate(0deg);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.6;
+    transform: translate3d(-20%, 0, 0) rotate(0deg);
+    opacity: 0.4;
   }
   50% {
-    transform: translateX(50%) translateY(-20px) scaleY(1.5) rotate(5deg);
-    opacity: 0.8;
+    transform: translate3d(20%, -10%, 0) rotate(5deg);
+    opacity: 0.7;
   }
-  80% {
+}
+
+@keyframes aurora-flow2 {
+  0%, 100% {
+    transform: translate3d(20%, 0, 0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(-20%, 10%, 0) rotate(-3deg);
     opacity: 0.6;
   }
 }
 
-/* Enhanced Shooting Stars */
+@keyframes aurora-flow3 {
+  0%, 100% {
+    transform: translate3d(0, -20%, 0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(0, 20%, 0) rotate(2deg);
+    opacity: 0.5;
+  }
+}
+
+/* Shooting Stars */
 .shooting-star {
-  width: var(--star-length, 80px);
-  height: 2px;
-  background: linear-gradient(to right, transparent, #ffffff 30%, #ffffff 70%, transparent);
-  transform: rotate(45deg);
-  opacity: 0;
-  box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.8);
-  animation: shooting-star-fly 4s ease-out infinite;
-  filter: blur(0.5px);
-}
-
-.shooting-star::before {
-  content: '';
   position: absolute;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, #74b9ff, transparent);
-  transform: scaleY(2);
-  filter: blur(4px);
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffff, transparent);
+  animation: shooting 8s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-@keyframes shooting-star-fly {
+/* 各流れ星の設定 */
+.shooting-1 { 
+  top: 20%; 
+  left: -30%;
+  animation-delay: 0s;
+  width: 100px;
+}
+
+.shooting-2 { 
+  top: 40%; 
+  left: -20%;
+  animation-delay: 3s;
+  width: 60px;
+}
+
+.shooting-3 { 
+  top: 10%; 
+  left: -25%;
+  animation-delay: 5s;
+  width: 80px;
+}
+
+@keyframes shooting {
   0% {
-    transform: translateX(0) translateY(0) rotate(45deg) scale(0);
+    transform: translate3d(-100px, 0, 0) rotate(45deg);
     opacity: 0;
   }
-  5% {
-    transform: translateX(0) translateY(0) rotate(45deg) scale(1);
+  10% {
     opacity: 1;
   }
-  70% {
+  90% {
     opacity: 1;
   }
   100% {
-    transform: translateX(400px) translateY(400px) rotate(45deg) scale(1);
+    transform: translate3d(calc(100vw + 100px), calc(100vh + 100px), 0) rotate(45deg);
     opacity: 0;
   }
 }
 
-/* Enhanced Nebula */
+/* Nebula */
 .nebula-container {
-  mix-blend-mode: screen;
+  opacity: 0.4;
 }
 
 .nebula {
   position: absolute;
-  filter: blur(60px);
-  opacity: 0.4;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .nebula-1 {
-  inset: -20%;
-  background: radial-gradient(ellipse at 30% 40%, #6a11cb, transparent 40%);
-  animation: nebula-drift 30s ease-in-out infinite;
+  background: radial-gradient(ellipse at 30% 70%, rgba(168, 85, 247, 0.4) 0%, transparent 60%);
+  animation: nebula-drift1 25s ease-in-out infinite;
 }
 
 .nebula-2 {
-  inset: -30%;
-  background: radial-gradient(ellipse at 70% 60%, #2575fc, transparent 45%);
-  animation: nebula-drift 40s ease-in-out infinite reverse;
+  background: radial-gradient(ellipse at 70% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+  animation: nebula-drift2 30s ease-in-out infinite reverse;
 }
 
 .nebula-3 {
-  inset: -25%;
-  background: radial-gradient(ellipse at 50% 30%, #b721ff, transparent 50%);
-  animation: nebula-drift 35s ease-in-out infinite;
-  animation-delay: 10s;
+  background: radial-gradient(ellipse at 50% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 70%);
+  animation: nebula-drift3 20s ease-in-out infinite;
 }
 
-@keyframes nebula-drift {
+@keyframes nebula-drift1 {
   0%, 100% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
   }
-  33% {
-    transform: translate(30px, -30px) scale(1.1) rotate(60deg);
+  50% {
+    transform: translate3d(-10%, 5%, 0) scale(1.1);
   }
-  66% {
-    transform: translate(-30px, 20px) scale(0.9) rotate(-30deg);
+}
+
+@keyframes nebula-drift2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10%, -5%, 0) scale(0.9);
+  }
+}
+
+@keyframes nebula-drift3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5%, 10%, 0) scale(1.05);
   }
 }
 
 /* Galaxy Spiral */
 .galaxy-spiral {
-  background:
-    conic-gradient(from 0deg at 50% 50%,
-      transparent 0deg,
-      rgba(138, 43, 226, 0.1) 60deg,
-      transparent 120deg,
-      rgba(30, 144, 255, 0.1) 180deg,
-      transparent 240deg,
-      rgba(147, 51, 234, 0.1) 300deg,
-      transparent 360deg);
+  background: radial-gradient(ellipse at center, transparent 20%, rgba(139, 92, 246, 0.1) 40%, transparent 80%);
   animation: galaxy-rotate 60s linear infinite;
-  opacity: 0.5;
-  mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes galaxy-rotate {
-  from { transform: rotate(0deg) scale(1); }
-  to { transform: rotate(360deg) scale(1); }
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+  }
 }
 
-/* Text Effects */
+/* Text */
 .cosmos-text {
-  text-shadow:
-    0 0 20px rgba(255, 255, 255, 0.8),
-    0 0 40px rgba(138, 43, 226, 0.6),
-    0 0 60px rgba(30, 144, 255, 0.4);
-  letter-spacing: 8px;
-  font-family: monospace;
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
 }
 
 .cosmos-letter {
   display: inline-block;
-  animation: letter-float 4s ease-in-out infinite;
+  animation: cosmos-glow 3s ease-in-out infinite;
   animation-delay: calc(var(--delay) * 0.2s);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-@keyframes letter-float {
+@keyframes cosmos-glow {
   0%, 100% {
-    transform: translateY(0) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
   }
-  25% {
-    transform: translateY(-5px) rotate(-5deg);
-  }
-  75% {
-    transform: translateY(3px) rotate(3deg);
+  50% {
+    transform: translate3d(0, -2px, 0) scale(1.05);
+    text-shadow: 0 0 30px rgba(139, 92, 246, 1);
   }
 }
 
-/* Performance optimization */
+/* パフォーマンス最適化 */
 .star-far,
 .star-mid,
 .star-near,
-.shooting-star,
 .aurora,
+.shooting-star,
 .nebula,
-.galaxy-spiral {
-  will-change: transform, opacity;
+.galaxy-spiral,
+.cosmos-letter {
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Reduced motion */

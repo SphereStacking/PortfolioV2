@@ -1,18 +1,8 @@
 <script setup>
-defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-})
 </script>
 
 <template>
-  <div :class="['relative overflow-hidden rounded-lg perspective-1000', height, width]">
+  <div :class="['relative overflow-hidden rounded-lg perspective-1000 size-full']">
     <!-- 3D Background Layer -->
     <div class="absolute inset-0 preserve-3d cyberpunk-3d">
       <div

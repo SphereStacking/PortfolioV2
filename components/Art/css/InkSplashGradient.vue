@@ -1,25 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 
-defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
-  style: {
-    type: Object,
-    default: () => ({}),
-  },
-})
-
 // インクの色
 const inkColors = [
   '#06b6d4', // シアン
@@ -45,8 +26,7 @@ const inkBlobs = ref([
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
-    :style="style">
+    :class="['relative overflow-hidden rounded-lg size-full']">
     <div class="absolute inset-0 bg-white ink-background"></div>
 
     <!-- 背景の薄い色合い -->

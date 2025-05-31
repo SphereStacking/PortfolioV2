@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="relative h-64 w-full overflow-hidden rounded-lg">
+  <div class="relative size-full overflow-hidden rounded-lg">
     <div class="absolute inset-0 glass-gradient"></div>
 
     <!-- ガラス板1 -->

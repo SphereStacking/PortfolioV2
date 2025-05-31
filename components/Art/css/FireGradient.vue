@@ -1,38 +1,83 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
   style: {
     type: Object,
     default: () => ({}),
   },
 })
 
+// パフォーマンス最適化
+const isVisible = ref(true)
+const containerRef = ref(null)
+
 const mouseX = ref(0.5)
 const mouseY = ref(0.5)
 
 const handleMouseMove = (e) => {
+  if (!isVisible.value) return
   const rect = e.currentTarget.getBoundingClientRect()
   mouseX.value = (e.clientX - rect.left) / rect.width
   mouseY.value = (e.clientY - rect.top) / rect.height
 }
+
+// 炎の粒子数を大幅削減（30→12）
+const emberParticles = computed(() => {
+  if (!isVisible.value) return []
+  return Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    width: Math.random() * 4 + 2,
+    height: Math.random() * 4 + 2,
+    left: Math.random() * 100,
+    animationDelay: Math.random() * 5,
+    animationDuration: 3 + Math.random() * 4,
+    wobble: Math.random() * 60 - 30,
+    glowSize: Math.random() * 10 + 5,
+  }))
+})
+
+// 火花の数を削減（25→10）
+const sparkParticles = computed(() => {
+  if (!isVisible.value) return []
+  return Array.from({ length: 10 }, (_, i) => ({
+    id: i,
+    width: Math.random() * 3 + 1,
+    height: Math.random() * 10 + 5,
+    left: Math.random() * 100,
+    animationDelay: Math.random() * 3,
+    sparkDistance: Math.random() * 150 + 50,
+  }))
+})
+
+// Intersection Observer
+let observer = null
+
+onMounted(() => {
+  if (containerRef.value && 'IntersectionObserver' in window) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible.value = entry.isIntersecting
+        })
+      },
+      { threshold: 0.1 },
+    )
+    observer.observe(containerRef.value)
+  }
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+  }
+})
 </script>
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
+    ref="containerRef"
+    :class="['relative overflow-hidden rounded-lg fire-container size-full']"
     :style="style"
     @mousemove="handleMouseMove">
     <div class="absolute inset-0 bg-fire-base"></div>
@@ -44,58 +89,58 @@ const handleMouseMove = (e) => {
     <div
       class="absolute inset-0 fire-base"
       :style="{
-        transform: `translateX(${(mouseX - 0.5) * 20}px)`,
+        transform: `translate3d(${(mouseX - 0.5) * 20}px, 0, 0)`,
       }"></div>
 
     <div
       class="absolute inset-0 fire-layer1"
       :style="{
-        transform: `translateX(${(mouseX - 0.5) * 30}px) translateY(${(1 - mouseY) * 10}px)`,
+        transform: `translate3d(${(mouseX - 0.5) * 30}px, ${(1 - mouseY) * 10}px, 0)`,
       }"></div>
 
     <div
       class="absolute inset-0 fire-layer2"
       :style="{
-        transform: `translateX(${(mouseX - 0.5) * -25}px) translateY(${(1 - mouseY) * 15}px)`,
+        transform: `translate3d(${(mouseX - 0.5) * -25}px, ${(1 - mouseY) * 15}px, 0)`,
       }"></div>
 
     <div
       class="absolute inset-0 fire-layer3"
       :style="{
-        transform: `translateX(${(mouseX - 0.5) * 40}px) translateY(${(1 - mouseY) * 20}px)`,
+        transform: `translate3d(${(mouseX - 0.5) * 40}px, ${(1 - mouseY) * 20}px, 0)`,
       }"></div>
 
-    <!-- Dynamic Ember Particles -->
-    <div class="absolute inset-0 overflow-hidden">
+    <!-- Dynamic Ember Particles - 要素数削減 -->
+    <div v-if="isVisible" class="absolute inset-0 overflow-hidden">
       <div
-        v-for="(_, i) in 30"
-        :key="`ember-${i}`"
+        v-for="ember in emberParticles"
+        :key="`ember-${ember.id}`"
         class="absolute ember-particle"
         :style="{
-          'width': `${Math.random() * 4 + 2}px`,
-          'height': `${Math.random() * 4 + 2}px`,
-          'left': `${Math.random() * 100}%`,
+          'width': `${ember.width}px`,
+          'height': `${ember.height}px`,
+          'left': `${ember.left}%`,
           'bottom': '-10px',
-          'animationDelay': `${Math.random() * 5}s`,
-          'animationDuration': `${3 + Math.random() * 4}s`,
-          '--wobble': `${Math.random() * 60 - 30}px`,
-          '--glow-size': `${Math.random() * 10 + 5}px`,
+          'animationDelay': `${ember.animationDelay}s`,
+          'animationDuration': `${ember.animationDuration}s`,
+          '--wobble': `${ember.wobble}px`,
+          '--glow-size': `${ember.glowSize}px`,
         }"></div>
     </div>
 
-    <!-- Enhanced Sparks -->
-    <div class="absolute inset-x-0 bottom-0 h-3/4">
+    <!-- Enhanced Sparks - 要素数削減 -->
+    <div v-if="isVisible" class="absolute inset-x-0 bottom-0 h-3/4">
       <div
-        v-for="(_, i) in 25"
-        :key="`spark-${i}`"
+        v-for="spark in sparkParticles"
+        :key="`spark-${spark.id}`"
         class="absolute spark"
         :style="{
-          'width': `${Math.random() * 3 + 1}px`,
-          'height': `${Math.random() * 10 + 5}px`,
-          'left': `${Math.random() * 100}%`,
+          'width': `${spark.width}px`,
+          'height': `${spark.height}px`,
+          'left': `${spark.left}%`,
           'bottom': '10%',
-          'animationDelay': `${Math.random() * 3}s`,
-          '--spark-distance': `${Math.random() * 150 + 50}px`,
+          'animationDelay': `${spark.animationDelay}s`,
+          '--spark-distance': `${spark.sparkDistance}px`,
         }"></div>
     </div>
 
@@ -107,7 +152,11 @@ const handleMouseMove = (e) => {
     <div class="absolute inset-0 flex items-center justify-center z-10 pt-12">
       <slot>
         <h3 class="text-white text-3xl font-bold fire-text">
-          <span class="flame-letter">フ</span><span class="flame-letter delay-1">ァ</span><span class="flame-letter delay-2">イ</span><span class="flame-letter delay-3">ヤ</span><span class="flame-letter delay-4">ー</span>
+          <span class="flame-letter">フ</span>
+          <span class="flame-letter delay-1">ァ</span>
+          <span class="flame-letter delay-2">イ</span>
+          <span class="flame-letter delay-3">ヤ</span>
+          <span class="flame-letter delay-4">ー</span>
         </h3>
       </slot>
     </div>
@@ -115,6 +164,12 @@ const handleMouseMove = (e) => {
 </template>
 
 <style scoped>
+.fire-container {
+  /* GPU加速を有効化 */
+  transform: translateZ(0);
+  will-change: auto;
+}
+
 /* Base Background */
 .bg-fire-base {
   background: linear-gradient(to bottom, #2a0800, #000000);
@@ -128,8 +183,12 @@ const handleMouseMove = (e) => {
 }
 
 @keyframes heat-wave {
-  0%, 100% { transform: translateY(0) skewY(0); }
-  50% { transform: translateY(-5px) skewY(2deg); }
+  0%, 100% {
+    transform: translate3d(0, 0, 0) skewY(0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0) skewY(2deg);
+  }
 }
 
 /* Enhanced Fire Layers */
@@ -140,16 +199,18 @@ const handleMouseMove = (e) => {
     radial-gradient(ellipse at 70% bottom, #ff7043 0%, transparent 50%);
   animation: fire-base 4s ease-in-out infinite;
   mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes fire-base {
   0%, 100% {
     opacity: 0.8;
-    transform: scaleY(1) translateY(0);
+    transform: translate3d(0, 0, 0) scaleY(1);
   }
   50% {
     opacity: 1;
-    transform: scaleY(1.1) translateY(-5px);
+    transform: translate3d(0, -5px, 0) scaleY(1.1);
   }
 }
 
@@ -160,19 +221,21 @@ const handleMouseMove = (e) => {
   filter: blur(8px);
   animation: fire-layer1 3s ease-in-out infinite;
   mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes fire-layer1 {
   0%, 100% {
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 0.9;
   }
   33% {
-    transform: translateY(-15px) scale(1.05) rotate(-2deg);
+    transform: translate3d(0, -15px, 0) scale(1.05);
     opacity: 1;
   }
   66% {
-    transform: translateY(-10px) scale(1.02) rotate(2deg);
+    transform: translate3d(0, -10px, 0) scale(1.02);
     opacity: 0.95;
   }
 }
@@ -184,195 +247,206 @@ const handleMouseMove = (e) => {
   filter: blur(6px) contrast(1.2);
   animation: fire-layer2 3.5s ease-in-out infinite 0.5s;
   mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes fire-layer2 {
   0%, 100% {
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 0.85;
   }
   50% {
-    transform: translateY(-20px) scale(1.1) rotate(3deg);
+    transform: translate3d(0, -20px, 0) scale(1.1);
     opacity: 1;
   }
 }
 
 .fire-layer3 {
   background:
-    radial-gradient(ellipse at 50% 80%, #ffeb3b 0%, #ffc107 30%, transparent 50%);
-  filter: blur(10px) brightness(1.2);
+    radial-gradient(ellipse at 50% 95%, #ff8a65 0%, transparent 65%),
+    radial-gradient(ellipse at 30% 90%, #ff6f00 0%, transparent 55%);
+  filter: blur(4px);
   animation: fire-layer3 4s ease-in-out infinite 1s;
   mix-blend-mode: screen;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes fire-layer3 {
   0%, 100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.8;
   }
   50% {
-    transform: translateY(-25px) scale(1.15);
-    opacity: 0.9;
+    transform: translate3d(0, -25px, 0) scale(1.15);
+    opacity: 1;
   }
 }
 
 /* Ember Particles */
 .ember-particle {
-  background: radial-gradient(circle, #ffeb3b, #ff6b1a);
+  background: radial-gradient(circle, #ff6b1a, #ff3d00);
   border-radius: 50%;
-  box-shadow: 0 0 var(--glow-size) #ff6b1a;
   animation: ember-rise 4s ease-out infinite;
-  filter: blur(0.5px);
+  box-shadow: 0 0 var(--glow-size, 8px) #ff6b1a;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes ember-rise {
   0% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0;
-  }
-  10% {
+    transform: translate3d(0, 0, 0) scale(0.5);
     opacity: 1;
   }
-  90% {
+  50% {
+    transform: translate3d(var(--wobble, 0px), -200px, 0) scale(1);
     opacity: 0.8;
   }
   100% {
-    transform: translateY(-200px) translateX(var(--wobble)) scale(0.3);
+    transform: translate3d(calc(var(--wobble, 0px) * 2), -400px, 0) scale(0.2);
     opacity: 0;
   }
 }
 
-/* Enhanced Sparks */
+/* Sparks */
 .spark {
-  background: linear-gradient(to top, #ffeb3b, #ff6b1a);
+  background: linear-gradient(to top, #ff6b1a, #ffeb3b);
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  box-shadow: 0 0 4px #ffeb3b;
   animation: spark-fly 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes spark-fly {
   0% {
-    transform: translateY(0) translateX(0) scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
+  }
+  70% {
+    transform: translate3d(calc(var(--spark-distance, 100px) * 0.3), calc(var(--spark-distance, 100px) * -0.8), 0) scale(0.5);
+    opacity: 0.6;
   }
   100% {
-    transform: translateY(calc(-1 * var(--spark-distance))) translateX(calc(var(--spark-distance) * 0.3)) scale(0) rotate(180deg);
+    transform: translate3d(var(--spark-distance, 100px), calc(var(--spark-distance, 100px) * -1), 0) scale(0.1);
     opacity: 0;
-  }
-}
-
-@keyframes tongue-flicker {
-  0%, 100% {
-    transform: scaleY(1) skewX(0deg);
-    opacity: 0.8;
-  }
-  25% {
-    transform: scaleY(1.2) skewX(-5deg);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scaleY(0.9) skewX(5deg);
-    opacity: 1;
-  }
-  75% {
-    transform: scaleY(1.1) skewX(-3deg);
-    opacity: 0.85;
   }
 }
 
 /* Smoke Layers */
 .smoke-layer1 {
-  background: linear-gradient(to top, transparent 60%, rgba(50, 50, 50, 0.2));
-  filter: blur(20px);
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(50, 50, 50, 0.3) 30%,
+    rgba(100, 100, 100, 0.2) 60%,
+    transparent 100%);
   animation: smoke-rise1 8s ease-in-out infinite;
-  opacity: 0.3;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .smoke-layer2 {
-  background: linear-gradient(to top, transparent 70%, rgba(30, 30, 30, 0.15));
-  filter: blur(30px);
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(80, 80, 80, 0.2) 40%,
+    rgba(120, 120, 120, 0.15) 70%,
+    transparent 100%);
   animation: smoke-rise2 10s ease-in-out infinite 2s;
-  opacity: 0.2;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes smoke-rise1 {
   0%, 100% {
-    transform: translateY(0) scaleX(1);
-    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.6;
   }
   50% {
-    transform: translateY(-20px) scaleX(1.1);
-    opacity: 0.2;
+    transform: translate3d(-20px, -30px, 0) scale(1.1);
+    opacity: 0.8;
   }
 }
 
 @keyframes smoke-rise2 {
   0%, 100% {
-    transform: translateY(0) scaleX(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.4;
   }
   50% {
-    transform: translateY(-30px) scaleX(1.2) rotate(5deg);
+    transform: translate3d(20px, -40px, 0) scale(1.2);
+    opacity: 0.6;
   }
 }
 
-/* Text Effects */
+/* Fire Text */
 .fire-text {
   text-shadow:
-    0 0 10px #ff5722,
-    0 0 20px #ff9800,
-    0 0 30px #ff6b1a,
-    0 -2px 10px rgba(255, 235, 59, 0.5);
+    0 0 10px #ff6b1a,
+    0 0 20px #ff3d00,
+    0 0 30px #ff1744,
+    0 0 40px #d50000;
   animation: text-heat 2s ease-in-out infinite;
 }
 
 .flame-letter {
   display: inline-block;
   animation: letter-dance 1.5s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-.flame-letter.delay-1 { animation-delay: 0.1s; }
-.flame-letter.delay-2 { animation-delay: 0.2s; }
-.flame-letter.delay-3 { animation-delay: 0.3s; }
-.flame-letter.delay-4 { animation-delay: 0.4s; }
-.flame-letter.delay-5 { animation-delay: 0.5s; }
-.flame-letter.delay-6 { animation-delay: 0.6s; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
 
 @keyframes text-heat {
   0%, 100% {
-    filter: brightness(1) contrast(1);
-    transform: translateY(0);
+    text-shadow:
+      0 0 10px #ff6b1a,
+      0 0 20px #ff3d00,
+      0 0 30px #ff1744,
+      0 0 40px #d50000;
   }
   50% {
-    filter: brightness(1.2) contrast(1.1);
-    transform: translateY(-2px);
+    text-shadow:
+      0 0 15px #ff6b1a,
+      0 0 25px #ff3d00,
+      0 0 35px #ff1744,
+      0 0 45px #d50000;
   }
 }
 
 @keyframes letter-dance {
   0%, 100% {
-    transform: translateY(0) rotate(0deg) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   25% {
-    transform: translateY(-3px) rotate(-5deg) scale(1.1);
+    transform: translate3d(0, -3px, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
   75% {
-    transform: translateY(-1px) rotate(3deg) scale(1.05);
+    transform: translate3d(0, 2px, 0) scale(0.98);
   }
 }
 
-/* Performance Optimization */
-.heat-distortion,
+/* パフォーマンス最適化 */
 .fire-base,
 .fire-layer1,
 .fire-layer2,
 .fire-layer3,
 .ember-particle,
 .spark,
-.flame-tongue {
-  will-change: transform, opacity;
+.smoke-layer1,
+.smoke-layer2,
+.flame-letter {
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-/* Reduced Motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

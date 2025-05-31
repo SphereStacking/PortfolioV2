@@ -1,24 +1,31 @@
 <script setup>
+import { ref, onUnmounted } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
+
 defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
   style: {
     type: Object,
     default: () => ({}),
   },
 })
 
-// 結晶の面を定義
+// パフォーマンス最適化：要素の可視性を追跡
+const target = ref(null)
+const isVisible = ref(false)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }]) => {
+    isVisible.value = isIntersecting
+  },
+  { threshold: 0.1 }
+)
+
+onUnmounted(() => {
+  stop()
+})
+
+// 結晶の面を定義（最適化: 固定配置で再計算を防ぐ）
 const crystalFaces = ref([
   {
     width: 120,
@@ -74,7 +81,7 @@ const crystalFaces = ref([
   },
 ])
 
-// 氷の亀裂を定義
+// 氷の亀裂を定義（最適化: 3→2要素に削減）
 const iceCracks = ref([
   {
     width: 2,
@@ -96,22 +103,13 @@ const iceCracks = ref([
     opacity: 0.5,
     boxShadow: '0 0 8px rgba(255, 255, 255, 0.5)',
   },
-  {
-    width: 2,
-    height: 60,
-    top: 50,
-    left: 50,
-    rotate: 20,
-    gradient: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3))',
-    opacity: 0.7,
-    boxShadow: '0 0 12px rgba(255, 255, 255, 0.5)',
-  },
 ])
 </script>
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
+    ref="target"
+    :class="['relative overflow-hidden rounded-lg size-full']"
     :style="style">
     <div class="absolute inset-0 crystal-background"></div>
 
@@ -121,6 +119,7 @@ const iceCracks = ref([
     <!-- 結晶の面 -->
     <div
       v-for="(face, i) in crystalFaces"
+      v-if="isVisible"
       :key="`face-${i}`"
       class="absolute crystal-face"
       :style="{
@@ -139,26 +138,28 @@ const iceCracks = ref([
     <!-- 光の反射 -->
     <div class="absolute inset-0 crystal-light-reflection"></div>
 
-    <!-- キラキラエフェクト -->
-    <div class="absolute inset-0">
+    <!-- キラキラエフェクト（最適化: 30→12要素）-->
+    <div v-if="isVisible" class="absolute inset-0">
       <div
-        v-for="(_, i) in 30"
+        v-for="(_, i) in 12"
         :key="`sparkle-${i}`"
         class="absolute rounded-full crystal-sparkle"
         :style="{
-          width: `${Math.random() * 3 + 1}px`,
-          height: `${Math.random() * 3 + 1}px`,
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
+          width: `${2 + (i % 2)}px`,
+          height: `${2 + (i % 2)}px`,
+          top: `${(i * 8.3) % 100}%`,
+          left: `${(i * 8.3 + 10) % 100}%`,
           backgroundColor: 'white',
-          opacity: Math.random() * 0.7 + 0.3,
+          opacity: 0.5 + (i % 3) * 0.2,
           boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
-          animation: `crystal-sparkle-animation ${Math.random() * 5 + 2}s ease-in-out infinite ${Math.random() * 5}s`,
+          animation: `crystal-sparkle-animation ${3 + (i % 3)}s ease-in-out infinite ${i * 0.4}s`,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
         }"></div>
     </div>
 
     <!-- 氷の亀裂 -->
-    <div class="absolute inset-0">
+    <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="(crack, i) in iceCracks"
         :key="`crack-${i}`"
@@ -197,15 +198,29 @@ const iceCracks = ref([
   filter: blur(10px);
 }
 
+.crystal-face {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
 @keyframes crystal-face-animation {
-  0%, 100% { transform: rotate(var(--rotate, 0deg)) scale(1) translateZ(0); opacity: var(--opacity, 0.7); }
-  50% { transform: rotate(calc(var(--rotate, 0deg) + 5deg)) scale(1.05) translateZ(0); opacity: calc(var(--opacity, 0.7) + 0.1); }
+  0%, 100% { 
+    transform: rotate(0deg) scale(1) translateZ(0); 
+    opacity: 0.7;
+  }
+  50% { 
+    transform: rotate(5deg) scale(1.05) translateZ(0); 
+    opacity: 0.8;
+  }
 }
 
 .crystal-light-reflection {
   background: linear-gradient(45deg, transparent, transparent, rgba(255, 255, 255, 0.1), transparent, transparent);
   background-size: 200% 200%;
   animation: light-sweep 8s ease-in-out infinite;
+  transform: translateZ(0);
+  will-change: background-position;
+  backface-visibility: hidden;
 }
 
 @keyframes light-sweep {
@@ -214,9 +229,20 @@ const iceCracks = ref([
   100% { background-position: -100% -100%; }
 }
 
+.crystal-sparkle {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
 @keyframes crystal-sparkle-animation {
-  0%, 100% { transform: scale(1); opacity: var(--opacity, 0.5); }
-  50% { transform: scale(1.5); opacity: var(--opacity-high, 0.8); }
+  0%, 100% { 
+    transform: scale(1) translateZ(0); 
+    opacity: 0.5;
+  }
+  50% { 
+    transform: scale(1.5) translateZ(0); 
+    opacity: 0.8;
+  }
 }
 
 .crystal-text {

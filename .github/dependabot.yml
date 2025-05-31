@@ -51,11 +51,10 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    # PRのレビュアー設定（必要に応じて追加）
-    # reviewers:
-    #   - "username"
-    # assignees:
-    #   - "username"
+    reviewers:
+      - "SphereStacking"
+    assignees:
+      - "SphereStacking"
 
   # GitHub Actions の依存関係を更新
   - package-ecosystem: "github-actions"

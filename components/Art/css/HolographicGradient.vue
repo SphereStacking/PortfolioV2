@@ -2,22 +2,6 @@
 import { computed, ref } from 'vue'
 
 const props = defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
-  style: {
-    type: Object,
-    default: () => ({}),
-  },
   colors: {
     type: Array,
     default: () => ['#f3ec78', '#af4261', '#4286f4', '#373B44'],
@@ -40,7 +24,7 @@ const holoParticles = ref(Array.from({ length: 20 }, (_, i) => ({
 </script>
 
 <template>
-  <div :class="['relative overflow-hidden rounded-lg', height, width, className]" :style="style">
+  <div :class="['relative overflow-hidden rounded-lg size-full']">
     <!-- ホログラフィック背景 -->
     <div
       class="absolute inset-0"
@@ -50,19 +34,21 @@ const holoParticles = ref(Array.from({ length: 20 }, (_, i) => ({
         animation: 'holographic 10s ease infinite',
         opacity: 0.7,
       }"></div>
-    
+
     <!-- 虹色レイヤー -->
     <div class="absolute inset-0 rainbow-layer"></div>
-    
+
     <!-- ストライプパターン -->
-    <div class="absolute inset-0" style="
+    <div
+      class="absolute inset-0" style="
         background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 4px);
         animation: stripe-shift 20s linear infinite;
       "></div>
-    
+
     <!-- ホログラムパーティクル -->
     <div class="absolute inset-0">
-      <div v-for="particle in holoParticles" :key="`particle-${particle.id}`"
+      <div
+        v-for="particle in holoParticles" :key="`particle-${particle.id}`"
         class="holo-particle"
         :style="{
           left: `${particle.x}%`,
@@ -73,7 +59,7 @@ const holoParticles = ref(Array.from({ length: 20 }, (_, i) => ({
           animationDelay: `${particle.delay}s`,
         }"></div>
     </div>
-    
+
     <!-- 中央の光彩 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div
@@ -84,10 +70,10 @@ const holoParticles = ref(Array.from({ length: 20 }, (_, i) => ({
           mix-blend-mode: overlay;
         "></div>
     </div>
-    
+
     <!-- スキャンライン -->
     <div class="absolute inset-0 holo-scan"></div>
-    
+
     <!-- メインコンテンツ -->
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
@@ -99,9 +85,10 @@ const holoParticles = ref(Array.from({ length: 20 }, (_, i) => ({
             perspective: 800px;
             transform-style: preserve-3d;
           ">
-          <span v-for="(char, index) in 'ホログラフィック'.split('')" :key="index" 
-                :style="`--char-index: ${index}`"
-                class="holo-char">{{ char }}</span>
+          <span
+            v-for="(char, index) in 'ホログラフィック'.split('')" :key="index"
+            :style="`--char-index: ${index}`"
+            class="holo-char">{{ char }}</span>
         </h3>
       </slot>
     </div>

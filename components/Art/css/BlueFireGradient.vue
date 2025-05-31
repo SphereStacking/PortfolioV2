@@ -1,67 +1,89 @@
 <script setup>
+import { ref, computed } from 'vue'
+
 defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
   style: {
     type: Object,
     default: () => ({}),
   },
 })
+
+const containerRef = ref(null)
+
+// 青い炎の粒子
+const blueParticles = computed(() => {
+  return Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    size: 3 + Math.random() * 8,
+    x: Math.random() * 100,
+    duration: 2 + Math.random() * 4,
+    delay: Math.random() * 5,
+    swayAmount: (Math.random() - 0.5) * 100,
+  }))
+})
+
+// プラズマコア
+const plasmaCores = computed(() => {
+  return Array.from({ length: 3 }, (_, i) => ({
+    id: i,
+    x: 30 + i * 20,
+    y: 70 + Math.random() * 20,
+    size: 60 + Math.random() * 40,
+    duration: 3 + Math.random() * 2,
+    delay: i * 0.8,
+  }))
+})
 </script>
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
+    ref="containerRef"
+    :class="['relative overflow-hidden rounded-lg size-full bluefire-container']"
     :style="style">
-    <div class="absolute inset-0 bluefire-base"></div>
-
-    <!-- 青い炎の基本層 -->
-    <div class="absolute inset-0 bluefire-layer"></div>
-
-    <!-- 炎の形状1 -->
-    <div class="absolute inset-x-0 bottom-0 h-3/4 bluefire-shape1"></div>
-
-    <!-- 炎の形状2 -->
-    <div class="absolute inset-x-0 bottom-0 h-2/3 bluefire-shape2"></div>
-
-    <!-- 炎の形状3 - 中心が最も熱い部分 -->
-    <div class="absolute inset-x-0 bottom-0 h-1/2 bluefire-shape3"></div>
-
-    <!-- 火花 -->
+    <!-- 黒いベース -->
+    <div class="absolute inset-0 black-base"></div>
+    
+    <!-- 青い炎のコア -->
+    <div
+      v-for="core in plasmaCores"
+      :key="`core-${core.id}`"
+      class="absolute plasma-core"
+      :style="{
+        width: `${core.size}px`,
+        height: `${core.size}px`,
+        left: `${core.x}%`,
+        bottom: `${core.y}%`,
+        animationDuration: `${core.duration}s`,
+        animationDelay: `${core.delay}s`,
+      }"></div>
+    
+    <!-- 青い炎のメインボディ -->
+    <div class="absolute inset-x-0 bottom-0 h-4/5">
+      <div class="blue-flame-main"></div>
+      <div class="blue-flame-secondary"></div>
+      <div class="blue-flame-tertiary"></div>
+    </div>
+    
+    <!-- 青い粒子 -->
     <div class="absolute inset-0 overflow-hidden">
       <div
-        v-for="(_, i) in 30"
-        :key="`spark-${i}`"
-        class="absolute rounded-full bluefire-spark"
+        v-for="particle in blueParticles"
+        :key="`particle-${particle.id}`"
+        class="blue-particle"
         :style="{
-          width: `${Math.random() * 3 + 1}px`,
-          height: `${Math.random() * 3 + 1}px`,
-          bottom: `${Math.random() * 30}%`,
-          left: `${Math.random() * 100}%`,
-          backgroundColor: ['#60a5fa', '#93c5fd', '#3b82f6', '#2563eb'][Math.floor(Math.random() * 4)],
-          opacity: Math.random() * 0.7 + 0.3,
-          filter: `blur(${Math.random() * 1}px)`,
-          animation: `bluefire-spark ${Math.random() * 2 + 1}s ease-out infinite ${Math.random() * 2}s`,
+          width: `${particle.size}px`,
+          height: `${particle.size}px`,
+          left: `${particle.x}%`,
+          '--sway': `${particle.swayAmount}px`,
+          animationDuration: `${particle.duration}s`,
+          animationDelay: `${particle.delay}s`,
         }"></div>
     </div>
-
-    <!-- 燃料 - 木や石などのシルエット -->
-    <div class="absolute inset-x-0 bottom-0 h-1/6 fuel-silhouette"></div>
-
-    <!-- 熱の歪み効果 -->
-    <div class="absolute inset-0 heat-distortion-blue"></div>
-
-    <div class="absolute inset-0 flex items-center justify-center z-10 pt-10">
+    
+    <!-- グローエフェクト -->
+    <div class="absolute inset-0 blue-glow"></div>
+    
+    <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
         <h3 class="text-white text-3xl font-bold bluefire-text">
           BLUE FIRE
@@ -72,113 +94,153 @@ defineProps({
 </template>
 
 <style scoped>
-.bluefire-base {
-  background: linear-gradient(to bottom, #0c0a24, #172554);
+.bluefire-container {
+  background: #000;
 }
 
-.bluefire-layer {
-  background: radial-gradient(ellipse at center bottom, rgba(59, 130, 246, 0.5) 0%, rgba(30, 58, 138, 0.3) 50%, transparent 90%);
-  animation: bluefire-base-pulse 4s ease-in-out infinite;
+/* 黒いベース */
+.black-base {
+  background: radial-gradient(ellipse at 50% 100%, #000033 0%, #000 70%);
 }
 
-@keyframes bluefire-base-pulse {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+/* プラズマコア */
+.plasma-core {
+  background: radial-gradient(circle, #ffffff 0%, #00ffff 20%, #0099ff 40%, #0066ff 60%, transparent 80%);
+  border-radius: 50%;
+  filter: blur(15px);
+  animation: core-pulse ease-in-out infinite;
+  transform: translate(-50%, 50%);
 }
 
-.bluefire-shape1 {
-  background:
-    radial-gradient(
-      ellipse at 20% 100%,
-      rgba(59, 130, 246, 0.7) 0%,
-      rgba(37, 99, 235, 0.6) 20%,
-      rgba(29, 78, 216, 0.4) 40%,
-      transparent 80%
-    ),
-    radial-gradient(
-      ellipse at 80% 100%,
-      rgba(59, 130, 246, 0.7) 0%,
-      rgba(37, 99, 235, 0.6) 20%,
-      rgba(29, 78, 216, 0.4) 40%,
-      transparent 80%
-    );
-  animation: bluefire-shape1 5s ease-in-out infinite alternate;
+@keyframes core-pulse {
+  0%, 100% {
+    transform: translate(-50%, 50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, 50%) scale(1.3);
+    opacity: 1;
+  }
 }
 
-@keyframes bluefire-shape1 {
-  0% { transform: scaleX(1); filter: brightness(1); }
-  100% { transform: scaleX(1.1); filter: brightness(1.2); }
+/* 青い炎のメインボディ */
+.blue-flame-main {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 50% 100%, #ffffff 0%, #00ffff 10%, #0099ff 30%, #0066ff 50%, transparent 70%),
+    radial-gradient(ellipse at 30% 100%, #00ffff 0%, #0099ff 20%, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, #00ffff 0%, #0099ff 20%, transparent 50%);
+  filter: blur(2px);
+  animation: flame-dance 3s ease-in-out infinite;
+  mix-blend-mode: screen;
 }
 
-.bluefire-shape2 {
-  background:
-    radial-gradient(
-      ellipse at 50% 100%,
-      rgba(96, 165, 250, 0.7) 0%,
-      rgba(59, 130, 246, 0.6) 20%,
-      rgba(37, 99, 235, 0.4) 40%,
-      transparent 80%
-    );
-  animation: bluefire-shape2 6s ease-in-out infinite;
-}
-
-@keyframes bluefire-shape2 {
-  0%, 100% { transform: translateY(0) scaleX(1); opacity: 0.7; }
-  50% { transform: translateY(-10px) scaleX(0.9); opacity: 0.9; }
-}
-
-.bluefire-shape3 {
-  background:
-    radial-gradient(
-      ellipse at 50% 90%,
-      rgba(147, 197, 253, 0.9) 0%,
-      rgba(96, 165, 250, 0.8) 10%,
-      rgba(59, 130, 246, 0.7) 20%,
-      rgba(37, 99, 235, 0.5) 40%,
-      transparent 80%
-    );
-  animation: bluefire-shape3 4s ease-in-out infinite alternate;
+.blue-flame-secondary {
+  position: absolute;
+  inset: 10% 20% 0;
+  background: 
+    radial-gradient(ellipse at 50% 100%, #ffffff 0%, #00ccff 20%, transparent 60%);
   filter: blur(5px);
-}
-
-@keyframes bluefire-shape3 {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-20px) scale(1.1); }
-}
-
-@keyframes bluefire-spark {
-  0% { transform: translate(0, 0); opacity: var(--opacity, 0.5); }
-  100% { transform: translate(var(--translateX, 10px), -100px); opacity: 0; }
-}
-
-.fuel-silhouette {
-  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.8)),
-              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='20' viewBox='0 0 100 20'%3E%3Cpath d='M0,0 L10,0 L15,10 L30,5 L40,10 L50,5 L60,10 L70,0 L80,10 L90,5 L100,10 L100,20 L0,20 Z' fill='%23000000'/%3E%3C/svg%3E");
-  background-size: 200px 100%;
-  background-repeat: repeat-x;
+  animation: flame-dance 4s ease-in-out infinite reverse;
+  mix-blend-mode: screen;
   opacity: 0.8;
 }
 
-.heat-distortion-blue {
-  background: linear-gradient(to top, transparent, rgba(96, 165, 250, 0.1));
-  animation: heat-distortion-blue 3s ease-in-out infinite;
-  filter: blur(5px);
-  opacity: 0.5;
+.blue-flame-tertiary {
+  position: absolute;
+  inset: 20% 30% 0;
+  background: 
+    radial-gradient(ellipse at 50% 100%, #ffffff 0%, transparent 50%);
+  filter: blur(10px);
+  animation: flame-dance 2.5s ease-in-out infinite;
+  mix-blend-mode: screen;
+  opacity: 0.6;
 }
 
-@keyframes heat-distortion-blue {
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(-5px); opacity: 0.7; }
+@keyframes flame-dance {
+  0%, 100% {
+    transform: scaleY(1) scaleX(1) translateY(0);
+  }
+  33% {
+    transform: scaleY(1.2) scaleX(0.9) translateY(-10px);
+  }
+  66% {
+    transform: scaleY(0.9) scaleX(1.1) translateY(5px);
+  }
 }
 
+/* 青い粒子 */
+.blue-particle {
+  position: absolute;
+  bottom: 0;
+  background: radial-gradient(circle, #ffffff 0%, #00ffff 30%, #0099ff 60%, transparent 100%);
+  border-radius: 50%;
+  animation: particle-rise ease-out infinite;
+  filter: blur(0.5px);
+}
+
+@keyframes particle-rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-100px) translateX(var(--sway)) scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-200px) translateX(calc(var(--sway) * 1.5)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* グローエフェクト */
+.blue-glow {
+  background: 
+    radial-gradient(ellipse at 50% 80%, rgba(0, 153, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 255, 255, 0.3) 0%, transparent 60%);
+  filter: blur(40px);
+  animation: glow-pulse 4s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* テキスト */
 .bluefire-text {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(37, 99, 235, 0.6);
-  letter-spacing: 2px;
-  animation: bluefire-text-glow 3s ease-in-out infinite;
+  text-shadow: 
+    0 0 10px #ffffff,
+    0 0 20px #00ffff,
+    0 0 30px #00ccff,
+    0 0 40px #0099ff,
+    0 0 50px #0066ff,
+    0 0 60px #0033ff;
+  animation: text-blue-fire 2s ease-in-out infinite;
+  mix-blend-mode: screen;
 }
 
-@keyframes bluefire-text-glow {
-  0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(37, 99, 235, 0.6); }
-  50% { text-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(59, 130, 246, 1), 0 0 40px rgba(37, 99, 235, 0.8); }
+@keyframes text-blue-fire {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px #ffffff,
+      0 0 20px #00ffff,
+      0 0 30px #00ccff,
+      0 0 40px #0099ff,
+      0 0 50px #0066ff,
+      0 0 60px #0033ff;
+  }
+  50% {
+    text-shadow: 
+      0 0 20px #ffffff,
+      0 0 30px #00ffff,
+      0 0 40px #00ccff,
+      0 0 50px #0099ff,
+      0 0 60px #0066ff,
+      0 0 70px #0033ff;
+  }
 }
 </style>

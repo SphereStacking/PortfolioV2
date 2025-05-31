@@ -1,23 +1,8 @@
 <script setup>
-import { ref } from 'vue'
-
-const mousePosition = ref({ x: 0, y: 0 })
-const isHovering = ref(false)
-
-const handleMouseMove = (e) => {
-  const containerRect = e.currentTarget.getBoundingClientRect()
-  const x = (e.clientX - containerRect.left) / containerRect.width * 100
-  const y = (e.clientY - containerRect.top) / containerRect.height * 100
-  mousePosition.value = { x, y }
-}
 </script>
 
 <template>
-  <div
-    class="relative h-64 w-full overflow-hidden rounded-lg"
-    @mousemove="handleMouseMove"
-    @mouseenter="isHovering = true"
-    @mouseleave="isHovering = false">
+  <div class="relative size-full overflow-hidden rounded-lg">
     <div class="absolute inset-0 mist-background"></div>
 
     <!-- 霧の層 -->
@@ -28,21 +13,6 @@ const handleMouseMove = (e) => {
 
     <!-- 下部の霧 -->
     <div class="absolute bottom-0 left-0 right-0 h-1/4 bottom-mist"></div>
-
-    <div
-      v-if="isHovering"
-      class="absolute"
-      :style="{
-        top: `${mousePosition.y}%`,
-        left: `${mousePosition.x}%`,
-        transform: 'translate(-50%, -50%)',
-        width: '100px',
-        height: '100px',
-        background: 'radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%)',
-        filter: 'blur(5px)',
-        transition: 'all 0.3s ease',
-        pointerEvents: 'none',
-      }"></div>
 
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <h3 class="text-white text-2xl font-bold px-6 py-2 mist-text">

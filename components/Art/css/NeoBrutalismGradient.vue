@@ -63,7 +63,7 @@ const cellAnimations = computed(() => {
 </script>
 
 <template>
-  <div :class="['relative overflow-hidden rounded-lg bg-gray-900', height, width, className]" :style="style">
+  <div :class="['relative overflow-hidden rounded-lg bg-gray-900 size-full']">
     <div class="absolute inset-0 grid gap-2 p-4" :style="gridStyle">
       <div
         v-for="(_, i) in Array.from({ length: totalGridCells })"

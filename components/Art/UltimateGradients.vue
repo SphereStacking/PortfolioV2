@@ -1,6 +1,5 @@
 <script setup>
 import CyberpunkGradient from './css/CyberpunkGradient.vue'
-import LiquidGradient from './css/LiquidGradient.vue'
 import HolographicGradient from './css/HolographicGradient.vue'
 import NeoBrutalismGradient from './css/NeoBrutalismGradient.vue'
 import RippleGradient from './css/RippleGradient.vue'
@@ -10,8 +9,6 @@ import MistGradient from './css/MistGradient.vue'
 import MoireGradient from './css/MoireGradient.vue'
 import FrostGlassGradient from './css/FrostGlassGradient.vue'
 import FireGradient from './css/FireGradient.vue'
-import PastelDreamGradient from './css/PastelDreamGradient.vue'
-import DynamicArtGradient from './css/DynamicArtGradient.vue'
 
 // 追加のグラデーション - コスモス、ファイア、ダイナミックアート系
 import BlackholeGradient from './css/BlackholeGradient.vue'
@@ -31,6 +28,10 @@ import TechGradient from './css/TechGradient.vue'
 // 追加のグラデーション - 水中/海洋系、四季/季節系
 import DeepOceanGradient from './css/DeepOceanGradient.vue'
 
+// 新しいテーマ
+import SakuraBlizzardGradient from './css/SakuraBlizzardGradient.vue'
+import QuantumRealmGradient from './css/QuantumRealmGradient.vue'
+
 // 選択されているグラデーションのインデックス
 const selectedIndex = ref(0)
 
@@ -46,10 +47,6 @@ const examples = [
   {
     name: 'サイバーパンク',
     component: CyberpunkGradient,
-  },
-  {
-    name: '液体',
-    component: LiquidGradient,
   },
   {
     name: 'ホログラフィック',
@@ -86,14 +83,6 @@ const examples = [
   {
     name: 'ファイア',
     component: FireGradient,
-  },
-  {
-    name: 'パステルドリーム',
-    component: PastelDreamGradient,
-  },
-  {
-    name: 'ダイナミックアート',
-    component: DynamicArtGradient,
   },
 
   {
@@ -136,6 +125,14 @@ const examples = [
     name: 'アーバン',
     component: UrbanGradient,
   },
+  {
+    name: '桜吹雪',
+    component: SakuraBlizzardGradient,
+  },
+  {
+    name: '量子の世界',
+    component: QuantumRealmGradient,
+  },
 
 ]
 </script>
@@ -146,9 +143,11 @@ const examples = [
       <div
         v-for="(example, index) in examples"
         :key="index"
-        class="relative cursor-pointer transition-all duration-300 hover:scale-105"
+        class="relative cursor-pointer transition-all duration-300 hover:scale-105 h-64"
         @click="selectedIndex = index">
-        <component :is="example.component" />
+        <IntersectionObserver>
+          <component :is="example.component" />
+        </IntersectionObserver>
       </div>
     </div>
   </div>

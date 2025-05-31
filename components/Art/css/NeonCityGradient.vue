@@ -1,151 +1,102 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 
-defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
-  style: {
-    type: Object,
-    default: () => ({}),
-  },
+// パフォーマンス最適化
+const isVisible = ref(true)
+const containerRef = ref(null)
+
+// ネオンサインの数を削減（4→2）
+const neonSigns = computed(() => {
+  if (!isVisible.value) return []
+  return [
+    {
+      width: 80,
+      height: 40,
+      top: 40,
+      left: 20,
+      color: '#f472b6',
+      borderRadius: '5px',
+      opacity: 0.9,
+      stretchDuration: 4,
+      delay: 0,
+    },
+    {
+      width: 60,
+      height: 30,
+      top: 50,
+      left: 70,
+      color: '#60a5fa',
+      borderRadius: '5px',
+      opacity: 0.9,
+      stretchDuration: 5,
+      delay: 1,
+    },
+  ]
 })
 
-// ネオンサイン（伸縮アニメーション付き）
-const neonSigns = computed(() => [
-  {
-    width: 80,
-    height: 40,
-    top: 40,
-    left: 20,
-    color: '#f472b6', // ピンク
-    borderRadius: '5px',
-    opacity: 0.9,
-    stretchDuration: 4,
-    delay: 0,
-    stretchX: 1.4, // 横方向の伸縮率
-    stretchY: 0.7, // 縦方向の伸縮率
-  },
-  {
-    width: 60,
-    height: 30,
-    top: 30,
-    left: 70,
-    color: '#60a5fa', // 青
-    borderRadius: '5px',
-    opacity: 0.9,
-    stretchDuration: 5,
-    delay: 1,
-    stretchX: 0.6,
-    stretchY: 1.6,
-  },
-  {
-    width: 40,
-    height: 60,
-    top: 50,
-    left: 40,
-    color: '#a78bfa', // 紫
-    borderRadius: '5px',
-    opacity: 0.9,
-    stretchDuration: 6,
-    delay: 2,
-    stretchX: 1.8,
-    stretchY: 0.8,
-  },
-  {
-    width: 100,
-    height: 20,
-    top: 60,
-    left: 60,
-    color: '#34d399', // 緑
-    borderRadius: '3px',
-    opacity: 0.9,
-    stretchDuration: 7,
-    delay: 3,
-    stretchX: 0.5,
-    stretchY: 2.0,
-  },
-])
+// ネオン線の数を削減（4→2）
+const neonLines = computed(() => {
+  if (!isVisible.value) return []
+  return [
+    {
+      length: 150,
+      top: 35,
+      left: 10,
+      color: '#f472b6',
+      isVertical: false,
+      opacity: 0.7,
+      stretchDuration: 4,
+      delay: 0,
+      thickness: 2,
+    },
+    {
+      length: 80,
+      top: 20,
+      left: 50,
+      color: '#60a5fa',
+      isVertical: true,
+      opacity: 0.7,
+      stretchDuration: 5,
+      delay: 1,
+      thickness: 3,
+    },
+  ]
+})
 
-// ネオン線（伸縮アニメーション付き）
-const neonLines = computed(() => [
-  {
-    length: 150,
-    top: 35,
-    left: 10,
-    color: '#f472b6', // ピンク
-    isVertical: false,
-    opacity: 0.7,
-    stretchDuration: 4,
-    delay: 0,
-    stretchAmount: 1.8, // 伸縮の最大倍率
-    thickness: 2,
-  },
-  {
-    length: 80,
-    top: 20,
-    left: 50,
-    color: '#60a5fa', // 青
-    isVertical: true,
-    opacity: 0.7,
-    stretchDuration: 5,
-    delay: 1,
-    stretchAmount: 2.2,
-    thickness: 3,
-  },
-  {
-    length: 100,
-    top: 70,
-    left: 30,
-    color: '#a78bfa', // 紫
-    isVertical: false,
-    opacity: 0.7,
-    stretchDuration: 6,
-    delay: 2,
-    stretchAmount: 1.5,
-    thickness: 2,
-  },
-  {
-    length: 120,
-    top: 40,
-    left: 80,
-    color: '#34d399', // 緑
-    isVertical: true,
-    opacity: 0.7,
-    stretchDuration: 7,
-    delay: 3,
-    stretchAmount: 1.9,
-    thickness: 2,
-  },
-])
+// 光の雨の数だけを管理（詳細はCSSで制御）
+const rainDropCount = 30
 
-// 雨滴を事前計算
-const rainDrops = computed(() => {
-  return Array.from({ length: 80 }, (_, i) => ({
-    id: i,
-    height: Math.random() * 15 + 10,
-    top: Math.random() * 100,
-    left: Math.random() * 100,
-    opacity: Math.random() * 0.3 + 0.1,
-    duration: Math.random() * 0.5 + 0.5,
-    delay: Math.random() * 1,
-  }))
+// 初期アニメーションをランダムにするための遅延を生成
+const rainDelays = ref(Array.from({ length: rainDropCount }, () => Math.random() * 3))
+
+// Intersection Observer
+let observer = null
+
+onMounted(() => {
+  if (containerRef.value && 'IntersectionObserver' in window) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible.value = entry.isIntersecting
+        })
+      },
+      { threshold: 0.1 },
+    )
+    observer.observe(containerRef.value)
+  }
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+  }
 })
 </script>
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
-    :style="style">
+    ref="containerRef"
+    :class="['relative overflow-hidden rounded-lg neon-container size-full']">
     <div class="absolute inset-0 neon-background"></div>
 
     <!-- 夜の都市シルエット -->
@@ -154,8 +105,8 @@ const rainDrops = computed(() => {
     <!-- ネオンの輝き -->
     <div class="absolute inset-0 neon-glow"></div>
 
-    <!-- ネオンサイン（伸縮アニメーション付き） -->
-    <div class="absolute inset-0">
+    <!-- ネオンサイン（要素数削減） -->
+    <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="(sign, i) in neonSigns"
         :key="`sign-${i}`"
@@ -168,18 +119,16 @@ const rainDrops = computed(() => {
           'backgroundColor': 'transparent',
           'borderRadius': sign.borderRadius,
           'border': `2px solid ${sign.color}`,
-          'boxShadow': `0 0 10px ${sign.color}, 0 0 20px ${sign.color}, inset 0 0 8px ${sign.color}`,
+          'boxShadow': `0 0 10px ${sign.color}, 0 0 20px ${sign.color}`,
           'opacity': sign.opacity,
           '--sign-color': sign.color,
-          '--stretch-x': sign.stretchX,
-          '--stretch-y': sign.stretchY,
           'animation': `neon-sign-stretch ${sign.stretchDuration}s ease-in-out infinite ${sign.delay}s`,
         }">
       </div>
     </div>
 
-    <!-- ネオン線（伸縮アニメーション付き） -->
-    <div class="absolute inset-0">
+    <!-- ネオン線（要素数削減） -->
+    <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="(line, i) in neonLines"
         :key="`line-${i}`"
@@ -194,7 +143,6 @@ const rainDrops = computed(() => {
           'boxShadow': `0 0 10px ${line.color}, 0 0 20px ${line.color}`,
           'opacity': line.opacity,
           '--line-color': line.color,
-          '--stretch-amount': line.stretchAmount,
           'animation': `neon-line-stretch-${line.isVertical ? 'vertical' : 'horizontal'} ${line.stretchDuration}s ease-in-out infinite ${line.delay}s`,
         }">
       </div>
@@ -203,21 +151,16 @@ const rainDrops = computed(() => {
     <!-- 霧の効果 -->
     <div class="absolute inset-0 neon-fog"></div>
 
-    <!-- 雨の効果 -->
-    <div class="absolute inset-0">
+    <!-- 光の雨（ネオンカラー） -->
+    <div v-if="isVisible" class="absolute inset-0 pointer-events-none overflow-hidden">
       <div
-        v-for="drop in rainDrops"
-        :key="`rain-${drop.id}`"
-        class="absolute neon-rain"
-        :style="{
-          width: '1px',
-          height: `${drop.height}px`,
-          top: `${drop.top}%`,
-          left: `${drop.left}%`,
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5))',
-          opacity: drop.opacity,
-          animation: `neon-rain-fall ${drop.duration}s linear infinite ${drop.delay}s`,
-        }"></div>
+        v-for="(delay, i) in rainDelays"
+        :key="`rain-${i}`"
+        :class="`neon-rain-drop rain-${i % 4}`"
+        :style="`--rain-index: ${i}; --rain-delay: ${delay}s`">
+        <!-- 雨滴の軌跡 -->
+        <div class="rain-trail"></div>
+      </div>
     </div>
 
     <div class="absolute inset-0 flex items-center justify-center z-10">
@@ -236,6 +179,12 @@ const rainDrops = computed(() => {
 </template>
 
 <style scoped>
+.neon-container {
+  /* GPU加速を有効化 */
+  transform: translateZ(0);
+  will-change: auto;
+}
+
 .neon-background {
   background: linear-gradient(to bottom, #0f172a, #1e293b);
 }
@@ -260,68 +209,36 @@ const rainDrops = computed(() => {
   50% { opacity: 0.8; }
 }
 
-/* ネオンサインの伸縮アニメーション */
+/* ネオンサインの最適化されたアニメーション */
 .neon-sign {
   position: relative;
   overflow: hidden;
-  will-change: transform, filter, box-shadow;
+  will-change: transform;
+  transform: translateZ(0);
   transform-origin: center;
-  /* デバッグ用：基本的なアニメーションが動作するかテスト */
-  animation-fill-mode: both;
-}
-
-/* デバッグ用：シンプルなテストアニメーション */
-@keyframes test-stretch {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.5);
-  }
 }
 
 @keyframes neon-sign-stretch {
   0% {
-    transform: scaleX(1) scaleY(1);
+    transform: translate3d(0, 0, 0) scale(1);
     filter: brightness(1);
-  }
-  25% {
-    transform: scaleX(1.5) scaleY(1);
-    filter: brightness(1.2);
   }
   50% {
-    transform: scaleX(1.5) scaleY(0.7);
-    filter: brightness(1.4);
-  }
-  75% {
-    transform: scaleX(1) scaleY(0.7);
-    filter: brightness(1.1);
+    transform: translate3d(0, 0, 0) scale(1.2);
+    filter: brightness(1.3);
   }
   100% {
-    transform: scaleX(1) scaleY(1);
+    transform: translate3d(0, 0, 0) scale(1);
     filter: brightness(1);
   }
 }
 
-/* ネオンサインの内部光 */
-.neon-sign-inner {
-  position: absolute;
-  inset: 20%;
-  background: radial-gradient(circle, var(--sign-color, #f472b6) 0%, transparent 70%);
-  opacity: 0.3;
-  animation: inner-glow 2s ease-in-out infinite;
-}
-
-@keyframes inner-glow {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 0.6; transform: scale(1.2); }
-}
-
-/* ネオン線の伸縮アニメーション */
+/* ネオン線の最適化されたアニメーション */
 .neon-line {
   position: relative;
   overflow: hidden;
-  will-change: transform, filter, box-shadow;
+  will-change: transform;
+  transform: translateZ(0);
   border-radius: 1px;
 }
 
@@ -335,30 +252,30 @@ const rainDrops = computed(() => {
 
 @keyframes neon-line-stretch-horizontal {
   0% {
-    transform: scaleX(1);
+    transform: translate3d(0, 0, 0) scaleX(1);
     filter: brightness(1);
   }
   50% {
-    transform: scaleX(2);
-    filter: brightness(1.6);
+    transform: translate3d(0, 0, 0) scaleX(1.5);
+    filter: brightness(1.4);
   }
   100% {
-    transform: scaleX(1);
+    transform: translate3d(0, 0, 0) scaleX(1);
     filter: brightness(1);
   }
 }
 
 @keyframes neon-line-stretch-vertical {
   0% {
-    transform: scaleY(1);
+    transform: translate3d(0, 0, 0) scaleY(1);
     filter: brightness(1);
   }
   50% {
-    transform: scaleY(2);
-    filter: brightness(1.6);
+    transform: translate3d(0, 0, 0) scaleY(1.5);
+    filter: brightness(1.4);
   }
   100% {
-    transform: scaleY(1);
+    transform: translate3d(0, 0, 0) scaleY(1);
     filter: brightness(1);
   }
 }
@@ -374,8 +291,12 @@ const rainDrops = computed(() => {
 }
 
 @keyframes neon-rain-fall {
-  0% { transform: translateY(-100px); }
-  100% { transform: translateY(100px); }
+  0% {
+    transform: translateY(-50px); /* グロー要素を完全に隠す */
+  }
+  100% {
+    transform: translateY(calc(100vh + 250px)); /* 下部でも完全に隠れるように調整 */
+  }
 }
 
 /* ネオンテキスト */
@@ -387,34 +308,90 @@ const rainDrops = computed(() => {
     0 0 5px rgba(255, 255, 255, 0.8),
     0 0 10px rgba(255, 255, 255, 0.8),
     0 0 15px rgba(244, 114, 182, 0.8),
-    0 0 20px rgba(244, 114, 182, 0.8),
-    0 0 25px rgba(244, 114, 182, 0.8);
+    0 0 20px rgba(244, 114, 182, 0.8);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes neon-char-glow {
   0%, 100% {
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
     filter: brightness(1);
   }
-  25% {
-    transform: translateY(-2px) scale(1.05);
+  50% {
+    transform: translate3d(0, -2px, 0) scale(1.05);
     filter: brightness(1.3);
   }
-  50% {
-    transform: translateY(0) scale(1);
-    filter: brightness(1.5);
-  }
-  75% {
-    transform: translateY(1px) scale(0.98);
-    filter: brightness(1.2);
-  }
 }
+
+/* 光の雨のスタイル */
+.neon-rain-drop {
+  position: absolute;
+  width: 2px;
+  height: 30px;
+  top: -15%; /* グロー要素が隠れるように調整 */
+  left: calc(var(--rain-index) * 3.3%);
+  will-change: transform;
+  transform: translateZ(0);
+  animation: neon-rain-fall 3s linear infinite;
+  animation-delay: var(--rain-delay, 0s);
+}
+
+/* 各色の雨滴 */
+.rain-0 {
+  background: linear-gradient(to bottom, transparent, #f472b6 20%, #f472b6 80%, transparent);
+  box-shadow: 0 0 10px #f472b6, 0 0 20px #f472b6;
+  height: 25px;
+}
+
+.rain-1 {
+  background: linear-gradient(to bottom, transparent, #60a5fa 20%, #60a5fa 80%, transparent);
+  box-shadow: 0 0 10px #60a5fa, 0 0 20px #60a5fa;
+  height: 30px;
+  animation-duration: 2.5s;
+}
+
+.rain-2 {
+  background: linear-gradient(to bottom, transparent, #a78bfa 20%, #a78bfa 80%, transparent);
+  box-shadow: 0 0 10px #a78bfa, 0 0 20px #a78bfa;
+  height: 35px;
+  animation-duration: 3.5s;
+  filter: blur(1px);
+}
+
+.rain-3 {
+  background: linear-gradient(to bottom, transparent, #fbbf24 20%, #fbbf24 80%, transparent);
+  box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24;
+  height: 28px;
+  animation-duration: 2.8s;
+}
+
+/* 雨滴の軌跡 */
+.rain-trail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(to bottom, currentColor, transparent);
+  opacity: 0.3;
+  filter: blur(3px);
+}
+
+/* 各雨滴のカラー設定 */
+.rain-0 .rain-trail { color: #f472b6; }
+.rain-1 .rain-trail { color: #60a5fa; }
+.rain-2 .rain-trail { color: #a78bfa; }
+.rain-3 .rain-trail { color: #fbbf24; }
 
 /* パフォーマンス最適化 */
 .neon-sign,
 .neon-line,
-.neon-char {
-  will-change: transform, opacity, filter;
+.neon-char,
+.neon-rain {
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Reduced motion */

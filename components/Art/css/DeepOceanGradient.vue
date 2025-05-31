@@ -1,56 +1,65 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 
 defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
   style: {
     type: Object,
     default: () => ({}),
   },
 })
 
-// 動的な泡の生成
-const bubbles = ref(Array.from({ length: 40 }, (_, i) => {
-  const size = Math.random() * 15 + 5
-  const wobbleRange = size * 3 // 大きい泡ほど大きく揺れる
+// パフォーマンス最適化：要素の可視性を追跡
+const target = ref(null)
+const isVisible = ref(false)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }]) => {
+    isVisible.value = isIntersecting
+  },
+  { threshold: 0.1 }
+)
+
+onUnmounted(() => {
+  stop()
+})
+
+// 動的な泡の生成（最適化: 40→15要素）
+const bubbles = ref(Array.from({ length: 15 }, (_, i) => {
+  const size = 10 + (i % 3) * 5
+  const wobbleRange = size * 3
   return {
     id: i,
     size,
-    left: Math.random() * 100,
-    opacity: Math.random() * 0.6 + 0.2,
-    duration: Math.random() * 10 + 15, // 15-25秒
-    delay: Math.random() * 20,
+    left: (i * 6.6) % 100,
+    opacity: 0.3 + (i % 3) * 0.2,
+    duration: 20 + (i % 3) * 5,
+    delay: Math.random() * 20, // ランダムな初期遅延
     wobbleRange,
-    wobbleDuration: Math.random() * 3 + 2, // 2-5秒
+    wobbleDuration: 3 + (i % 2),
   }
 }))
 
-// 小さな泡の群れ
-const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
+// 小さな泡の群れ（最適化: 60→10要素）
+const smallBubbles = ref(Array.from({ length: 10 }, (_, i) => ({
   id: i,
-  size: Math.random() * 4 + 1,
-  left: Math.random() * 100,
-  opacity: Math.random() * 0.4 + 0.1,
-  duration: Math.random() * 15 + 10,
-  delay: Math.random() * 30,
-  wobbleRange: Math.random() * 10 + 5,
+  size: 2 + (i % 3),
+  left: (i * 10) % 100,
+  opacity: 0.2 + (i % 3) * 0.1,
+  duration: 15 + (i % 3) * 5,
+  delay: Math.random() * 10, // ランダムな初期遅延
+  wobbleRange: 8 + (i % 2) * 2,
 })))
+
+// 光の筋のランダム遅延
+const lightRayDelays = ref(Array.from({ length: 3 }, () => Math.random() * 5))
 </script>
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
+    ref="target"
+    :class="['relative overflow-hidden rounded-lg size-full']"
     :style="style">
     <!-- 深海のグラデーション背景 -->
     <div class="absolute inset-0 ocean-gradient"></div>
@@ -58,20 +67,21 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     <!-- 深層の暗い層 -->
     <div class="absolute inset-0 deep-layer"></div>
 
-    <!-- 光の筋 -->
-    <div class="absolute inset-0 light-rays-container">
+    <!-- 光の筋（最適化: 5→3要素）-->
+    <div v-if="isVisible" class="absolute inset-0 light-rays-container">
       <div
-        v-for="i in 5" :key="`ray-${i}`"
+        v-for="(delay, i) in lightRayDelays" :key="`ray-${i}`"
         class="light-ray"
         :style="{
-          left: `${i * 20}%`,
-          animationDelay: `${i * 2}s`,
-          opacity: 0.1 + (i * 0.02),
+          left: `${25 + i * 25}%`,
+          animationDelay: `${delay}s`,
+          opacity: 0.12 + (i * 0.02),
+          transform: 'translateZ(0)',
         }"></div>
     </div>
 
     <!-- メインの泡（揺れながら上昇） -->
-    <div class="absolute inset-0">
+    <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="bubble in bubbles"
         :key="`bubble-${bubble.id}`"
@@ -80,6 +90,8 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
           left: `${bubble.left}%`,
           animationDuration: `${bubble.duration}s`,
           animationDelay: `${bubble.delay}s`,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
         }">
         <div
           class="bubble"
@@ -96,7 +108,7 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     </div>
 
     <!-- 小さな泡の群れ -->
-    <div class="absolute inset-0">
+    <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="bubble in smallBubbles"
         :key="`small-${bubble.id}`"
@@ -109,24 +121,15 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
           'animationDuration': `${bubble.duration}s`,
           'animationDelay': `${bubble.delay}s`,
           '--wobble': `${bubble.wobbleRange}px`,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
         }"></div>
     </div>
 
     <!-- 水流エフェクト -->
     <div class="absolute inset-0 water-current"></div>
 
-    <!-- 深海の粒子 -->
-    <div class="absolute inset-0">
-      <div
-        v-for="i in 30" :key="`particle-${i}`"
-        class="ocean-particle"
-        :style="{
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 10}s`,
-          animationDuration: `${Math.random() * 20 + 10}s`,
-        }"></div>
-    </div>
+    <!-- 深海の粒子（削除）-->
 
     <!-- コンテンツ -->
     <div class="absolute inset-0 flex items-center justify-center z-10">
@@ -179,17 +182,18 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
   );
   filter: blur(3px);
   animation: light-flicker 10s ease-in-out infinite;
+  backface-visibility: hidden;
 }
 
 @keyframes light-flicker {
-  0%, 100% { opacity: var(--opacity, 0.15); transform: scaleX(1); }
-  50% { opacity: calc(var(--opacity, 0.15) * 0.5); transform: scaleX(1.5); }
+  0%, 100% { opacity: 0.15; transform: scaleX(1) translateZ(0); }
+  50% { opacity: 0.075; transform: scaleX(1.5) translateZ(0); }
 }
 
 /* 泡のコンテナ（上昇アニメーション） */
 .bubble-container {
   position: absolute;
-  bottom: -20px;
+  bottom: -50px; /* グロー要素が隠れるように調整 */
   animation: bubble-rise linear infinite;
 }
 
@@ -198,7 +202,7 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     transform: translateY(0);
   }
   to {
-    transform: translateY(calc(-100vh - 50px));
+    transform: translateY(calc(-100vh - 100px)); /* 上部でも完全に隠れるように調整 */
   }
 }
 
@@ -214,20 +218,21 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     0 0 10px rgba(147, 197, 253, 0.6),
     inset -2px -2px 5px rgba(0, 0, 0, 0.2);
   animation: bubble-wobble var(--wobble-duration) ease-in-out infinite;
+  backface-visibility: hidden;
 }
 
 @keyframes bubble-wobble {
   0%, 100% {
-    transform: translateX(0) scale(1);
+    transform: translateX(0) scale(1) translateZ(0);
   }
   25% {
-    transform: translateX(calc(var(--wobble-range) * 0.7)) scale(0.98);
+    transform: translateX(15px) scale(0.98) translateZ(0);
   }
   50% {
-    transform: translateX(calc(var(--wobble-range) * -0.5)) scale(1.02);
+    transform: translateX(-10px) scale(1.02) translateZ(0);
   }
   75% {
-    transform: translateX(calc(var(--wobble-range) * 0.3)) scale(0.99);
+    transform: translateX(5px) scale(0.99) translateZ(0);
   }
 }
 
@@ -254,7 +259,7 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     rgba(219, 234, 254, 0.3)
   );
   border-radius: 50%;
-  bottom: -10px;
+  bottom: -30px; /* グロー要素が隠れるように調整 */
   animation: small-bubble-rise linear infinite;
 }
 
@@ -263,7 +268,7 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     transform: translateY(0) translateX(0);
   }
   to {
-    transform: translateY(calc(-100vh - 20px)) translateX(var(--wobble));
+    transform: translateY(calc(-100vh - 50px)) translateX(var(--wobble)); /* 上部でも完全に隠れるように調整 */
   }
 }
 
@@ -275,6 +280,9 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
     transparent 100%
   );
   animation: current-flow 20s linear infinite;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 @keyframes current-flow {
@@ -282,24 +290,6 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
   to { transform: translateX(100%); }
 }
 
-/* 深海の粒子 */
-.ocean-particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: rgba(219, 234, 254, 0.5);
-  border-radius: 50%;
-  animation: particle-float linear infinite;
-}
-
-@keyframes particle-float {
-  from {
-    transform: translateY(0) translateX(0);
-  }
-  to {
-    transform: translateY(-50px) translateX(20px);
-  }
-}
 
 /* テキストスタイル */
 .ocean-text {
@@ -326,9 +316,9 @@ const smallBubbles = ref(Array.from({ length: 60 }, (_, i) => ({
 .bubble-container,
 .bubble,
 .small-bubble,
-.light-ray,
-.ocean-particle {
+.light-ray {
   will-change: transform, opacity;
+  perspective: 1000px;
 }
 
 /* Reduced motion support */

@@ -1,5 +1,5 @@
 <script setup>
-import ArtHelloThree from '~/components/Art/ArtHelloThree.vue'
+import ArtHelloThree from '~/components/Art/3d/ArtHelloThree.vue'
 
 defineOgImageComponent('MyProfile', {})
 </script>

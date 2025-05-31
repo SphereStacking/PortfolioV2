@@ -2,18 +2,6 @@
 import { ref } from 'vue'
 
 defineProps({
-  height: {
-    type: String,
-    default: 'h-64',
-  },
-  width: {
-    type: String,
-    default: 'w-full',
-  },
-  className: {
-    type: String,
-    default: '',
-  },
   style: {
     type: Object,
     default: () => ({}),
@@ -102,7 +90,7 @@ const palmTree = ref({
 
 <template>
   <div
-    :class="['relative overflow-hidden rounded-lg', height, width, className]"
+    :class="['relative overflow-hidden rounded-lg size-full']"
     :style="style">
     <div class="absolute inset-0 desert-background"></div>
 

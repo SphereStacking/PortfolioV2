@@ -54,7 +54,8 @@ const hslToRgb = (h: number, s: number, l: number) => {
 
   if (s === 0) {
     r = g = b = l // achromatic
-  } else {
+  }
+  else {
     const hue2rgb = (p: number, q: number, t: number) => {
       if (t < 0) t += 1
       if (t > 1) t -= 1
@@ -84,7 +85,7 @@ const rgbToHex = (r: number, g: number, b: number) => {
 
 // コントラスト比計算
 const getLuminance = (r: number, g: number, b: number) => {
-  const [rs, gs, bs] = [r, g, b].map(c => {
+  const [rs, gs, bs] = [r, g, b].map((c) => {
     c = c / 255
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   })
@@ -122,31 +123,31 @@ const generatePalette = computed(() => {
         rgbToHex(...Object.values(hslToRgb((hsl.h + 30) % 360, hsl.s, hsl.l))),
         rgbToHex(...Object.values(hslToRgb((hsl.h - 30 + 360) % 360, hsl.s, hsl.l))),
         rgbToHex(...Object.values(hslToRgb((hsl.h + 60) % 360, hsl.s, hsl.l))),
-        rgbToHex(...Object.values(hslToRgb((hsl.h - 60 + 360) % 360, hsl.s, hsl.l)))
+        rgbToHex(...Object.values(hslToRgb((hsl.h - 60 + 360) % 360, hsl.s, hsl.l))),
       )
       break
     case 'complementary':
       // 補色（180度）
       colors.push(
-        rgbToHex(...Object.values(hslToRgb((hsl.h + 180) % 360, hsl.s, hsl.l)))
+        rgbToHex(...Object.values(hslToRgb((hsl.h + 180) % 360, hsl.s, hsl.l))),
       )
       // バリエーション追加
       colors.push(
         rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, Math.min(hsl.l + 20, 100)))),
         rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, Math.max(hsl.l - 20, 0)))),
-        rgbToHex(...Object.values(hslToRgb((hsl.h + 180) % 360, hsl.s, Math.min(hsl.l + 20, 100))))
+        rgbToHex(...Object.values(hslToRgb((hsl.h + 180) % 360, hsl.s, Math.min(hsl.l + 20, 100)))),
       )
       break
     case 'triadic':
       // トライアド（120度ずつ）
       colors.push(
         rgbToHex(...Object.values(hslToRgb((hsl.h + 120) % 360, hsl.s, hsl.l))),
-        rgbToHex(...Object.values(hslToRgb((hsl.h + 240) % 360, hsl.s, hsl.l)))
+        rgbToHex(...Object.values(hslToRgb((hsl.h + 240) % 360, hsl.s, hsl.l))),
       )
       // バリエーション追加
       colors.push(
         rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, Math.min(hsl.l + 15, 100)))),
-        rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, Math.max(hsl.l - 15, 0))))
+        rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, Math.max(hsl.l - 15, 0)))),
       )
       break
     case 'tetradic':
@@ -154,15 +155,15 @@ const generatePalette = computed(() => {
       colors.push(
         rgbToHex(...Object.values(hslToRgb((hsl.h + 90) % 360, hsl.s, hsl.l))),
         rgbToHex(...Object.values(hslToRgb((hsl.h + 180) % 360, hsl.s, hsl.l))),
-        rgbToHex(...Object.values(hslToRgb((hsl.h + 270) % 360, hsl.s, hsl.l)))
+        rgbToHex(...Object.values(hslToRgb((hsl.h + 270) % 360, hsl.s, hsl.l))),
       )
       break
     case 'monochromatic':
       // モノクロマティック（明度違い）
       const steps = [20, 40, 60, 80]
-      steps.forEach(step => {
+      steps.forEach((step) => {
         colors.push(
-          rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, step)))
+          rgbToHex(...Object.values(hslToRgb(hsl.h, hsl.s, step))),
         )
       })
       break
@@ -172,12 +173,23 @@ const generatePalette = computed(() => {
 })
 
 // クリップボードにコピー
+const { toast } = useToast()
+
 const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text)
-    // TODO: トースト通知を表示
-  } catch (err) {
+    toast({
+      title: 'コピーしました',
+      description: text,
+    })
+  }
+  catch (err) {
     console.error('Failed to copy:', err)
+    toast({
+      title: 'エラー',
+      description: 'クリップボードへのコピーに失敗しました',
+      variant: 'destructive',
+    })
   }
 }
 
@@ -202,14 +214,16 @@ useSeoMeta({
         <Icon name="ChevronLeft" class="w-4 h-4 mr-1" />
         ツール一覧に戻る
       </NuxtLink>
-      
-      <h1 class="text-3xl font-bold mb-2">カラーパレットジェネレーター</h1>
+
+      <h1 class="text-3xl font-bold mb-2">
+        カラーパレットジェネレーター
+      </h1>
       <p class="text-muted-foreground">
         基準色から美しい配色を自動生成します。Webデザインに最適なカラーパレットを作成できます。
       </p>
     </div>
 
-    <div class="grid md:grid-cols-[300px_1fr] gap-8">
+    <div class="grid lg:grid-cols-[300px_1fr] gap-8">
       <!-- コントロールパネル -->
       <div class="space-y-6">
         <Card>
@@ -239,19 +253,29 @@ useSeoMeta({
               <select
                 v-model="paletteType"
                 class="w-full h-10 px-3 rounded-md border border-input bg-background">
-                <option value="analogous">類似色</option>
-                <option value="complementary">補色</option>
-                <option value="triadic">トライアド（3色配色）</option>
-                <option value="tetradic">テトラード（4色配色）</option>
-                <option value="monochromatic">モノクロマティック</option>
+                <option value="analogous">
+                  類似色
+                </option>
+                <option value="complementary">
+                  補色
+                </option>
+                <option value="triadic">
+                  トライアド（3色配色）
+                </option>
+                <option value="tetradic">
+                  テトラード（4色配色）
+                </option>
+                <option value="monochromatic">
+                  モノクロマティック
+                </option>
               </select>
             </div>
 
             <!-- 一括コピー -->
             <Button
-              @click="copyPalette"
               class="w-full"
-              variant="outline">
+              variant="outline"
+              @click="copyPalette">
               <Icon name="Copy" class="w-4 h-4 mr-2" />
               パレットをコピー
             </Button>
@@ -261,15 +285,17 @@ useSeoMeta({
         <!-- パレット説明 -->
         <Card>
           <CardHeader>
-            <CardTitle class="text-sm">{{ 
-              {
-                analogous: '類似色配色',
-                complementary: '補色配色',
-                triadic: 'トライアド配色',
-                tetradic: 'テトラード配色',
-                monochromatic: 'モノクロマティック配色'
-              }[paletteType]
-            }}</CardTitle>
+            <CardTitle class="text-sm">
+              {{
+                {
+                  analogous: '類似色配色',
+                  complementary: '補色配色',
+                  triadic: 'トライアド配色',
+                  tetradic: 'テトラード配色',
+                  monochromatic: 'モノクロマティック配色',
+                }[paletteType]
+              }}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p class="text-sm text-muted-foreground">
@@ -279,7 +305,7 @@ useSeoMeta({
                   complementary: '色相環で正反対の色を使った、コントラストの強い配色です。',
                   triadic: '色相環を3等分した位置の色を使った、バランスの良い配色です。',
                   tetradic: '色相環を4等分した位置の色を使った、豊かな配色です。',
-                  monochromatic: '同じ色相で明度を変えた、統一感のある配色です。'
+                  monochromatic: '同じ色相で明度を変えた、統一感のある配色です。',
                 }[paletteType]
               }}
             </p>
@@ -306,7 +332,9 @@ useSeoMeta({
                   @click="copyToClipboard(color)">
                 </div>
                 <div class="text-center">
-                  <p class="text-xs font-mono">{{ color }}</p>
+                  <p class="text-xs font-mono">
+                    {{ color }}
+                  </p>
                   <p class="text-xs text-muted-foreground">
                     {{ index === 0 ? '基準色' : '' }}
                   </p>
@@ -323,10 +351,12 @@ useSeoMeta({
           </CardHeader>
           <CardContent>
             <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid md:grid-cols-2 gap-4">
                 <!-- 白背景でのテスト -->
                 <div>
-                  <h4 class="text-sm font-medium mb-2">白背景（#FFFFFF）</h4>
+                  <h4 class="text-sm font-medium mb-2">
+                    白背景（#FFFFFF）
+                  </h4>
                   <div class="space-y-2">
                     <div
                       v-for="(color, index) in generatePalette"
@@ -347,7 +377,9 @@ useSeoMeta({
 
                 <!-- 黒背景でのテスト -->
                 <div>
-                  <h4 class="text-sm font-medium mb-2">黒背景（#000000）</h4>
+                  <h4 class="text-sm font-medium mb-2">
+                    黒背景（#000000）
+                  </h4>
                   <div class="space-y-2">
                     <div
                       v-for="(color, index) in generatePalette"

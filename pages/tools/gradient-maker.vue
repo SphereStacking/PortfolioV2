@@ -193,7 +193,7 @@ useSeoMeta({
             <CardTitle>プリセット</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 v-for="preset in presets"
                 :key="preset.name"

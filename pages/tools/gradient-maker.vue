@@ -413,7 +413,8 @@ useSeoMeta({
 
 <style scoped>
 input[type="range"] {
-  @apply h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700;
+  height: 0.5rem;
+  @apply bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700;
 }
 
 input[type="range"]::-webkit-slider-thumb {

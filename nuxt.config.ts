@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
+import llmsConfig from './llms.config'
 
 export default defineNuxtConfig({
   modules: [
@@ -14,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     'shadcn-nuxt',
     '@nuxt/fonts',
+    'nuxt-llms',
   ],
   devtools: {
     enabled: true,
@@ -57,6 +59,7 @@ export default defineNuxtConfig({
       stylistic: true,
     },
   },
+  llms: llmsConfig,
   ogImage: {
     fonts: [
       'Monomaniac+One:400',

@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
+import { useIntersectionObserver } from '@vueuse/core'
 
 defineProps({
   height: {
@@ -20,36 +21,59 @@ defineProps({
   },
 })
 
-// 高層ビル
-const buildings = ref(Array.from({ length: 10 }, (_, i) => {
+// パフォーマンス最適化：要素の可視性を追跡
+const target = ref(null)
+const isVisible = ref(false)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }]) => {
+    isVisible.value = isIntersecting
+  },
+  { threshold: 0.1 }
+)
+
+onUnmounted(() => {
+  stop()
+})
+
+// 高層ビル（最適化: 10→6要素、窓を削減）
+const buildings = ref(Array.from({ length: 6 }, (_, i) => {
+  const windowCount = 8 + (i % 3) * 2
   return {
-    width: Math.floor(Math.random() * 20) + 20,
-    height: Math.floor(Math.random() * 80) + 80,
-    left: i * 10,
-    color: ['#0f172a', '#1e293b', '#334155', '#475569'][Math.floor(Math.random() * 4)],
-    opacity: Math.random() * 0.4 + 0.6,
-    zIndex: Math.floor(Math.random() * 3) + 1,
+    width: 30 + (i % 3) * 10,
+    height: 100 + (i % 4) * 40,
+    left: i * 16.6,
+    color: ['#0f172a', '#1e293b', '#334155', '#475569'][i % 4],
+    opacity: 0.7 + (i % 2) * 0.2,
+    zIndex: (i % 3) + 1,
     shadow: '0 0 20px rgba(0, 0, 0, 0.5)',
-    windows: Array.from({ length: Math.floor(Math.random() * 20) + 10 }),
+    windows: Array.from({ length: windowCount }, (_, j) => ({
+      // 各窓にランダムな点滅パターンを設定
+      blinkDuration: 3 + Math.random() * 4, // 3-7秒
+      blinkDelay: Math.random() * 5, // 0-5秒の遅延
+      shouldBlink: Math.random() > 0.6, // 40%の窓が点滅
+    })),
   }
 }))
 
-// 車
-const cars = ref(Array.from({ length: 10 }, (_, i) => {
+// 車（最適化: 10→5要素）
+const cars = ref(Array.from({ length: 5 }, (_, i) => {
   return {
-    bottom: Math.floor(Math.random() * 3) + 5,
-    left: Math.random() * 100,
-    color: Math.random() > 0.5 ? '#dc2626' : '#f8fafc',
+    bottom: 5 + (i % 2) * 2,
+    left: i * 20,
+    color: i % 2 === 0 ? '#dc2626' : '#f8fafc',
     opacity: 0.8,
-    duration: Math.random() * 10 + 10,
-    delay: Math.random() * 5,
-    direction: Math.random() > 0.5 ? 'normal' : 'reverse',
+    duration: 15 + (i % 3) * 5,
+    delay: i * 1,
+    direction: i % 2 === 0 ? 'normal' : 'reverse',
   }
 }))
 </script>
 
 <template>
   <div
+    ref="target"
     :class="['relative overflow-hidden rounded-lg', height, width, className]"
     :style="style">
     <div class="absolute inset-0 urban-background"></div>
@@ -62,6 +86,7 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
       <!-- 高層ビル -->
       <div
         v-for="(building, i) in buildings"
+        v-if="isVisible"
         :key="`building-${i}`"
         class="absolute urban-building"
         :style="{
@@ -73,19 +98,25 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
           opacity: building.opacity,
           zIndex: building.zIndex,
           boxShadow: building.shadow,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
         }">
         <!-- ビルの窓 -->
         <div
-          v-for="(_, j) in building.windows"
+          v-for="(window, j) in building.windows"
           :key="`window-${i}-${j}`"
           class="absolute urban-window"
+          :class="{ 'window-blink': window.shouldBlink }"
           :style="{
             width: '4px',
             height: '4px',
             top: `${10 + Math.floor(j / 4) * 10}%`,
             left: `${10 + (j % 4) * 24}%`,
-            backgroundColor: '#f8fafc',
-            opacity: Math.random() > 0.3 ? 0.8 : 0,
+            backgroundColor: '#fbbf24',
+            opacity: 0.8,
+            boxShadow: window.shouldBlink ? '0 0 8px #fbbf24' : 'none',
+            '--blink-duration': `${window.blinkDuration}s`,
+            '--blink-delay': `${window.blinkDelay}s`,
           }"></div>
       </div>
     </div>
@@ -94,7 +125,7 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
     <div class="absolute inset-x-0 bottom-0 h-1/6 urban-road"></div>
 
     <!-- 車のライト -->
-    <div class="absolute inset-0">
+    <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="(car, i) in cars"
         :key="`car-${i}`"
@@ -109,6 +140,9 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
           opacity: car.opacity,
           animation: `car-move ${car.duration}s linear infinite ${car.delay}s`,
           animationDirection: car.direction,
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
         }"></div>
     </div>
 
@@ -150,8 +184,8 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
 }
 
 @keyframes car-move {
-  0% { left: -5%; }
-  100% { left: 105%; }
+  0% { left: -5%; transform: translateZ(0); }
+  100% { left: 105%; transform: translateZ(0); }
 }
 
 .urban-ambient-light {
@@ -159,6 +193,9 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
     radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   animation: ambient-pulse 20s ease-in-out infinite alternate;
+  transform: translateZ(0);
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 
 @keyframes ambient-pulse {
@@ -175,6 +212,9 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
   background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.2));
   opacity: 0.6;
   animation: fog-move 30s ease-in-out infinite alternate;
+  transform: translateZ(0);
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 
 @keyframes fog-move {
@@ -188,5 +228,46 @@ const cars = ref(Array.from({ length: 10 }, (_, i) => {
   border-top: 2px solid rgba(255, 255, 255, 0.7);
   border-bottom: 2px solid rgba(255, 255, 255, 0.7);
   padding: 6px 12px;
+}
+
+/* 窓の点滅アニメーション */
+.window-blink {
+  animation: window-flicker var(--blink-duration) ease-in-out infinite;
+  animation-delay: var(--blink-delay);
+  will-change: opacity, filter;
+  transform: translateZ(0);
+}
+
+@keyframes window-flicker {
+  0%, 100% {
+    opacity: 0.8;
+    filter: brightness(1);
+  }
+  10% {
+    opacity: 0.2;
+    filter: brightness(0.5);
+  }
+  15% {
+    opacity: 0.9;
+    filter: brightness(1.2);
+  }
+  50% {
+    opacity: 0.3;
+    filter: brightness(0.6);
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(1.3);
+  }
+  90% {
+    opacity: 0.6;
+    filter: brightness(0.8);
+  }
+}
+
+/* 窓の基本スタイル */
+.urban-window {
+  transition: all 0.3s ease;
+  backface-visibility: hidden;
 }
 </style>

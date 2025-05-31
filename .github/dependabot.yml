@@ -1,0 +1,71 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # npm の依存関係を更新
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    # グループ化設定
+    groups:
+      # Nuxt関連のパッケージをグループ化
+      nuxt:
+        patterns:
+          - "nuxt"
+          - "nuxt-*"
+          - "@nuxt/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Vue関連のパッケージをグループ化
+      vue:
+        patterns:
+          - "vue"
+          - "vue-*"
+          - "@vue/*"
+        update-types:
+          - "minor"
+          - "patch"
+      # 開発依存関係をグループ化
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # 特定のパッケージの更新設定
+    allow:
+      - dependency-type: "all"
+    ignore:
+      # メジャーバージョンアップは手動で対応
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # PRのラベル設定
+    labels:
+      - "dependencies"
+      - "npm"
+    # PRのレビュアー設定（必要に応じて追加）
+    # reviewers:
+    #   - "username"
+    # assignees:
+    #   - "username"
+
+  # GitHub Actions の依存関係を更新
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"

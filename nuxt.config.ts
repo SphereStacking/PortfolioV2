@@ -39,7 +39,7 @@ export default defineNuxtConfig({
     // TODO: ホットリロードのエラー問題(https://github.com/nuxt/nuxt/issues/15201)が発生しているため、一旦無効化
     // https://content.nuxt.com/docs/getting-started/configuration#watch
     watch: {
-      enabled: false,
+      // enabled: false,
     },
   },
   compatibilityDate: '2024-11-01',

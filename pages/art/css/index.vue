@@ -1,5 +1,6 @@
 <script setup>
 import UltimateGradients from '~/components/Art/UltimateGradients.vue'
+import PerformanceMonitor from '~/components/Art/PerformanceMonitor.vue'
 </script>
 
 <template>
@@ -10,6 +11,9 @@ import UltimateGradients from '~/components/Art/UltimateGradients.vue'
       </template>
     </PageHeader>
     <div class="container md:mx-auto px-2 mb-16 mt-8">
+      <PerformanceMonitor
+        :enabled="true"
+        position="bottom-right" />
       <UltimateGradients />
     </div>
   </div>

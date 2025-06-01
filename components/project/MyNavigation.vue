@@ -45,16 +45,7 @@ const artComponents: { title: string, href: string, description: string }[] = [
       <NavigationMenuItem>
         <NavigationMenuTrigger>Me</NavigationMenuTrigger>
         <NavigationMenuContent>
-          <ul class="grid gap-3 p-6 w-[300px] lg:grid-cols-[minmax(0,.75fr)_minmax(0,1fr)]">
-            <li class="row-span-4">
-              <NavigationMenuLink as-child>
-                <a
-                  class="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                  href="/">
-                  <img src="/images/me.png" class="object-contain">
-                </a>
-              </NavigationMenuLink>
-            </li>
+          <ul class="grid gap-3 p-4 w-[300px]">
             <li v-for="component in meComponents" :key="component.title">
               <NavigationMenuLink as-child>
                 <NuxtLink

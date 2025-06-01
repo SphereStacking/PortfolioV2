@@ -62,6 +62,19 @@ npm run lint:fix
 - 3Dアニメーションは`/components/Art/partial/`のカスタムcomposablesを使用
 - コンテンツクエリは`content.config.ts`で定義された型付きコレクションを使用すべき
 
+## 開発ガイドライン
+
+### Composablesの実装方針
+- **VueUseを優先的に使用**: カスタムcomposableを実装する前に、VueUseに同等の機能があるか確認すること
+- VueUseで利用可能な主要なcomposables:
+  - `useClipboard` - クリップボード操作（`useCopyToClipboard`の代替）
+  - `useLocalStorage` / `useSessionStorage` - ストレージ操作
+  - `useDark` - ダークモード管理
+  - `useDebounce` / `useThrottle` - パフォーマンス最適化
+  - `useFetch` - データフェッチング
+  - その他多数のユーティリティ
+- カスタム実装が必要な場合のみ、プロジェクト固有のcomposableを作成
+
 ## Gitコミットルール
 
 このプロジェクトでは絵文字を使用した日本語コミットメッセージを採用しています：

@@ -20,14 +20,12 @@ const links = Object.values(profile.links)
         <DropdownMenuItem
           v-for="link in links"
           :key="link.name"
-          as-child
-        >
+          as-child>
           <a
             :href="link.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-2 cursor-pointer"
-          >
+            class="flex items-center gap-2 cursor-pointer">
             <Icon :name="link.icon" class="h-4 w-4" />
             <span>{{ link.name }}</span>
           </a>

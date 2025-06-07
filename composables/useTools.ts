@@ -251,6 +251,59 @@ export const useTools = () => {
       icon: 'heroicons:cog-6-tooth',
       route: '/tools/cron-expression-builder',
     },
+    {
+      id: 'hash-generator',
+      name: 'ハッシュ生成',
+      description: 'MD5/SHA256/SHA512等のハッシュ値生成',
+      category: 'dev',
+      icon: 'heroicons:finger-print',
+      route: '/tools/hash-generator',
+      badge: 'New',
+    },
+
+    // 🔄 変換・コンバーター（追加）
+    {
+      id: 'yaml-json-converter',
+      name: 'YAML ↔ JSON変換',
+      description: 'YAMLとJSONの相互変換',
+      category: 'converter',
+      icon: 'heroicons:arrows-right-left',
+      route: '/tools/yaml-json-converter',
+      badge: 'New',
+    },
+
+    // 🎨 デザイン・UI（追加）
+    {
+      id: 'color-contrast-checker',
+      name: 'カラーコントラストチェッカー',
+      description: 'WCAG準拠のアクセシビリティチェック',
+      category: 'design',
+      icon: 'heroicons:eye',
+      route: '/tools/color-contrast-checker',
+      badge: 'New',
+    },
+
+    // 📝 テキスト・文書（追加）
+    {
+      id: 'markdown-table-generator',
+      name: 'Markdownテーブル生成',
+      description: 'GUIでMarkdownテーブルを作成',
+      category: 'text',
+      icon: 'heroicons:table-cells',
+      route: '/tools/markdown-table-generator',
+      badge: 'New',
+    },
+
+    // 🧮 計算・数学
+    {
+      id: 'number-base-converter',
+      name: '進数変換計算機',
+      description: '2進数/8進数/10進数/16進数の相互変換',
+      category: 'math',
+      icon: 'heroicons:calculator',
+      route: '/tools/number-base-converter',
+      badge: 'New',
+    },
   ]
 
   const getToolsByCategory = (category: Tool['category']) => {

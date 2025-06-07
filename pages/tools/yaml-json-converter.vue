@@ -67,7 +67,7 @@ const yamlToJson = (yaml: string): any => {
       if (!Array.isArray(parent)) {
         // 親をオブジェクトから配列に変換
         const lastKey = Object.keys(parent).pop()
-        if (lastKey && parent[lastKey] === {}) {
+        if (lastKey && typeof parent[lastKey] === 'object' && Object.keys(parent[lastKey]).length === 0) {
           parent[lastKey] = []
           stack[stack.length - 1] = parent[lastKey]
         }

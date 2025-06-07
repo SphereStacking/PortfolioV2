@@ -443,14 +443,14 @@ useSeoMeta({
 
 .markdown-preview :deep(th),
 .markdown-preview :deep(td) {
-  @apply border border-zinc-300 px-4 py-2 text-left;
+  @apply border border-border px-4 py-2 text-left;
 }
 
 .markdown-preview :deep(th) {
-  @apply bg-zinc-100 font-semibold;
+  @apply bg-muted font-semibold;
 }
 
 .markdown-preview :deep(tr:nth-child(even)) {
-  @apply bg-zinc-50;
+  @apply bg-muted/50;
 }
 </style>

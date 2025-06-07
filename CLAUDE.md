@@ -53,7 +53,7 @@ npm run lint:fix
 プロジェクトはNuxtUIからshadcn-vueへ移行中です。UIコンポーネントを扱う際は：
 1. `/components/ui/`からshadcn-vueコンポーネントを使用
 2. New Yorkスタイルテーマ設定に従う
-3. CSS変数でZincを基本色として使用
+3. CSS変数でZincを基本色として使用（`/assets/css/tailwind.css`参照）
 4. 既存のshadcn-vueコンポーネントとの一貫性を保つ
 
 ### 重要なパターン
@@ -74,6 +74,34 @@ npm run lint:fix
   - `useFetch` - データフェッチング
   - その他多数のユーティリティ
 - カスタム実装が必要な場合のみ、プロジェクト固有のcomposableを作成
+
+### スタイリングガイドライン
+- **Tailwind CSSの使用方法**:
+  - `@apply`ディレクティブは使用しない
+  - すべてのTailwindクラスはテンプレート内で直接使用する
+  - 再利用可能なスタイルはVueコンポーネントとして抽出する
+  - 動的なクラスの組み合わせにはcn()ユーティリティを使用する
+
+- **スタイリングの優先順位**:
+  1. **Tailwindクラスを最優先**: 基本的なスタイリングはすべてTailwindクラスで実装
+  2. **CSSの使用は最小限に**: 以下の場合のみCSSを使用
+     - 複雑なアニメーション（キーフレーム、トランジション）
+     - 擬似要素（::before、::after）を使った装飾
+     - Tailwindで表現できない特殊なスタイル
+  3. **スタイルはコンポーネントに閉じ込める**: グローバルCSSは避け、scopedスタイルを使用
+
+- **テーマ色の使用**:
+  - **テーマ変数の参照**: `/assets/css/tailwind.css`に定義されているCSS変数を使用
+  - **セマンティックな色を優先**: 直接的な色指定（例：`text-gray-500`）ではなく、テーマ変数を使用
+    - `text-foreground` / `bg-background` - 基本的なテキストと背景
+    - `text-muted-foreground` / `bg-muted` - 二次的なテキストと背景
+    - `border` / `ring` - ボーダーとフォーカスリング
+    - `bg-primary` / `text-primary-foreground` - プライマリアクション
+    - `bg-secondary` / `text-secondary-foreground` - セカンダリ要素
+    - `bg-destructive` / `text-destructive-foreground` - 削除・エラー
+  - **Zinc色の使用**: グレースケールが必要な場合は`gray`ではなく`zinc`を使用
+  - **ダークモード対応**: `dark:`プレフィックスは不要（CSS変数が自動対応）
+  - **shadcn-vueのガイドライン**: [shadcn-vue](https://www.shadcn-vue.com/)のコンポーネント実装パターンに従う
 
 ## Gitコミットルール
 

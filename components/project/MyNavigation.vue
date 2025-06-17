@@ -36,6 +36,11 @@ const artComponents: { title: string, href: string, description: string }[] = [
     href: '/art/3d',
     description: '3Dモデリングやデジタルアート作品の展示',
   },
+  {
+    title: 'Graphics Programming',
+    href: '/art/graphics',
+    description: 'WebGLとWebGPUを使用したシェーダーデモ',
+  },
 ]
 </script>
 

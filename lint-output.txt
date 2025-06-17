@@ -1,0 +1,270 @@
+
+> lint
+> eslint .
+
+
+/root/_i/PortfolioWithNuxtContent/components/Art/css/CosmosGradient.vue
+  89:7  error  This 'v-if' should be moved to the wrapper element  vue/no-use-v-if-with-v-for
+
+/root/_i/PortfolioWithNuxtContent/components/Art/css/CrystalGradient.vue
+  122:7  error  This 'v-if' should be moved to the wrapper element  vue/no-use-v-if-with-v-for
+
+/root/_i/PortfolioWithNuxtContent/components/Art/css/UrbanGradient.vue
+  51:51  error  Unexpected parentheses around single function argument having a body with no curly braces  @stylistic/arrow-parens
+  89:9   error  This 'v-if' should be moved to the wrapper element                                         vue/no-use-v-if-with-v-for
+
+/root/_i/PortfolioWithNuxtContent/components/ui/slider/Slider.vue
+  30:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/root/_i/PortfolioWithNuxtContent/components/ui/table/utils.ts
+  4:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/root/_i/PortfolioWithNuxtContent/components/ui/toast/Toast.vue
+  12:11  error    An interface declaring no members is equivalent to its supertype                @typescript-eslint/no-empty-object-type
+  38:25  warning  The "update:open" event has been triggered but not declared on `defineEmits`    vue/require-explicit-emits
+  39:29  warning  The "escapeKeyDown" event has been triggered but not declared on `defineEmits`  vue/require-explicit-emits
+  40:19  warning  The "pause" event has been triggered but not declared on `defineEmits`          vue/require-explicit-emits
+  41:20  warning  The "resume" event has been triggered but not declared on `defineEmits`         vue/require-explicit-emits
+  42:25  warning  The "swipeStart" event has been triggered but not declared on `defineEmits`     vue/require-explicit-emits
+  43:24  warning  The "swipeMove" event has been triggered but not declared on `defineEmits`      vue/require-explicit-emits
+  44:26  warning  The "swipeCancel" event has been triggered but not declared on `defineEmits`    vue/require-explicit-emits
+  45:23  warning  The "swipeEnd" event has been triggered but not declared on `defineEmits`       vue/require-explicit-emits
+
+/root/_i/PortfolioWithNuxtContent/composables/useForwardPropsEmits.ts
+   3:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   3:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   9:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/ai-background-remover.vue
+  165:10  error  '_err' is defined but never used                                        @typescript-eslint/no-unused-vars
+  503:28  error  'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+  515:28  error  'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+  555:77  error  Parsing error: missing-whitespace-between-attributes                    vue/no-parsing-error
+  556:15  error  Attribute name 2000 is not valid                                        vue/valid-attribute-name
+  556:20  error  Parsing error: unexpected-solidus-in-tag                                vue/no-parsing-error
+  556:20  error  Attribute name svg\" is not valid                                       vue/valid-attribute-name
+  556:24  error  Parsing error: unexpected-character-in-attribute-name                   vue/no-parsing-error
+  562:19  error  Parsing error: x-invalid-end-tag                                        vue/no-parsing-error
+  616:77  error  Parsing error: missing-whitespace-between-attributes                    vue/no-parsing-error
+  617:15  error  Attribute name 2000 is not valid                                        vue/valid-attribute-name
+  617:20  error  Parsing error: unexpected-solidus-in-tag                                vue/no-parsing-error
+  617:20  error  Attribute name svg\" is not valid                                       vue/valid-attribute-name
+  617:24  error  Parsing error: unexpected-character-in-attribute-name                   vue/no-parsing-error
+  623:19  error  Parsing error: x-invalid-end-tag                                        vue/no-parsing-error
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/animation-generator.vue
+  520:28  error    'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+  543:28  error    'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+  629:48  warning  'v-html' directive can lead to XSS attack                               vue/no-v-html
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/api-mock-generator.vue
+   15:7   error  'randomSeed' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  157:46  error  'i' is defined but never used. Allowed unused args must match /^_/u                    @typescript-eslint/no-unused-vars
+  187:41  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  187:47  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  201:19  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  215:17  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  222:14  error  'e' is defined but never used                                                          @typescript-eslint/no-unused-vars
+  262:9   error  Unexpected lexical declaration in case block                                           no-case-declarations
+  279:38  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+  299:31  error  Unexpected any. Specify a different type                                               @typescript-eslint/no-explicit-any
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/ascii-art-converter.vue
+  268:10  error    'err' is defined but never used            @typescript-eslint/no-unused-vars
+  618:13  warning  'v-html' directive can lead to XSS attack  vue/no-v-html
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/base64-encoder.vue
+  13:7  error  'charset' is assigned a value but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  18:7  error  'charsets' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/base64-file-encoder.vue
+    2:15  error  'computed' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  131:7   error  'base64ToFile' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  263:24  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/blur-generator.vue
+    2:15  error  'computed' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  288:9   error  'components' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  355:10  error  'err' is defined but never used                                                        @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/character-encoding-converter.vue
+   88:39  error  Unexpected mix of '&&' and '||'. Use parentheses to clarify the intended order of operations  @stylistic/no-mixed-operators
+   88:55  error  Unexpected mix of '&&' and '||'. Use parentheses to clarify the intended order of operations  @stylistic/no-mixed-operators
+   88:55  error  Unexpected mix of '||' and '&&'. Use parentheses to clarify the intended order of operations  @stylistic/no-mixed-operators
+   88:71  error  Unexpected mix of '||' and '&&'. Use parentheses to clarify the intended order of operations  @stylistic/no-mixed-operators
+  160:10  error  'e' is defined but never used                                                                 @typescript-eslint/no-unused-vars
+  342:10  error  'e' is defined but never used                                                                 @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/color-code-converter.vue
+   55:56  error  This line has 2 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+   56:42  error  This line has 2 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+   57:42  error  This line has 2 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  116:56  error  This line has 2 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  117:42  error  This line has 2 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  118:42  error  This line has 2 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  143:20  error  This line has 4 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  144:20  error  This line has 4 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  145:20  error  This line has 4 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  146:20  error  This line has 4 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  147:20  error  This line has 4 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  148:20  error  This line has 4 statements. Maximum allowed is 1                        @stylistic/max-statements-per-line
+  409:26  error  'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/color-contrast-checker.vue
+   2:25  error  'watch' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  17:7   error  'colorFormat' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  57:56  error  This line has 2 statements. Maximum allowed is 1                                        @stylistic/max-statements-per-line
+  58:42  error  This line has 2 statements. Maximum allowed is 1                                        @stylistic/max-statements-per-line
+  59:42  error  This line has 2 statements. Maximum allowed is 1                                        @stylistic/max-statements-per-line
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/color-palette-extractor.vue
+  131:12  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/color-palette.vue
+    5:29  error  'CardDescription' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  186:7   error  Unexpected lexical declaration in case block                                       no-case-declarations
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/font-pairing.vue
+  209:7   error  'generateHTML' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  377:32  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+  388:32  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+  399:32  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+  420:32  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+  431:32  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+  442:32  error  'v-model' directives require the attribute value which is valid as LHS                   vue/valid-v-model
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/gitignore-generator.vue
+  2:15  error  'computed' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/gradient-maker.vue
+   5:29  error  'CardDescription' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  30:7   error  'selectPreset' is assigned a value but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  30:31  error  Unexpected any. Specify a different type                                                  @typescript-eslint/no-explicit-any
+  90:7   error  'svgGradientId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/hash-generator.vue
+  121:14  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  150:16  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/image-compressor.vue
+  137:11  error  'extension' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/image-format-converter.vue
+  248:10  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  318:10  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/image-metadata-viewer.vue
+   16:37  error  Unexpected any. Specify a different type                                  @typescript-eslint/no-explicit-any
+  136:62  error  'length' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/index.vue
+  9:9  error  'tools' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/json-formatter.vue
+    5:29  error  'CardDescription' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   85:28  error  'obj' is defined but never used. Allowed unused args must match /^_/u              @typescript-eslint/no-unused-vars
+   85:33  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+   88:31  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  137:30  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  137:36  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  147:16  error  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  210:10  error  'e' is defined but never used                                                      @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/json-to-typescript.vue
+   21:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  122:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  176:10  error  '_e' is defined but never used            @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/jsonpath-tester.vue
+   12:21  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+   19:33  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+   19:53  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+   24:18  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+   36:28  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+   84:27  error  Do not access Object.prototype method 'hasOwnProperty' from target object                       no-prototype-builtins
+   99:18  error  Do not access Object.prototype method 'hasOwnProperty' from target object                       no-prototype-builtins
+  278:31  error  Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  309:7   error  'jsonWithLineNumbers' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  586:34  error  Parsing error: invalid-first-character-of-tag-name                                              vue/no-parsing-error
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/jwt-decoder.vue
+   12:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   23:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:10  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  175:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/lorem-ipsum.vue
+  266:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  267:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/markdown-to-html.vue
+  448:36  warning  'v-html' directive can lead to XSS attack  vue/no-v-html
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/number-base-converter.vue
+   32:7   error  Unexpected side effect in computed function         vue/no-side-effects-in-computed-properties
+   37:7   error  Unexpected side effect in computed function         vue/no-side-effects-in-computed-properties
+   50:10  error  'e' is defined but never used                       @typescript-eslint/no-unused-vars
+   51:5   error  Unexpected side effect in computed function         vue/no-side-effects-in-computed-properties
+  309:70  error  Parsing error: invalid-first-character-of-tag-name  vue/no-parsing-error
+  309:71  error  Parsing error: invalid-first-character-of-tag-name  vue/no-parsing-error
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/og-tag-generator.vue
+    2:25  error  'watch' is defined but never used. Allowed unused vars must match /^_/u                      @typescript-eslint/no-unused-vars
+  208:15  error  Unexpected any. Specify a different type                                                     @typescript-eslint/no-explicit-any
+  298:7   error  'imageAspectRatio' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/password-generator.vue
+  61:64  error  Unnecessary escape character: \[  no-useless-escape
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/regex-tester.vue
+   33:5    error    Unexpected side effect in computed function            vue/no-side-effects-in-computed-properties
+   37:5    error    Unexpected side effect in computed function            vue/no-side-effects-in-computed-properties
+   74:10   error    '_e' is defined but never used                         @typescript-eslint/no-unused-vars
+  285:103  warning  'v-html' directive can lead to XSS attack              vue/no-v-html
+  369:20   warning  Variable 'ref' is already declared in the upper scope  vue/no-template-shadow
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/svg-optimizer.vue
+  575:15  warning  'v-html' directive can lead to XSS attack  vue/no-v-html
+  583:15  warning  'v-html' directive can lead to XSS attack  vue/no-v-html
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/text-proofreader.vue
+   71:17  error    Irregular whitespace not allowed           no-irregular-whitespace
+  518:13  warning  'v-html' directive can lead to XSS attack  vue/no-v-html
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/text-replacer.vue
+  214:14  error  '_err' is defined but never used  @typescript-eslint/no-unused-vars
+  288:14  error  '_err' is defined but never used  @typescript-eslint/no-unused-vars
+  353:12  error  '_err' is defined but never used  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/unit-converter.vue
+  249:51  error  Unexpected any. Specify a different type                                @typescript-eslint/no-explicit-any
+  447:28  error  'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/url-encoder.vue
+  25:10  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  40:10  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/webp-avif-converter.vue
+  346:24  error  'v-model' directives require the attribute value which is valid as LHS  vue/valid-v-model
+
+/root/_i/PortfolioWithNuxtContent/pages/tools/yaml-json-converter.vue
+   31:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   40:3   error  Unnecessary try/catch wrapper             no-useless-catch
+   55:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   56:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   57:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:82  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:81  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  177:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  207:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  365:16  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+✖ 174 problems (158 errors, 16 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

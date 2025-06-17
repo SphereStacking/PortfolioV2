@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
-import { ToastAction, ToastClose, ToastDescription, ToastProvider, ToastRoot, ToastTitle, ToastViewport, type ToastRootEmits, type ToastRootProps } from 'reka-ui'
+import { ToastRoot, type ToastRootProps, type ToastRootEmits } from 'reka-ui'
 import { cn } from '@/lib/utils'
 
 interface ToastProps extends ToastRootProps {
@@ -8,8 +8,6 @@ interface ToastProps extends ToastRootProps {
   variant?: 'default' | 'destructive'
   onOpenChange?: ((value: boolean) => void) | undefined
 }
-
-interface ToastEmits extends ToastRootEmits {}
 
 const props = withDefaults(defineProps<ToastProps>(), {
   variant: 'default',
@@ -20,7 +18,7 @@ const delegatedProps = computed(() => {
   return delegated
 })
 
-const emits = defineEmits<ToastEmits>()
+const emits = defineEmits<ToastRootEmits>()
 </script>
 
 <template>
@@ -37,8 +35,8 @@ const emits = defineEmits<ToastEmits>()
     )"
     @update:open="emits('update:open', $event)"
     @escape-key-down="emits('escapeKeyDown', $event)"
-    @pause="emits('pause', $event)"
-    @resume="emits('resume', $event)"
+    @pause="emits('pause')"
+    @resume="emits('resume')"
     @swipe-start="emits('swipeStart', $event)"
     @swipe-move="emits('swipeMove', $event)"
     @swipe-cancel="emits('swipeCancel', $event)"

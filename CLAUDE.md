@@ -64,6 +64,9 @@ npm run lint:fix
 
 ## 開発ガイドライン
 
+### コード実装後の必須作業
+- **Lintの実行**: コード実装完了後、必ず `npm run lint:fix` を実行してコードを整形する
+
 ### Composablesの実装方針
 - **VueUseを優先的に使用**: カスタムcomposableを実装する前に、VueUseに同等の機能があるか確認すること
 - VueUseで利用可能な主要なcomposables:
@@ -103,11 +106,45 @@ npm run lint:fix
   - **ダークモード対応**: `dark:`プレフィックスは不要（CSS変数が自動対応）
   - **shadcn-vueのガイドライン**: [shadcn-vue](https://www.shadcn-vue.com/)のコンポーネント実装パターンに従う
 
-## Gitコミットルール
+## Git運用ルール
+
+### ブランチ戦略
+- **メインブランチ**: `main` - 常に本番環境にデプロイ可能な状態を保つ
+- **機能ブランチ**: `feature/機能名` または `claude/issue-番号` - 新機能開発用
+- **修正ブランチ**: `fix/修正内容` - バグ修正用
+
+### mainブランチの取り込み方法
+履歴をきれいに保つため、以下の手順で`rebase`を使用：
+
+```bash
+# 1. 現在の変更をコミット
+git add .
+git commit -m "作業内容"
+
+# 2. mainブランチの最新を取得
+git fetch origin main
+
+# 3. rebaseでmainブランチの変更を取り込む
+git rebase origin/main
+
+# 4. コンフリクトがある場合は解決してcontinue
+git add .
+git rebase --continue
+
+# 5. リモートにプッシュ（初回または履歴が変更された場合）
+git push --force-with-lease origin ブランチ名
+```
+
+### プルリクエスト作成時の注意
+- mainブランチに直接プッシュしない
+- プルリクエスト作成前に必ずrebaseで最新のmainを取り込む
+- コミット履歴は論理的な単位でまとめる（必要に応じて`git rebase -i`で整理）
+
+### Gitコミットルール
 
 このプロジェクトでは絵文字を使用した日本語コミットメッセージを採用しています：
 
-### よく使う絵文字
+#### よく使う絵文字
 - ✨ 新機能の追加
 - 🎨 UI/スタイルの改善
 - 📝 ドキュメントの追加・更新
@@ -123,7 +160,7 @@ npm run lint:fix
 - 🚧 作業中
 - ✅ テストの追加・修正
 
-### コミットメッセージの例
+#### コミットメッセージの例
 ```
 ✨ shadcn-vue の導入
 🎨 レスポンシブデザインを改善

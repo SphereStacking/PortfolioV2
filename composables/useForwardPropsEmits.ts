@@ -1,20 +1,18 @@
 import { computed } from 'vue'
 
-export function useForwardPropsEmits<T extends Record<string, any>, E = any>(
+type EmitFunction = (event: string, ...args: unknown[]) => void
+
+export function useForwardPropsEmits<T extends Record<string, unknown>, E extends EmitFunction>(
   props: T,
   emits: E,
 ) {
   return computed(() => ({
     ...props,
-    onValueChange: (value: any) => {
-      if (typeof emits === 'function') {
-        emits('update:modelValue', value)
-      }
+    onValueChange: (value: unknown) => {
+      emits('update:modelValue', value)
     },
-    onUpdate: (value: any) => {
-      if (typeof emits === 'function') {
-        emits('update:modelValue', value)
-      }
+    onUpdate: (value: unknown) => {
+      emits('update:modelValue', value)
     },
   }))
 }

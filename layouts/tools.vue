@@ -20,18 +20,20 @@ const currentTool = computed(() => {
 
 <template>
   <div class="min-h-screen flex flex-col relative bg-background">
-    <!-- ヘッダー -->
-    <MyHeader class="sticky top-0 z-50" />
     <SidebarProvider>
       <TooltipProvider :delay-duration="0">
-        <div class="flex min-h-screen w-full">
+        <div class="flex w-full">
           <!-- サイドバー -->
           <ToolsSidebar />
 
           <!-- メインコンテンツ -->
           <SidebarInset class="flex-1">
-            <ToolsHeader :current-tool="currentTool" />
-
+            <!-- ヘッダー -->
+            <MyHeader class="sticky top-0 z-50">
+              <template #tools-footer>
+                <ToolsHeader :current-tool="currentTool" />
+              </template>
+            </MyHeader>
             <main class="p-6">
               <Alert variant="destructive" class="mb-10">
                 <AlertCircle class="w-4 h-4" />

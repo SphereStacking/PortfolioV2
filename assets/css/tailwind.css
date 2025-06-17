@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 /* スムーズスクロール */
 html {
   scroll-behavior: smooth;
@@ -207,6 +206,47 @@ html {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* スクロールバーのカスタマイズ */
+  /* Chrome, Edge, Safari */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-300 dark:bg-zinc-700 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-400 dark:bg-zinc-600;
+  }
+  
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.zinc.300') transparent;
+  }
+  
+  .dark * {
+    scrollbar-color: theme('colors.zinc.700') transparent;
+  }
+  
+  /* Sidebarコンポーネント専用のスクロールバー */
+  [data-sidebar="sidebar"] ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  
+  [data-sidebar="sidebar"] ::-webkit-scrollbar-thumb {
+    @apply bg-sidebar-border;
+  }
+  
+  [data-sidebar="sidebar"] ::-webkit-scrollbar-thumb:hover {
+    @apply bg-sidebar-accent;
   }
 }
 @theme {

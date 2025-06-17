@@ -2,7 +2,7 @@ export interface Tool {
   id: string
   name: string
   description: string
-  category: 'design' | 'image' | 'text' | 'converter' | 'dev'
+  category: 'design' | 'image' | 'text' | 'converter' | 'dev' | 'data' | 'math'
   icon: string // Heroicons iconの名前
   route: string
   badge?: string // 例: "New", "Beta"
@@ -51,5 +51,19 @@ export const toolCategories: Record<Tool['category'], ToolCategory> = {
     description: 'JSON処理、JWT解析、ID生成、パスワード生成ツール',
     icon: 'heroicons:code-bracket',
     emoji: '⚡',
+  },
+  data: {
+    id: 'data',
+    name: 'データ・分析',
+    description: 'データ処理、解析、可視化ツール',
+    icon: 'heroicons:chart-bar',
+    emoji: '📊',
+  },
+  math: {
+    id: 'math',
+    name: '計算・数学',
+    description: '各種計算、変換、グラフ描画ツール',
+    icon: 'heroicons:calculator',
+    emoji: '🧮',
   },
 }

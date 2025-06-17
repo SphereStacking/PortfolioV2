@@ -23,11 +23,10 @@ defineProps<Props>()
 </script>
 
 <template>
-  <header class="sticky top-16 z-40 flex h-10 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <header class="sticky z-40 flex h-10 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
     <div class="flex items-center gap-2 px-4 justify-center">
       <SidebarTrigger class="-ml-1" />
       <SidebarSeparator orientation="vertical" class="h-4" />
-      <!-- パンくずリスト -->
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

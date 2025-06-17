@@ -16,7 +16,6 @@ interface TimeFormat {
 const inputValue = ref('')
 const inputType = ref<'timestamp' | 'datetime' | 'iso'>('timestamp')
 const timestampUnit = ref<'seconds' | 'milliseconds'>('milliseconds')
-const timezone = ref('local')
 const currentTime = ref(Date.now())
 
 // 現在時刻の更新

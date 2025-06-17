@@ -51,10 +51,10 @@ const lightStreams = computed(() => {
     :style="style">
     <!-- 深宇宙の背景 -->
     <div class="absolute inset-0 deep-space"></div>
-    
+
     <!-- 歪曲グリッド -->
     <div class="absolute inset-0 distortion-grid"></div>
-    
+
     <!-- 光の渦 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div class="light-vortex">
@@ -71,20 +71,20 @@ const lightStreams = computed(() => {
           }"></div>
       </div>
     </div>
-    
+
     <!-- 降着円盤 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div class="accretion-disk-outer"></div>
       <div class="accretion-disk-inner"></div>
     </div>
-    
+
     <!-- 事象の地平線 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div class="event-horizon">
         <div class="horizon-inner"></div>
       </div>
     </div>
-    
+
     <!-- 周回する粒子 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div
@@ -105,15 +105,15 @@ const lightStreams = computed(() => {
           }"></div>
       </div>
     </div>
-    
+
     <!-- 重力レンズ効果 -->
     <div class="absolute inset-0 gravity-lens"></div>
-    
+
     <!-- ホーキング放射 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div class="hawking-radiation"></div>
     </div>
-    
+
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
         <h3 class="text-white text-3xl font-bold blackhole-text">
@@ -131,14 +131,14 @@ const lightStreams = computed(() => {
 
 /* 深宇宙の背景 */
 .deep-space {
-  background: 
+  background:
     radial-gradient(circle at 50% 50%, #000 0%, #000033 50%, #000066 100%),
     url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
 /* 歪曲グリッド */
 .distortion-grid {
-  background-image: 
+  background-image:
     repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 20px, rgba(255,255,255,0.03) 21px),
     repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 20px, rgba(255,255,255,0.03) 21px);
   animation: grid-warp 10s ease-in-out infinite;
@@ -167,10 +167,10 @@ const lightStreams = computed(() => {
   left: 50%;
   top: 0;
   transform-origin: center bottom;
-  background: linear-gradient(to bottom, 
-    rgba(255,255,255,0.8) 0%, 
-    rgba(255,200,100,0.6) 30%, 
-    rgba(255,100,0,0.4) 60%, 
+  background: linear-gradient(to bottom,
+    rgba(255,255,255,0.8) 0%,
+    rgba(255,200,100,0.6) 30%,
+    rgba(255,100,0,0.4) 60%,
     transparent 100%);
   filter: blur(1px);
   animation: stream-pull ease-in infinite;
@@ -253,7 +253,7 @@ const lightStreams = computed(() => {
   border-radius: 50%;
   background: #000;
   position: relative;
-  box-shadow: 
+  box-shadow:
     0 0 50px rgba(0,0,0,1),
     0 0 100px rgba(0,0,0,0.8),
     0 0 150px rgba(0,0,0,0.6),
@@ -369,7 +369,7 @@ const lightStreams = computed(() => {
 
 /* テキスト */
 .blackhole-text {
-  text-shadow: 
+  text-shadow:
     0 0 10px #ffffff,
     0 0 20px #ffff00,
     0 0 30px #ffa500,
@@ -382,7 +382,7 @@ const lightStreams = computed(() => {
 
 @keyframes text-warp {
   0%, 100% {
-    text-shadow: 
+    text-shadow:
       0 0 10px #ffffff,
       0 0 20px #ffff00,
       0 0 30px #ffa500,
@@ -392,7 +392,7 @@ const lightStreams = computed(() => {
     transform: scale(1);
   }
   50% {
-    text-shadow: 
+    text-shadow:
       0 0 20px #ffffff,
       0 0 30px #ffff00,
       0 0 40px #ffa500,

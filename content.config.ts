@@ -56,5 +56,23 @@ export default defineContentConfig({
         })),
       }),
     }),
+    graphics: defineCollection({
+      source: 'graphics/**/*.md',
+      type: 'page',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        type: z.enum(['webgl', 'webgpu']),
+        date: z.string(),
+        order: z.number(),
+        tags: z.array(z.string()),
+        vertexShader: z.string().optional(),
+        fragmentShader: z.string().optional(),
+        computeShader: z.string().optional(),
+        geometry: z.string().optional(),
+        animation: z.string().optional(),
+        particleCount: z.number().optional(),
+      }),
+    }),
   },
 })

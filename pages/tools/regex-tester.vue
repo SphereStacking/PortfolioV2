@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -29,13 +29,29 @@ const flagString = computed(() => {
 
 // 正規表現オブジェクト
 const regex = computed(() => {
+  if (!pattern.value) return null
+
   try {
-    error.value = ''
-    return pattern.value ? new RegExp(pattern.value, flagString.value) : null
+    return new RegExp(pattern.value, flagString.value)
   }
-  catch (e) {
-    error.value = e instanceof Error ? e.message : '無効な正規表現です'
+  catch (_e) {
     return null
+  }
+})
+
+// エラーメッセージを監視
+watch([pattern, flagString], () => {
+  if (!pattern.value) {
+    error.value = ''
+    return
+  }
+
+  try {
+    new RegExp(pattern.value, flagString.value)
+    error.value = ''
+  }
+  catch (_e) {
+    error.value = _e instanceof Error ? _e.message : '無効な正規表現です'
   }
 })
 
@@ -71,7 +87,7 @@ const replacedString = computed(() => {
   try {
     return testString.value.replace(regex.value, replacementString.value)
   }
-  catch (e) {
+  catch (_e) {
     return ''
   }
 })

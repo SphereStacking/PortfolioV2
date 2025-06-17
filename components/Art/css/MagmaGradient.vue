@@ -34,12 +34,12 @@ const fireParticles = computed(() => {
     :class="['relative overflow-hidden rounded-lg size-full magma-container']">
     <!-- ベースグラデーション -->
     <div class="absolute inset-0 magma-base"></div>
-    
+
     <!-- 溶岩流 -->
     <div class="absolute inset-0 lava-flow lava-flow-1"></div>
     <div class="absolute inset-0 lava-flow lava-flow-2"></div>
     <div class="absolute inset-0 lava-flow lava-flow-3"></div>
-    
+
     <!-- 溶岩のバブル -->
     <div class="absolute inset-0">
       <div
@@ -55,7 +55,7 @@ const fireParticles = computed(() => {
           animationDelay: `${bubble.delay}s`,
         }"></div>
     </div>
-    
+
     <!-- 火の粒子 -->
     <div class="absolute inset-0 overflow-hidden">
       <div
@@ -63,18 +63,18 @@ const fireParticles = computed(() => {
         :key="`particle-${particle.id}`"
         class="fire-particle"
         :style="{
-          width: `${particle.size}px`,
-          height: `${particle.size}px`,
-          left: `${particle.startX}%`,
+          'width': `${particle.size}px`,
+          'height': `${particle.size}px`,
+          'left': `${particle.startX}%`,
           '--end-x': `${particle.endX}%`,
-          animationDuration: `${particle.duration}s`,
-          animationDelay: `${particle.delay}s`,
+          'animationDuration': `${particle.duration}s`,
+          'animationDelay': `${particle.delay}s`,
         }"></div>
     </div>
-    
+
     <!-- グロー効果 -->
     <div class="absolute inset-0 magma-glow"></div>
-    
+
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
         <h3 class="text-white text-3xl font-bold magma-text">
@@ -92,7 +92,7 @@ const fireParticles = computed(() => {
 
 /* ベースグラデーション */
 .magma-base {
-  background: 
+  background:
     radial-gradient(ellipse at 50% 100%, #ff0000 0%, #ff4500 20%, #ff6347 40%, #000 80%),
     radial-gradient(ellipse at 20% 80%, #ff6347 0%, #ff4500 30%, transparent 60%),
     radial-gradient(ellipse at 80% 90%, #ffa500 0%, #ff8c00 30%, transparent 60%);
@@ -107,7 +107,7 @@ const fireParticles = computed(() => {
 }
 
 .lava-flow-1 {
-  background: 
+  background:
     radial-gradient(ellipse at 50% 120%, #ff0000 0%, transparent 50%),
     radial-gradient(ellipse at 30% 100%, #ff4500 0%, transparent 40%),
     radial-gradient(ellipse at 70% 110%, #ff6347 0%, transparent 45%);
@@ -115,14 +115,14 @@ const fireParticles = computed(() => {
 }
 
 .lava-flow-2 {
-  background: 
+  background:
     radial-gradient(ellipse at 40% 150%, #ffa500 0%, transparent 50%),
     radial-gradient(ellipse at 60% 130%, #ff8c00 0%, transparent 40%);
   animation: flow-2 10s ease-in-out infinite;
 }
 
 .lava-flow-3 {
-  background: 
+  background:
     radial-gradient(ellipse at 50% 100%, #ffff00 0%, #ffd700 20%, transparent 40%);
   animation: flow-3 6s ease-in-out infinite;
   opacity: 0.5;
@@ -150,7 +150,7 @@ const fireParticles = computed(() => {
   border-radius: 50%;
   filter: blur(0.5px);
   animation: bubble-rise ease-in-out infinite;
-  box-shadow: 
+  box-shadow:
     0 0 10px #ff0000,
     0 0 20px #ff4500,
     0 0 30px #ff6347;
@@ -210,7 +210,7 @@ const fireParticles = computed(() => {
 
 /* テキスト */
 .magma-text {
-  text-shadow: 
+  text-shadow:
     0 0 10px #fff,
     0 0 20px #ffff00,
     0 0 30px #ff8c00,
@@ -221,7 +221,7 @@ const fireParticles = computed(() => {
 
 @keyframes text-fire {
   0%, 100% {
-    text-shadow: 
+    text-shadow:
       0 0 10px #fff,
       0 0 20px #ffff00,
       0 0 30px #ff8c00,
@@ -229,7 +229,7 @@ const fireParticles = computed(() => {
       0 0 50px #ff0000;
   }
   50% {
-    text-shadow: 
+    text-shadow:
       0 0 20px #fff,
       0 0 30px #ffff00,
       0 0 40px #ff8c00,

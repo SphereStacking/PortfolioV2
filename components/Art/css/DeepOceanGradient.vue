@@ -18,7 +18,7 @@ const { stop } = useIntersectionObserver(
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
   },
-  { threshold: 0.1 }
+  { threshold: 0.1 },
 )
 
 onUnmounted(() => {
@@ -67,7 +67,7 @@ const lightRayDelays = ref(Array.from({ length: 3 }, () => Math.random() * 5))
     <!-- 深層の暗い層 -->
     <div class="absolute inset-0 deep-layer"></div>
 
-    <!-- 光の筋（最適化: 5→3要素）-->
+    <!-- 光の筋（最適化: 5→3要素） -->
     <div v-if="isVisible" class="absolute inset-0 light-rays-container">
       <div
         v-for="(delay, i) in lightRayDelays" :key="`ray-${i}`"
@@ -121,15 +121,15 @@ const lightRayDelays = ref(Array.from({ length: 3 }, () => Math.random() * 5))
           'animationDuration': `${bubble.duration}s`,
           'animationDelay': `${bubble.delay}s`,
           '--wobble': `${bubble.wobbleRange}px`,
-          transform: 'translateZ(0)',
-          willChange: 'transform',
+          'transform': 'translateZ(0)',
+          'willChange': 'transform',
         }"></div>
     </div>
 
     <!-- 水流エフェクト -->
     <div class="absolute inset-0 water-current"></div>
 
-    <!-- 深海の粒子（削除）-->
+    <!-- 深海の粒子（削除） -->
 
     <!-- コンテンツ -->
     <div class="absolute inset-0 flex items-center justify-center z-10">
@@ -289,7 +289,6 @@ const lightRayDelays = ref(Array.from({ length: 3 }, () => Math.random() * 5))
   from { transform: translateX(-100%); }
   to { transform: translateX(100%); }
 }
-
 
 /* テキストスタイル */
 .ocean-text {

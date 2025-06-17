@@ -53,7 +53,7 @@ npm run lint:fix
 プロジェクトはNuxtUIからshadcn-vueへ移行中です。UIコンポーネントを扱う際は：
 1. `/components/ui/`からshadcn-vueコンポーネントを使用
 2. New Yorkスタイルテーマ設定に従う
-3. CSS変数でZincを基本色として使用
+3. CSS変数でZincを基本色として使用（`/assets/css/tailwind.css`参照）
 4. 既存のshadcn-vueコンポーネントとの一貫性を保つ
 
 ### 重要なパターン
@@ -63,6 +63,9 @@ npm run lint:fix
 - コンテンツクエリは`content.config.ts`で定義された型付きコレクションを使用すべき
 
 ## 開発ガイドライン
+
+### コード実装後の必須作業
+- **Lintの実行**: コード実装完了後、必ず `npm run lint:fix` を実行してコードを整形する
 
 ### Composablesの実装方針
 - **VueUseを優先的に使用**: カスタムcomposableを実装する前に、VueUseに同等の機能があるか確認すること
@@ -75,11 +78,73 @@ npm run lint:fix
   - その他多数のユーティリティ
 - カスタム実装が必要な場合のみ、プロジェクト固有のcomposableを作成
 
-## Gitコミットルール
+### スタイリングガイドライン
+- **Tailwind CSSの使用方法**:
+  - `@apply`ディレクティブは使用しない
+  - すべてのTailwindクラスはテンプレート内で直接使用する
+  - 再利用可能なスタイルはVueコンポーネントとして抽出する
+  - 動的なクラスの組み合わせにはcn()ユーティリティを使用する
+
+- **スタイリングの優先順位**:
+  1. **Tailwindクラスを最優先**: 基本的なスタイリングはすべてTailwindクラスで実装
+  2. **CSSの使用は最小限に**: 以下の場合のみCSSを使用
+     - 複雑なアニメーション（キーフレーム、トランジション）
+     - 擬似要素（::before、::after）を使った装飾
+     - Tailwindで表現できない特殊なスタイル
+  3. **スタイルはコンポーネントに閉じ込める**: グローバルCSSは避け、scopedスタイルを使用
+
+- **テーマ色の使用**:
+  - **テーマ変数の参照**: `/assets/css/tailwind.css`に定義されているCSS変数を使用
+  - **セマンティックな色を優先**: 直接的な色指定（例：`text-gray-500`）ではなく、テーマ変数を使用
+    - `text-foreground` / `bg-background` - 基本的なテキストと背景
+    - `text-muted-foreground` / `bg-muted` - 二次的なテキストと背景
+    - `border` / `ring` - ボーダーとフォーカスリング
+    - `bg-primary` / `text-primary-foreground` - プライマリアクション
+    - `bg-secondary` / `text-secondary-foreground` - セカンダリ要素
+    - `bg-destructive` / `text-destructive-foreground` - 削除・エラー
+  - **Zinc色の使用**: グレースケールが必要な場合は`gray`ではなく`zinc`を使用
+  - **ダークモード対応**: `dark:`プレフィックスは不要（CSS変数が自動対応）
+  - **shadcn-vueのガイドライン**: [shadcn-vue](https://www.shadcn-vue.com/)のコンポーネント実装パターンに従う
+
+## Git運用ルール
+
+### ブランチ戦略
+- **メインブランチ**: `main` - 常に本番環境にデプロイ可能な状態を保つ
+- **機能ブランチ**: `feature/機能名` または `claude/issue-番号` - 新機能開発用
+- **修正ブランチ**: `fix/修正内容` - バグ修正用
+
+### mainブランチの取り込み方法
+履歴をきれいに保つため、以下の手順で`rebase`を使用：
+
+```bash
+# 1. 現在の変更をコミット
+git add .
+git commit -m "作業内容"
+
+# 2. mainブランチの最新を取得
+git fetch origin main
+
+# 3. rebaseでmainブランチの変更を取り込む
+git rebase origin/main
+
+# 4. コンフリクトがある場合は解決してcontinue
+git add .
+git rebase --continue
+
+# 5. リモートにプッシュ（初回または履歴が変更された場合）
+git push --force-with-lease origin ブランチ名
+```
+
+### プルリクエスト作成時の注意
+- mainブランチに直接プッシュしない
+- プルリクエスト作成前に必ずrebaseで最新のmainを取り込む
+- コミット履歴は論理的な単位でまとめる（必要に応じて`git rebase -i`で整理）
+
+### Gitコミットルール
 
 このプロジェクトでは絵文字を使用した日本語コミットメッセージを採用しています：
 
-### よく使う絵文字
+#### よく使う絵文字
 - ✨ 新機能の追加
 - 🎨 UI/スタイルの改善
 - 📝 ドキュメントの追加・更新
@@ -95,7 +160,7 @@ npm run lint:fix
 - 🚧 作業中
 - ✅ テストの追加・修正
 
-### コミットメッセージの例
+#### コミットメッセージの例
 ```
 ✨ shadcn-vue の導入
 🎨 レスポンシブデザインを改善

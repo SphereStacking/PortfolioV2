@@ -18,7 +18,7 @@ const { stop } = useIntersectionObserver(
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
   },
-  { threshold: 0.1 }
+  { threshold: 0.1 },
 )
 
 onUnmounted(() => {
@@ -44,10 +44,10 @@ const petals = ref(Array.from({ length: 30 }, (_, i) => ({
     :style="style">
     <!-- 春の空グラデーション -->
     <div class="absolute inset-0 sakura-sky"></div>
-    
+
     <!-- 遠くの桜の木のシルエット -->
     <div class="absolute inset-x-0 bottom-0 h-2/5 sakura-trees"></div>
-    
+
     <!-- 桜の花びら -->
     <div v-if="isVisible" class="absolute inset-0">
       <div
@@ -55,19 +55,19 @@ const petals = ref(Array.from({ length: 30 }, (_, i) => ({
         :key="`petal-${petal.id}`"
         class="sakura-petal"
         :style="{
-          width: `${petal.size}px`,
-          height: `${petal.size}px`,
-          left: `${petal.left}%`,
-          animationDelay: `${petal.delay}s`,
-          animationDuration: `${petal.duration}s`,
+          'width': `${petal.size}px`,
+          'height': `${petal.size}px`,
+          'left': `${petal.left}%`,
+          'animationDelay': `${petal.delay}s`,
+          'animationDuration': `${petal.duration}s`,
           '--sway-duration': `${petal.swayDuration}s`,
-          opacity: petal.opacity,
+          'opacity': petal.opacity,
         }"></div>
     </div>
-    
+
     <!-- 舞い散る小さな花びら -->
     <div class="absolute inset-0 sakura-particle-container"></div>
-    
+
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
         <h3 class="text-white text-3xl font-bold sakura-text">
@@ -158,7 +158,7 @@ const petals = ref(Array.from({ length: 30 }, (_, i) => ({
 
 .sakura-text {
   color: #fff;
-  text-shadow: 
+  text-shadow:
     0 2px 10px rgba(136, 14, 79, 0.5),
     0 0 20px rgba(255, 192, 203, 0.5);
   letter-spacing: 4px;

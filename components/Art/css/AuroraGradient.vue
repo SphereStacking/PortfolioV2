@@ -306,7 +306,6 @@ onUnmounted(() => {
   }
 }
 
-
 .landscape-container {
   position: relative;
   overflow: hidden;
@@ -402,7 +401,6 @@ onUnmounted(() => {
       0 0 60px rgba(16, 185, 129, 0.6);
   }
 }
-
 
 /* パフォーマンス最適化 */
 .aurora-curtain,

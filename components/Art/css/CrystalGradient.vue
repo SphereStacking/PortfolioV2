@@ -18,7 +18,7 @@ const { stop } = useIntersectionObserver(
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
   },
-  { threshold: 0.1 }
+  { threshold: 0.1 },
 )
 
 onUnmounted(() => {
@@ -117,28 +117,29 @@ const iceCracks = ref([
     <div class="absolute inset-0 crystal-structure"></div>
 
     <!-- 結晶の面 -->
-    <div
-      v-for="(face, i) in crystalFaces"
-      v-if="isVisible"
-      :key="`face-${i}`"
-      class="absolute crystal-face"
-      :style="{
-        width: `${face.width}px`,
-        height: `${face.height}px`,
-        top: `${face.top}%`,
-        left: `${face.left}%`,
-        transform: `rotate(${face.rotate}deg)`,
-        background: face.gradient,
-        opacity: face.opacity,
-        borderRadius: face.borderRadius,
-        boxShadow: face.boxShadow,
-        animation: `crystal-face-animation ${face.duration}s ease-in-out infinite ${face.delay}s`,
-      }"></div>
+    <template v-if="isVisible">
+      <div
+        v-for="(face, i) in crystalFaces"
+        :key="`face-${i}`"
+        class="absolute crystal-face"
+        :style="{
+          width: `${face.width}px`,
+          height: `${face.height}px`,
+          top: `${face.top}%`,
+          left: `${face.left}%`,
+          transform: `rotate(${face.rotate}deg)`,
+          background: face.gradient,
+          opacity: face.opacity,
+          borderRadius: face.borderRadius,
+          boxShadow: face.boxShadow,
+          animation: `crystal-face-animation ${face.duration}s ease-in-out infinite ${face.delay}s`,
+        }"></div>
+    </template>
 
     <!-- 光の反射 -->
     <div class="absolute inset-0 crystal-light-reflection"></div>
 
-    <!-- キラキラエフェクト（最適化: 30→12要素）-->
+    <!-- キラキラエフェクト（最適化: 30→12要素） -->
     <div v-if="isVisible" class="absolute inset-0">
       <div
         v-for="(_, i) in 12"
@@ -204,12 +205,12 @@ const iceCracks = ref([
 }
 
 @keyframes crystal-face-animation {
-  0%, 100% { 
-    transform: rotate(0deg) scale(1) translateZ(0); 
+  0%, 100% {
+    transform: rotate(0deg) scale(1) translateZ(0);
     opacity: 0.7;
   }
-  50% { 
-    transform: rotate(5deg) scale(1.05) translateZ(0); 
+  50% {
+    transform: rotate(5deg) scale(1.05) translateZ(0);
     opacity: 0.8;
   }
 }
@@ -235,12 +236,12 @@ const iceCracks = ref([
 }
 
 @keyframes crystal-sparkle-animation {
-  0%, 100% { 
-    transform: scale(1) translateZ(0); 
+  0%, 100% {
+    transform: scale(1) translateZ(0);
     opacity: 0.5;
   }
-  50% { 
-    transform: scale(1.5) translateZ(0); 
+  50% {
+    transform: scale(1.5) translateZ(0);
     opacity: 0.8;
   }
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 
 defineProps({
@@ -18,7 +18,7 @@ const { stop } = useIntersectionObserver(
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
   },
-  { threshold: 0.1 }
+  { threshold: 0.1 },
 )
 
 onUnmounted(() => {
@@ -30,7 +30,7 @@ const starCounts = {
   far: 20,
   mid: 15,
   near: 10,
-  shooting: 3
+  shooting: 3,
 }
 </script>
 
@@ -84,12 +84,13 @@ const starCounts = {
     </div>
 
     <!-- Multiple Shooting Stars - CSSで制御 -->
-    <div
-      v-for="i in starCounts.shooting"
-      v-if="isVisible"
-      :key="`shooting-${i}`"
-      :class="`shooting-star shooting-${i}`"
-      :style="`--star-index: ${i}`"></div>
+    <template v-if="isVisible">
+      <div
+        v-for="i in starCounts.shooting"
+        :key="`shooting-${i}`"
+        :class="`shooting-star shooting-${i}`"
+        :style="`--star-index: ${i}`"></div>
+    </template>
 
     <!-- Enhanced Nebula -->
     <div class="absolute inset-0 nebula-container">
@@ -369,22 +370,22 @@ const starCounts = {
 }
 
 /* 各流れ星の設定 */
-.shooting-1 { 
-  top: 20%; 
+.shooting-1 {
+  top: 20%;
   left: -30%;
   animation-delay: 0s;
   width: 100px;
 }
 
-.shooting-2 { 
-  top: 40%; 
+.shooting-2 {
+  top: 40%;
   left: -20%;
   animation-delay: 3s;
   width: 60px;
 }
 
-.shooting-3 { 
-  top: 10%; 
+.shooting-3 {
+  top: 10%;
   left: -25%;
   animation-delay: 5s;
   width: 80px;

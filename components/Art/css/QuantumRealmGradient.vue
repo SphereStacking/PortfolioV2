@@ -18,7 +18,7 @@ const { stop } = useIntersectionObserver(
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
   },
-  { threshold: 0.1 }
+  { threshold: 0.1 },
 )
 
 onUnmounted(() => {
@@ -62,7 +62,7 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
     :style="style">
     <!-- 量子場の背景 -->
     <div class="absolute inset-0 quantum-field"></div>
-    
+
     <!-- 電子軌道 -->
     <div class="absolute inset-0 flex items-center justify-center">
       <div
@@ -78,7 +78,7 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
         <div class="electron"></div>
       </div>
     </div>
-    
+
     <!-- 量子粒子 -->
     <div v-if="isVisible" class="absolute inset-0">
       <div
@@ -86,17 +86,17 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
         :key="`particle-${particle.id}`"
         class="quantum-particle"
         :style="{
-          width: `${particle.size}px`,
-          height: `${particle.size}px`,
-          left: `${particle.x}%`,
-          top: `${particle.y}%`,
-          backgroundColor: particle.color,
-          animationDuration: `${particle.duration}s`,
-          animationDelay: `${particle.delay}s`,
+          'width': `${particle.size}px`,
+          'height': `${particle.size}px`,
+          'left': `${particle.x}%`,
+          'top': `${particle.y}%`,
+          'backgroundColor': particle.color,
+          'animationDuration': `${particle.duration}s`,
+          'animationDelay': `${particle.delay}s`,
           '--particle-color': particle.color,
         }"></div>
     </div>
-    
+
     <!-- エネルギー波 -->
     <div v-if="isVisible" class="absolute inset-0">
       <div
@@ -108,17 +108,17 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
           animationDuration: `${wave.duration}s`,
         }"></div>
     </div>
-    
+
     <!-- 波動関数の可視化 -->
     <div class="absolute inset-0 wave-function">
       <div class="wave-function-line wave-1"></div>
       <div class="wave-function-line wave-2"></div>
       <div class="wave-function-line wave-3"></div>
     </div>
-    
+
     <!-- 量子もつれ効果 -->
     <div class="absolute inset-0 entanglement-effect"></div>
-    
+
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
         <h3 class="text-cyan-400 text-3xl font-bold quantum-text">
@@ -137,7 +137,7 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
 }
 
 .quantum-field {
-  background: 
+  background:
     radial-gradient(circle at 25% 25%, #0a0033 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, #001a33 0%, transparent 50%),
     linear-gradient(180deg, #000011 0%, #000033 50%, #000011 100%);
@@ -169,7 +169,7 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
   top: -4px;
   left: 50%;
   transform: translateX(-50%);
-  box-shadow: 
+  box-shadow:
     0 0 10px #00ffff,
     0 0 20px #00ffff;
   animation: electron-glow 2s ease-in-out infinite;
@@ -191,7 +191,7 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
   border-radius: 50%;
   animation: quantum-teleport ease-in-out infinite;
   will-change: transform, opacity;
-  box-shadow: 
+  box-shadow:
     0 0 10px var(--particle-color),
     0 0 20px var(--particle-color);
 }
@@ -315,7 +315,7 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
 }
 
 .quantum-text {
-  text-shadow: 
+  text-shadow:
     0 0 20px rgba(0, 255, 255, 0.8),
     0 0 40px rgba(255, 0, 255, 0.6),
     0 0 60px rgba(0, 255, 0, 0.4);
@@ -326,13 +326,13 @@ const energyWaves = ref(Array.from({ length: 5 }, (_, i) => ({
 
 @keyframes text-glitch {
   0%, 100% {
-    text-shadow: 
+    text-shadow:
       0 0 20px rgba(0, 255, 255, 0.8),
       0 0 40px rgba(255, 0, 255, 0.6),
       0 0 60px rgba(0, 255, 0, 0.4);
   }
   95% {
-    text-shadow: 
+    text-shadow:
       2px 0 20px rgba(0, 255, 255, 0.8),
       -2px 0 40px rgba(255, 0, 255, 0.6),
       0 0 60px rgba(0, 255, 0, 0.4);

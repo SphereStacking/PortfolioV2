@@ -30,7 +30,7 @@ const { stop } = useIntersectionObserver(
   ([{ isIntersecting }]) => {
     isVisible.value = isIntersecting
   },
-  { threshold: 0.1 }
+  { threshold: 0.1 },
 )
 
 onUnmounted(() => {
@@ -48,7 +48,7 @@ const buildings = ref(Array.from({ length: 6 }, (_, i) => {
     opacity: 0.7 + (i % 2) * 0.2,
     zIndex: (i % 3) + 1,
     shadow: '0 0 20px rgba(0, 0, 0, 0.5)',
-    windows: Array.from({ length: windowCount }, (_, j) => ({
+    windows: Array.from({ length: windowCount }, _ => ({
       // 各窓にランダムな点滅パターンを設定
       blinkDuration: 3 + Math.random() * 4, // 3-7秒
       blinkDelay: Math.random() * 5, // 0-5秒の遅延
@@ -84,41 +84,42 @@ const cars = ref(Array.from({ length: 5 }, (_, i) => {
       <div class="absolute inset-0 urban-grid"></div>
 
       <!-- 高層ビル -->
-      <div
-        v-for="(building, i) in buildings"
-        v-if="isVisible"
-        :key="`building-${i}`"
-        class="absolute urban-building"
-        :style="{
-          width: `${building.width}px`,
-          height: `${building.height}px`,
-          bottom: 0,
-          left: `${building.left}%`,
-          backgroundColor: building.color,
-          opacity: building.opacity,
-          zIndex: building.zIndex,
-          boxShadow: building.shadow,
-          transform: 'translateZ(0)',
-          willChange: 'transform',
-        }">
-        <!-- ビルの窓 -->
+      <template v-if="isVisible">
         <div
-          v-for="(window, j) in building.windows"
-          :key="`window-${i}-${j}`"
-          class="absolute urban-window"
-          :class="{ 'window-blink': window.shouldBlink }"
+          v-for="(building, i) in buildings"
+          :key="`building-${i}`"
+          class="absolute urban-building"
           :style="{
-            width: '4px',
-            height: '4px',
-            top: `${10 + Math.floor(j / 4) * 10}%`,
-            left: `${10 + (j % 4) * 24}%`,
-            backgroundColor: '#fbbf24',
-            opacity: 0.8,
-            boxShadow: window.shouldBlink ? '0 0 8px #fbbf24' : 'none',
-            '--blink-duration': `${window.blinkDuration}s`,
-            '--blink-delay': `${window.blinkDelay}s`,
-          }"></div>
-      </div>
+            width: `${building.width}px`,
+            height: `${building.height}px`,
+            bottom: 0,
+            left: `${building.left}%`,
+            backgroundColor: building.color,
+            opacity: building.opacity,
+            zIndex: building.zIndex,
+            boxShadow: building.shadow,
+            transform: 'translateZ(0)',
+            willChange: 'transform',
+          }">
+          <!-- ビルの窓 -->
+          <div
+            v-for="(window, j) in building.windows"
+            :key="`window-${i}-${j}`"
+            class="absolute urban-window"
+            :class="{ 'window-blink': window.shouldBlink }"
+            :style="{
+              'width': '4px',
+              'height': '4px',
+              'top': `${10 + Math.floor(j / 4) * 10}%`,
+              'left': `${10 + (j % 4) * 24}%`,
+              'backgroundColor': '#fbbf24',
+              'opacity': 0.8,
+              'boxShadow': window.shouldBlink ? '0 0 8px #fbbf24' : 'none',
+              '--blink-duration': `${window.blinkDuration}s`,
+              '--blink-delay': `${window.blinkDelay}s`,
+            }"></div>
+        </div>
+      </template>
     </div>
 
     <!-- 道路と交通 -->

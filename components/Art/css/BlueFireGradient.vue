@@ -42,7 +42,7 @@ const plasmaCores = computed(() => {
     :style="style">
     <!-- 黒いベース -->
     <div class="absolute inset-0 black-base"></div>
-    
+
     <!-- 青い炎のコア -->
     <div
       v-for="core in plasmaCores"
@@ -56,14 +56,14 @@ const plasmaCores = computed(() => {
         animationDuration: `${core.duration}s`,
         animationDelay: `${core.delay}s`,
       }"></div>
-    
+
     <!-- 青い炎のメインボディ -->
     <div class="absolute inset-x-0 bottom-0 h-4/5">
       <div class="blue-flame-main"></div>
       <div class="blue-flame-secondary"></div>
       <div class="blue-flame-tertiary"></div>
     </div>
-    
+
     <!-- 青い粒子 -->
     <div class="absolute inset-0 overflow-hidden">
       <div
@@ -71,18 +71,18 @@ const plasmaCores = computed(() => {
         :key="`particle-${particle.id}`"
         class="blue-particle"
         :style="{
-          width: `${particle.size}px`,
-          height: `${particle.size}px`,
-          left: `${particle.x}%`,
+          'width': `${particle.size}px`,
+          'height': `${particle.size}px`,
+          'left': `${particle.x}%`,
           '--sway': `${particle.swayAmount}px`,
-          animationDuration: `${particle.duration}s`,
-          animationDelay: `${particle.delay}s`,
+          'animationDuration': `${particle.duration}s`,
+          'animationDelay': `${particle.delay}s`,
         }"></div>
     </div>
-    
+
     <!-- グローエフェクト -->
     <div class="absolute inset-0 blue-glow"></div>
-    
+
     <div class="absolute inset-0 flex items-center justify-center z-10">
       <slot>
         <h3 class="text-white text-3xl font-bold bluefire-text">
@@ -127,7 +127,7 @@ const plasmaCores = computed(() => {
 .blue-flame-main {
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(ellipse at 50% 100%, #ffffff 0%, #00ffff 10%, #0099ff 30%, #0066ff 50%, transparent 70%),
     radial-gradient(ellipse at 30% 100%, #00ffff 0%, #0099ff 20%, transparent 50%),
     radial-gradient(ellipse at 70% 100%, #00ffff 0%, #0099ff 20%, transparent 50%);
@@ -139,7 +139,7 @@ const plasmaCores = computed(() => {
 .blue-flame-secondary {
   position: absolute;
   inset: 10% 20% 0;
-  background: 
+  background:
     radial-gradient(ellipse at 50% 100%, #ffffff 0%, #00ccff 20%, transparent 60%);
   filter: blur(5px);
   animation: flame-dance 4s ease-in-out infinite reverse;
@@ -150,7 +150,7 @@ const plasmaCores = computed(() => {
 .blue-flame-tertiary {
   position: absolute;
   inset: 20% 30% 0;
-  background: 
+  background:
     radial-gradient(ellipse at 50% 100%, #ffffff 0%, transparent 50%);
   filter: blur(10px);
   animation: flame-dance 2.5s ease-in-out infinite;
@@ -197,7 +197,7 @@ const plasmaCores = computed(() => {
 
 /* グローエフェクト */
 .blue-glow {
-  background: 
+  background:
     radial-gradient(ellipse at 50% 80%, rgba(0, 153, 255, 0.4) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 100%, rgba(0, 255, 255, 0.3) 0%, transparent 60%);
   filter: blur(40px);
@@ -212,7 +212,7 @@ const plasmaCores = computed(() => {
 
 /* テキスト */
 .bluefire-text {
-  text-shadow: 
+  text-shadow:
     0 0 10px #ffffff,
     0 0 20px #00ffff,
     0 0 30px #00ccff,
@@ -225,7 +225,7 @@ const plasmaCores = computed(() => {
 
 @keyframes text-blue-fire {
   0%, 100% {
-    text-shadow: 
+    text-shadow:
       0 0 10px #ffffff,
       0 0 20px #00ffff,
       0 0 30px #00ccff,
@@ -234,7 +234,7 @@ const plasmaCores = computed(() => {
       0 0 60px #0033ff;
   }
   50% {
-    text-shadow: 
+    text-shadow:
       0 0 20px #ffffff,
       0 0 30px #00ffff,
       0 0 40px #00ccff,

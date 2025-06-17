@@ -250,16 +250,16 @@ const dataStreams = ref([
 }
 
 @keyframes stream-flow {
-  from { 
-    opacity: 0; 
-    transform: scale(0, 1) translateZ(0); 
+  from {
+    opacity: 0;
+    transform: scale(0, 1) translateZ(0);
   }
-  50% { 
-    opacity: 0.8; 
+  50% {
+    opacity: 0.8;
   }
-  to { 
-    opacity: 0; 
-    transform: scale(1, 1) translateZ(0); 
+  to {
+    opacity: 0;
+    transform: scale(1, 1) translateZ(0);
   }
 }
 

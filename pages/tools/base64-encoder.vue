@@ -10,12 +10,12 @@ definePageMeta({
 const inputText = ref('')
 const outputText = ref('')
 const mode = ref<'encode' | 'decode'>('encode')
-const charset = ref('UTF-8')
+const _charset = ref('UTF-8')
 const urlSafe = ref(false)
 const error = ref('')
 
 // 文字エンコーディングのオプション
-const charsets = [
+const _charsets = [
   'UTF-8',
   'UTF-16',
   'UTF-16BE',

@@ -22,22 +22,22 @@ const bases = [
 // 変換結果
 const results = computed(() => {
   if (error.value) return {}
-  
+
   try {
     // 入力値を10進数に変換
     const cleanValue = inputValue.value.replace(/^(0x|0X|0b|0B|0o|0O)/, '')
     const decimal = parseInt(cleanValue, inputBase.value)
-    
+
     if (isNaN(decimal)) {
       error.value = '無効な数値です'
       return {}
     }
-    
+
     if (decimal < 0) {
       error.value = '負の数はサポートされていません'
       return {}
     }
-    
+
     // 各基数に変換
     return {
       2: decimal.toString(2),
@@ -46,7 +46,8 @@ const results = computed(() => {
       16: decimal.toString(16).toUpperCase(),
       decimal: decimal,
     }
-  } catch (e) {
+  }
+  catch (e) {
     error.value = '変換エラーが発生しました'
     return {}
   }
@@ -55,15 +56,15 @@ const results = computed(() => {
 // 入力値の検証
 const validateInput = () => {
   error.value = ''
-  
+
   if (!inputValue.value) {
     error.value = '値を入力してください'
     return
   }
-  
+
   const cleanValue = inputValue.value.replace(/^(0x|0X|0b|0B|0o|0O)/, '')
   const validChars = getValidChars(inputBase.value)
-  
+
   for (const char of cleanValue.toUpperCase()) {
     if (!validChars.includes(char)) {
       error.value = `基数${inputBase.value}では '${char}' は無効な文字です`
@@ -92,7 +93,7 @@ const setPresetValue = (value: string, base: number) => {
 // ビット演算の例
 const bitOperations = computed(() => {
   if (!results.value.decimal || results.value.decimal === 0) return null
-  
+
   const num = results.value.decimal
   return {
     not: (~num >>> 0).toString(2), // 32ビット符号なし
@@ -107,11 +108,11 @@ const bitOperations = computed(() => {
 // ビット情報
 const bitInfo = computed(() => {
   if (!results.value.decimal) return null
-  
+
   const binary = results.value[2]
   const setBits = binary.split('').filter(bit => bit === '1').length
   const totalBits = binary.length
-  
+
   return {
     setBits,
     totalBits,
@@ -129,7 +130,8 @@ const copyToClipboard = async (text: string, label: string) => {
     toast({
       description: `${label}をクリップボードにコピーしました`,
     })
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Failed to copy:', err)
     toast({
       description: 'コピーに失敗しました',
@@ -201,7 +203,7 @@ useSeoMeta({
               class="w-full px-3 py-2 font-mono text-lg border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="42">
           </div>
-          
+
           <div>
             <label class="text-sm font-medium mb-2 block">入力の基数</label>
             <div class="grid grid-cols-4 gap-2">
@@ -214,7 +216,7 @@ useSeoMeta({
               </Button>
             </div>
           </div>
-          
+
           <div v-if="error">
             <Alert variant="destructive">
               <Icon name="heroicons:exclamation-circle" class="h-4 w-4" />
@@ -262,16 +264,28 @@ useSeoMeta({
       <CardContent>
         <div class="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div class="text-2xl font-bold">{{ bitInfo.totalBits }}</div>
-            <div class="text-sm text-muted-foreground">総ビット数</div>
+            <div class="text-2xl font-bold">
+              {{ bitInfo.totalBits }}
+            </div>
+            <div class="text-sm text-muted-foreground">
+              総ビット数
+            </div>
           </div>
           <div>
-            <div class="text-2xl font-bold">{{ bitInfo.setBits }}</div>
-            <div class="text-sm text-muted-foreground">1のビット数</div>
+            <div class="text-2xl font-bold">
+              {{ bitInfo.setBits }}
+            </div>
+            <div class="text-sm text-muted-foreground">
+              1のビット数
+            </div>
           </div>
           <div>
-            <div class="text-2xl font-bold">{{ bitInfo.totalBits - bitInfo.setBits }}</div>
-            <div class="text-sm text-muted-foreground">0のビット数</div>
+            <div class="text-2xl font-bold">
+              {{ bitInfo.totalBits - bitInfo.setBits }}
+            </div>
+            <div class="text-sm text-muted-foreground">
+              0のビット数
+            </div>
           </div>
         </div>
       </CardContent>
@@ -287,27 +301,39 @@ useSeoMeta({
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span class="font-medium">NOT (~{{ results.decimal }})</span>
-              <div class="font-mono text-muted-foreground">{{ bitOperations.not }}</div>
+              <div class="font-mono text-muted-foreground">
+                {{ bitOperations.not }}
+              </div>
             </div>
             <div>
               <span class="font-medium">左シフト ({{ results.decimal }} << 1)</span>
-              <div class="font-mono text-muted-foreground">{{ bitOperations.leftShift1 }}</div>
+              <div class="font-mono text-muted-foreground">
+                {{ bitOperations.leftShift1 }}
+              </div>
             </div>
             <div>
               <span class="font-medium">右シフト ({{ results.decimal }} >> 1)</span>
-              <div class="font-mono text-muted-foreground">{{ bitOperations.rightShift1 }}</div>
+              <div class="font-mono text-muted-foreground">
+                {{ bitOperations.rightShift1 }}
+              </div>
             </div>
             <div>
               <span class="font-medium">AND ({{ results.decimal }} & 15)</span>
-              <div class="font-mono text-muted-foreground">{{ bitOperations.and15 }}</div>
+              <div class="font-mono text-muted-foreground">
+                {{ bitOperations.and15 }}
+              </div>
             </div>
             <div>
               <span class="font-medium">OR ({{ results.decimal }} | 8)</span>
-              <div class="font-mono text-muted-foreground">{{ bitOperations.or8 }}</div>
+              <div class="font-mono text-muted-foreground">
+                {{ bitOperations.or8 }}
+              </div>
             </div>
             <div>
               <span class="font-medium">XOR ({{ results.decimal }} ^ 255)</span>
-              <div class="font-mono text-muted-foreground">{{ bitOperations.xor255 }}</div>
+              <div class="font-mono text-muted-foreground">
+                {{ bitOperations.xor255 }}
+              </div>
             </div>
           </div>
         </div>
@@ -322,7 +348,9 @@ useSeoMeta({
       <CardContent>
         <div class="space-y-4 text-muted-foreground">
           <div>
-            <h3 class="font-semibold text-foreground mb-2">各進数の用途</h3>
+            <h3 class="font-semibold text-foreground mb-2">
+              各進数の用途
+            </h3>
             <ul class="list-disc list-inside space-y-1">
               <li><strong>2進数（Binary）</strong>: コンピュータの基本、ビット演算、フラグ管理</li>
               <li><strong>8進数（Octal）</strong>: Unixファイルパーミッション（例: 755）</li>
@@ -330,9 +358,11 @@ useSeoMeta({
               <li><strong>16進数（Hexadecimal）</strong>: カラーコード、メモリアドレス、バイトデータ</li>
             </ul>
           </div>
-          
+
           <div>
-            <h3 class="font-semibold text-foreground mb-2">プログラミングでの表記</h3>
+            <h3 class="font-semibold text-foreground mb-2">
+              プログラミングでの表記
+            </h3>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -345,21 +375,39 @@ useSeoMeta({
               <TableBody>
                 <TableRow>
                   <TableCell>2進数</TableCell>
-                  <TableCell class="font-mono">0b1010</TableCell>
-                  <TableCell class="font-mono">0b1010</TableCell>
-                  <TableCell class="font-mono">0b1010</TableCell>
+                  <TableCell class="font-mono">
+                    0b1010
+                  </TableCell>
+                  <TableCell class="font-mono">
+                    0b1010
+                  </TableCell>
+                  <TableCell class="font-mono">
+                    0b1010
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>8進数</TableCell>
-                  <TableCell class="font-mono">0o12</TableCell>
-                  <TableCell class="font-mono">0o12</TableCell>
-                  <TableCell class="font-mono">012</TableCell>
+                  <TableCell class="font-mono">
+                    0o12
+                  </TableCell>
+                  <TableCell class="font-mono">
+                    0o12
+                  </TableCell>
+                  <TableCell class="font-mono">
+                    012
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>16進数</TableCell>
-                  <TableCell class="font-mono">0xA</TableCell>
-                  <TableCell class="font-mono">0xA</TableCell>
-                  <TableCell class="font-mono">0xA</TableCell>
+                  <TableCell class="font-mono">
+                    0xA
+                  </TableCell>
+                  <TableCell class="font-mono">
+                    0xA
+                  </TableCell>
+                  <TableCell class="font-mono">
+                    0xA
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>

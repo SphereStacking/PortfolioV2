@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
 import { Slider } from '~/components/ui/slider'
 

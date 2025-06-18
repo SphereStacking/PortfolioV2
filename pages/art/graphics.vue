@@ -207,7 +207,7 @@ function selectShader(shader) {
       </template>
     </PageHeader>
 
-    <div class="container md:mx-auto px-2 mb-16 mt-8">
+    <div class="container mx-auto mb-16 mt-8">
       <div class="space-y-8">
         <!-- Introduction -->
         <Card>

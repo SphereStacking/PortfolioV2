@@ -32,7 +32,7 @@ const artCategories = [
       </template>
     </PageHeader>
 
-    <div class="container md:mx-auto px-2 mb-16 mt-8">
+    <div class="container mx-auto mb-16 mt-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <NuxtLink
           v-for="category in artCategories"

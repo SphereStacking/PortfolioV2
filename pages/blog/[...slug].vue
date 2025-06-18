@@ -53,7 +53,7 @@ const links = computed(() => {
 
 <template>
   <ThreeColumnLayout
-    class="container md:mx-auto px-2 mb-16"
+    class="container mx-auto mb-16"
     :left="{ class: 'hidden' }"
     :main="{ class: 'md:col-span-9 xl:col-span-9 col-span-12' }"
     :right="{ class: 'md:col-span-3 xl:col-span-3 col-span-0' }">

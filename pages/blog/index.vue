@@ -15,7 +15,7 @@ const { data } = await useAsyncData(() => queryCollection('blog')
         Blog
       </template>
     </PageHeader>
-    <div class="container md:mx-auto px-2 mb-16 mt-8">
+    <div class="container mx-auto mb-16 mt-8">
       <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <li
           v-for="(post, index) in data"

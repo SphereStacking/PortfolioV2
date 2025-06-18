@@ -43,7 +43,7 @@ const careersWithProjects = computed(() => {
         Career
       </template>
     </PageHeader>
-    <div class="container md:mx-auto px-2 mb-16 mt-8">
+    <div class="container mx-auto mb-16 mt-8">
       <ul class="grid grid-cols-1 gap-8">
         <li
           v-for="(career, index) in careersWithProjects"

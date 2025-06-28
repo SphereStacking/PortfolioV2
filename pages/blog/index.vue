@@ -4,6 +4,7 @@ import ArticleCard from '~/components/content/ArticleCard.vue'
 
 const { data } = await useAsyncData(() => queryCollection('blog')
   .where('draft', '=', false)
+  .order('created', 'DESC')
   .all(),
 )
 </script>

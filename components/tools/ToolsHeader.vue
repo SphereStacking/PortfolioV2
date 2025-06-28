@@ -30,13 +30,13 @@ defineProps<Props>()
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">
+            <BreadcrumbLink href="/" as="NuxtLink">
               <Icon name="heroicons:home" class="h-4 w-4" />
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/tools">
+            <BreadcrumbLink href="/tools" as="NuxtLink">
               ツール
             </BreadcrumbLink>
           </BreadcrumbItem>

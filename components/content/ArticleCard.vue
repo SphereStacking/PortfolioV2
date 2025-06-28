@@ -3,10 +3,10 @@ interface Props {
   data: {
     title: string
     created: string
-    updated: string
+    updated?: string
     image?: string
     path: string
-    tags: string[]
+    tags?: string[]
     icons?: string[]
   }
 }
@@ -19,7 +19,7 @@ defineProps<Props>()
     :to="data.path"
     :aria-label="data.title"
     class="flex cursor-pointer flex-col gap-2">
-    <div class="overflow-hidden rounded-md border border-white/10 shadow-md shadow-zinc-950/50 transition-colors duration-200 hover:border-white/20">
+    <div class="relative overflow-hidden rounded-md border border-white/10 shadow-md shadow-zinc-950/50 transition-colors duration-200 hover:border-white/20">
       <template v-if="data.image">
         <div class="aspect-video overflow-hidden">
           <NuxtImg
@@ -32,14 +32,14 @@ defineProps<Props>()
       </template>
       <template v-else>
         <div
-          class="aspect-video flex flex-col gap-2 grow justify-between py-10 px-10 transition-transform duration-300 hover:scale-110"
+          class="aspect-video flex flex-col gap-2 justify-center items-center py-10 px-10 transition-transform duration-300 hover:scale-110"
           :style="{
             backgroundImage: `
               linear-gradient(-30deg, rgba(16,152,173,0.2) 10%, rgb(16,152,173,0.4) 30%, rgb(64,169,152,0.5) 40%, rgb(111,186,130,0.4) 50%, rgba(16,152,173,0.1) 70%)
             `,
           }">
           <div
-            class="text-white/50 text-xl flex items-center justify-center gap-4 m-auto w-full"
+            class="text-white/50 text-xl flex items-center justify-center gap-4"
             :class="[
               data.icons?.length && data.icons.length < 3 ? 'gap-8' : 'gap-4',
             ]">
@@ -51,6 +51,16 @@ defineProps<Props>()
           </div>
         </div>
       </template>
+      <div v-if="data.tags && data.tags.length > 0" class="absolute top-2 flex flex-wrap gap-1 px-2">
+        <Badge
+          v-for="tag in data.tags"
+          :key="tag"
+          class="cursor-pointer"
+          variant="outline"
+          @click.stop.prevent="navigateTo(`/blog?tag=${encodeURIComponent(tag)}`)">
+          {{ tag }}
+        </Badge>
+      </div>
     </div>
     <div class="flex flex-col">
       <h3 class="text-lg font-m-plus-rounded-1c line-clamp-2">

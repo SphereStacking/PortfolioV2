@@ -110,4 +110,4 @@ const rowData = [
 
 ### 表示結果
 
-![An image](./1018-image.avif)
+![An image](https://raw.githubusercontent.com/SphereStacking/PortfolioV2/refs/heads/main/content/2.blog/2023/1018-image.avif)

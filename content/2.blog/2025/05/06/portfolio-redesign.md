@@ -211,12 +211,12 @@ export const useColorMode = () => {
 
 VitePressからの移行で最も大きく変わったのは、デザインの自由度でした：
 
-**Before (VitePress)**
+### Before (VitePress)
 - VitePressの標準的なドキュメントサイトデザイン
 - 誰が見ても「VitePressで作られたサイト」とわかる見た目
 - テーマのカスタマイズに制限があり、独自性を出しにくい
 
-**After (Nuxt + shadcn-vue)**
+### After (Nuxt + shadcn-vue)
 - 完全にオリジナルなデザインを実現
 - ポートフォリオサイトとしての独自性を表現
 - 細部まで自分好みにカスタマイズ可能

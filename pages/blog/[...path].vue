@@ -184,7 +184,9 @@ const { data: page } = await useAsyncData(
 const articleBreadcrumbItems = computed(() => {
   if (!page.value) return []
 
-  const items = []
+  const items = [
+    { label: 'Blog', icon: 'heroicons:book-open', to: '/blog' },
+  ]
 
   // 年/月/日のパンくずを追加
   if (pathParams.value.length >= 4) {

@@ -308,7 +308,7 @@ else if (isArticlePage.value) {
           <BreadcrumbList>
             <template v-for="(item, index) in archiveBreadcrumbItems" :key="item.label">
               <BreadcrumbItem>
-                <BreadcrumbLink v-if="item.to" :href="item.to">
+                <BreadcrumbLink v-if="item.to" :href="item.to" as="NuxtLink">
                   <Icon v-if="item.icon" :name="item.icon" class="h-4 w-4" />
                   <span v-else>{{ item.label }}</span>
                 </BreadcrumbLink>
@@ -408,14 +408,15 @@ else if (isArticlePage.value) {
         </template>
       </div>
       <motion.div
-        :initial="{ opacity: 0, y: 20 }"
-        :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.5, delay: 0 }" class="mt-2">
+        :initial="{ opacity: 0, x: -20 }"
+        :animate="{ opacity: 1, x: 0 }"
+        :transition="{ duration: 0.5 }"
+        class="mt-2">
         <Breadcrumb>
           <BreadcrumbList>
             <template v-for="(item, index) in articleBreadcrumbItems" :key="item.label">
               <BreadcrumbItem>
-                <BreadcrumbLink v-if="item.to" :href="item.to">
+                <BreadcrumbLink v-if="item.to" :href="item.to" as="NuxtLink">
                   <Icon v-if="item.icon" :name="item.icon" class="h-4 w-4" />
                   <span v-else>{{ item.label }}</span>
                 </BreadcrumbLink>

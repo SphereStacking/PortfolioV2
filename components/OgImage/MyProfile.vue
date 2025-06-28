@@ -15,7 +15,7 @@ const myProfile = useMyProfile()
         <img :src="myProfile.profileImagePath" alt="logo" class="object-contain w-full h-full">
       </div>
       <div class="flex flex-col gap-2 w-3/5 my-auto">
-        <h1 class="text-8xl font-black text-white mx-auto font-monomaniac-one">
+        <h1 class="text-8xl font-black text-white mx-auto font-wdxl-lubrifont-jp-n">
           {{ myProfile.name }}
         </h1>
         <p class="h-10 text-white text-4xl mx-auto">

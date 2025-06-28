@@ -1,6 +1,6 @@
 <template>
   <NuxtLink to="/">
-    <div class="text-2xl font-monomaniac-one text-center leading-none">
+    <div class="text-2xl font-wdxl-lubrifont-jp-n text-center leading-none">
       Sphere<br>Stacking
     </div>
   </NuxtLink>

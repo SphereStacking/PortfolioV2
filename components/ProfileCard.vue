@@ -37,7 +37,7 @@ const mousePosition = computed(() => {
         <img :src="myProfile.profileImagePath" alt="logo" class="object-cover w-full h-full">
       </div>
       <div class="flex flex-col gap-2 md:w-7/12 md:my-auto h-2/5 md:h-auto">
-        <h1 class="text-5xl font-medium text-white mx-auto font-monomaniac-one text-nowrap">
+        <h1 class="text-5xl font-medium text-white mx-auto font-wdxl-lubrifont-jp-n text-nowrap">
           {{ myProfile.name }}
         </h1>
         <p class="text-white text-md mx-auto">

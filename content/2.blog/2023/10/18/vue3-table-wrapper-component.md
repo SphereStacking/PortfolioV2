@@ -7,9 +7,11 @@ created: 2023-10-18
 updated: 2025-05-04
 image: null
 tags:
-  - vue3
-  - table
-  - component
+  - Vue.js
+  - Table
+  - Component
+  - TypeScript
+  - UI/UX
 icons:
   - devicon:vuejs
   - mdi:grid

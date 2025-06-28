@@ -7,10 +7,11 @@ created: 2024-04-19
 updated:
 image:
 tags:
-  - "slack"
-  - "bolt"
-  - "local"
-  - "dev"
+  - "Slack"
+  - "Bolt"
+  - "Docker"
+  - "ngrok"
+  - "ローカル開発"
 icons:
   - "devicon:slack"
   - "fxemoji:bolt"

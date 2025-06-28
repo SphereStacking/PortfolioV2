@@ -10,6 +10,8 @@ tags:
   - "Claude Code"
   - "カスタムコマンド"
   - "自動化"
+  - "AI"
+  - "開発効率"
 icons:
   - " logos:claude-icon"
   - "codicon:terminal"

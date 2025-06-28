@@ -9,8 +9,8 @@ image: null
 tags:
   - Nuxt
   - shadcn-vue
-  - TailwindCSS
   - NuxtContent
+  - ポートフォリオ
 icons:
   - logos:nuxt-icon
   - simple-icons:shadcnui

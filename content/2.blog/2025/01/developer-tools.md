@@ -9,8 +9,9 @@ image:
 tags:
   - Nuxt
   - WebTools
-  - Vue
-  - TailwindCSS
+  - 個人開発
+  - ポートフォリオ
+  - Vue.js
 icons:
   - devicon:nuxtjs
   - mdi:tools

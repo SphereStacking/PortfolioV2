@@ -8,8 +8,10 @@ updated:
 image:
 tags:
   - "VSCode"
-  - "開発効率"
   - "拡張機能"
+  - "開発効率"
+  - "Tips"
+  - "IDE"
 icons:
   - "devicon:vscode"
   - "codicon:extensions"

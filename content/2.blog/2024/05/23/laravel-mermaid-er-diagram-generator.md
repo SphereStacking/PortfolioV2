@@ -10,6 +10,8 @@ tags:
   - "Laravel"
   - "Mermaid"
   - "ER図"
+  - "PostgreSQL"
+  - "CLI"
 icons:
   - "devicon:laravel"
   - "simple-icons:mermaid"

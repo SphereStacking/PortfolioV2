@@ -7,12 +7,11 @@ created: 2024-06-05
 updated:
 image:
 tags:
-  - "laravel"
-  - "sail"
-  - "jetstream"
-  - "inertia"
-  - "vue3"
-  - "ssr"
+  - "Laravel"
+  - "Render.com"
+  - "Docker"
+  - "SSR"
+  - "Deployment"
 icons:
   - "devicon:laravel"
   - "simple-icons:render"

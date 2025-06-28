@@ -9,10 +9,9 @@ image:
 tags:
   - "Laravel"
   - "Vue.js"
-  - "VR"
   - "個人開発"
   - "VRChat"
-  - "HollowShelfie"
+  - "SSR"
 icons:
   - "iconoir:laptop-dev-mode"
   - "tabler:badge-vr-filled"

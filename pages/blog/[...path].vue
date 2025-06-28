@@ -440,7 +440,12 @@ else if (isArticlePage.value) {
         :initial="{ opacity: 0, y: 20 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.5, delay: 0.2 }" class="flex items-center gap-2">
-        <Badge v-for="tag in page?.tags" :key="tag">
+        <Badge
+          v-for="tag in page?.tags"
+          :key="tag"
+          class="cursor-pointer"
+          variant="outline"
+          @click="navigateTo(`/blog?tag=${encodeURIComponent(tag)}`)">
           {{ tag }}
         </Badge>
       </motion.div>

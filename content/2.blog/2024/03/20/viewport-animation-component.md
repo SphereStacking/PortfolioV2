@@ -8,7 +8,9 @@ updated:
 image: 
 tags:
   - "Vue.js"
-  - "tailwindcss"
+  - "Animation"
+  - "Component"
+  - "TailwindCSS"
 icons:
   - "devicon:vuejs"
   - "devicon:tailwindcss"

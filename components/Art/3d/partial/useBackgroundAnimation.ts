@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import * as THREE from 'three'
-import { presets } from './preset'
+import { presets, DEFAULT_PRESETS } from './preset'
 
 export interface BackgroundAnimation {
   gridSize: { value: number }
@@ -21,21 +21,21 @@ export const useBackgroundAnimation = () => {
     waves: [] as Array<{
       x: number
       y: number
+      radius: number
       opacity: number
       startTime: number
-      direction: number
     }>,
-    waveDuration: ref(2000),
+    waveDuration: ref(presets.texture[DEFAULT_PRESETS.texture].waveDuration),
     lastWaveTime: 0,
-    gridSize: ref(presets.texture.default.gridSize),
-    gridDensity: ref(presets.texture.default.gridDensity),
-    waveSpeed: ref(presets.texture.default.waveSpeed),
-    defaultCrossOpacity: ref(presets.texture.default.defaultCrossOpacity),
-    defaultCrossSize: ref(presets.texture.default.defaultCrossSize),
-    defaultCrossColor: 'rgba(255, 255, 255, 0.02)',
-    waveColor: ref(presets.texture.default.waveColor),
-    waveInterval: ref(presets.texture.default.waveInterval),
-    repeat: ref(presets.texture.default.repeat),
+    gridSize: ref(presets.texture[DEFAULT_PRESETS.texture].gridSize),
+    gridDensity: ref(presets.texture[DEFAULT_PRESETS.texture].gridDensity),
+    waveSpeed: ref(presets.texture[DEFAULT_PRESETS.texture].waveSpeed),
+    defaultCrossOpacity: ref(presets.texture[DEFAULT_PRESETS.texture].defaultCrossOpacity),
+    defaultCrossSize: ref(presets.texture[DEFAULT_PRESETS.texture].defaultCrossSize),
+    defaultCrossColor: presets.texture[DEFAULT_PRESETS.texture].defaultCrossColor,
+    waveColor: ref(presets.texture[DEFAULT_PRESETS.texture].waveColor),
+    waveInterval: ref(presets.texture[DEFAULT_PRESETS.texture].waveInterval),
+    repeat: ref(presets.texture[DEFAULT_PRESETS.texture].repeat),
   }
 
   // Create background pattern
@@ -57,7 +57,7 @@ export const useBackgroundAnimation = () => {
     return canvas
   }
 
-  // 背景アニメーションの更新
+  // 背景アニメーションの更新（外部から呼び出される）
   function updateBackgroundAnimation() {
     const now = performance.now()
     const canvas = backgroundTexture.value?.image as HTMLCanvasElement
@@ -65,8 +65,8 @@ export const useBackgroundAnimation = () => {
 
     if (!canvas || !context) return
 
+    // フレームレート制限（60fps）
     if (now - backgroundAnimation.lastUpdate < 16) {
-      requestAnimationFrame(updateBackgroundAnimation)
       return
     }
     backgroundAnimation.lastUpdate = now
@@ -92,40 +92,73 @@ export const useBackgroundAnimation = () => {
       }
     }
 
-    // 波紋の更新と描画
+    // 波紋の更新と描画（円形の波紋）
     const activeWaves = backgroundAnimation.waves.filter((wave) => {
       const elapsed = now - wave.startTime
       const progress = elapsed / backgroundAnimation.waveDuration.value
 
       if (progress >= 1) return false
 
-      const distance = progress * backgroundAnimation.waveSpeed.value * 100
-      const newX = wave.x + Math.cos(wave.direction) * distance
-      const newY = wave.y + Math.sin(wave.direction) * distance
+      // 波紋の半径を拡大
+      wave.radius = progress * backgroundAnimation.waveSpeed.value * 200
       wave.opacity = 1 - progress
 
-      const influenceRadius = 20
-      const startGridX = Math.floor((newX - influenceRadius) / cellWidth)
-      const endGridX = Math.ceil((newX + influenceRadius) / cellWidth)
-      const startGridY = Math.floor((newY - influenceRadius) / cellHeight)
-      const endGridY = Math.ceil((newY + influenceRadius) / cellHeight)
+      // 波紋の幅（リングの厚さ）
+      const waveWidth = 30
+      const innerRadius = Math.max(0, wave.radius - waveWidth / 2)
+      const outerRadius = wave.radius + waveWidth / 2
+
+      // 影響範囲のグリッドを計算
+      const startGridX = Math.floor((wave.x - outerRadius) / cellWidth)
+      const endGridX = Math.ceil((wave.x + outerRadius) / cellWidth)
+      const startGridY = Math.floor((wave.y - outerRadius) / cellHeight)
+      const endGridY = Math.ceil((wave.y + outerRadius) / cellHeight)
 
       for (let i = Math.max(0, startGridX); i < Math.min(backgroundAnimation.gridSize.value * backgroundAnimation.gridDensity.value, endGridX); i++) {
         for (let j = Math.max(0, startGridY); j < Math.min(backgroundAnimation.gridSize.value * backgroundAnimation.gridDensity.value, endGridY); j++) {
           const cellX = i * cellWidth + cellWidth / 2
           const cellY = j * cellHeight + cellHeight / 2
 
-          const dx = cellX - newX
-          const dy = cellY - newY
-          const distanceToWave = Math.sqrt(dx * dx + dy * dy)
-          const cellOpacity = Math.max(0, wave.opacity * (1 - distanceToWave / influenceRadius))
+          const dx = cellX - wave.x
+          const dy = cellY - wave.y
+          const distanceFromCenter = Math.sqrt(dx * dx + dy * dy)
+
+          // リング状の波紋を作成
+          let cellOpacity = 0
+          if (distanceFromCenter >= innerRadius && distanceFromCenter <= outerRadius) {
+            // リングの端に向かってフェードアウト
+            const edgeFade = 1 - Math.abs(distanceFromCenter - wave.radius) / (waveWidth / 2)
+            cellOpacity = wave.opacity * edgeFade
+          }
 
           if (cellOpacity > 0.01) {
             context.font = `${backgroundAnimation.defaultCrossSize.value}px sans-serif`
             context.textAlign = 'center'
             context.textBaseline = 'middle'
-            context.fillStyle = `${backgroundAnimation.waveColor.value}${Math.floor(cellOpacity * 255).toString(16).padStart(2, '0')}`
+
+            // 波紋タイプによって色を変える
+            const waveColor = wave.color || backgroundAnimation.waveColor.value
+
+            // 波紋タイプによってエフェクトを変える
+            if (wave.type === 'pulse') {
+              // パルス：中心からの距離に応じてサイズを変える
+              const sizeFactor = 1 + (1 - progress) * 0.5
+              context.font = `${backgroundAnimation.defaultCrossSize.value * sizeFactor}px sans-serif`
+            }
+            else if (wave.type === 'shockwave') {
+              // ショックウェーブ：回転する
+              context.save()
+              context.translate(cellX, cellY)
+              context.rotate(progress * Math.PI * 2)
+              context.translate(-cellX, -cellY)
+            }
+
+            context.fillStyle = `${waveColor}${Math.floor(cellOpacity * 255).toString(16).padStart(2, '0')}`
             context.fillText('+', cellX, cellY)
+
+            if (wave.type === 'shockwave') {
+              context.restore()
+            }
           }
         }
       }
@@ -133,17 +166,16 @@ export const useBackgroundAnimation = () => {
       return true
     })
 
+    // アクティブな波紋のみを保持（完了した波紋は自動的に削除される）
     backgroundAnimation.waves = activeWaves
 
     if (backgroundTexture.value) {
       backgroundTexture.value.needsUpdate = true
     }
-
-    requestAnimationFrame(updateBackgroundAnimation)
   }
 
-  // 波紋を追加する関数
-  function addWave(x: number, y: number) {
+  // 波紋を追加する関数（拡張版）
+  function addWave(x: number, y: number, type?: 'ring' | 'pulse' | 'shockwave', color?: string) {
     const now = performance.now()
     if (now - backgroundAnimation.lastWaveTime < backgroundAnimation.waveInterval.value) return
 
@@ -152,16 +184,24 @@ export const useBackgroundAnimation = () => {
     const gridX = Math.floor(x / cellWidth) * cellWidth + cellWidth / 2
     const gridY = Math.floor(y / cellHeight) * cellHeight + cellHeight / 2
 
-    const directions = Array.from({ length: 8 }, (_, i) => i * Math.PI / 4)
-    directions.forEach((direction) => {
-      backgroundAnimation.waves.push({
-        x: gridX,
-        y: gridY,
-        opacity: 1,
-        startTime: now,
-        direction,
-      })
+    // ランダムな波紋タイプを選択
+    const waveTypes: Array<'ring' | 'pulse' | 'shockwave'> = ['ring', 'pulse', 'shockwave']
+    const selectedType = type || waveTypes[Math.floor(Math.random() * waveTypes.length)]
+
+    // ランダムな色を選択（指定がない場合）
+    const colors = ['#00ff41', '#ff00ff', '#00ffff', '#ff0080', '#ffff00']
+    const selectedColor = color || colors[Math.floor(Math.random() * colors.length)]
+
+    backgroundAnimation.waves.push({
+      x: gridX,
+      y: gridY,
+      radius: 0,
+      opacity: 1,
+      startTime: now,
+      type: selectedType,
+      color: selectedColor,
     })
+
     backgroundAnimation.lastWaveTime = now
   }
 

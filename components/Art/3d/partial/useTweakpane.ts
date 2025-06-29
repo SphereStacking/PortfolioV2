@@ -86,6 +86,7 @@ export function useTweakpane(
   presetChangeInterval: { value: number },
 ) {
   let pane: Pane | null = null
+  let isUpdatingFromPreset = false // プリセット適用中のフラグ
 
   function initTweakpane() {
     pane = new Pane({
@@ -131,10 +132,10 @@ export function useTweakpane(
     })
 
     autoChangeFolder.addBinding(presetChangeInterval, 'value', {
-      label: 'interval',
-      min: 1000,
+      label: 'interval (ms)',
+      min: 100,
       max: 10000,
-      step: 500,
+      step: 100,
     })
 
     const texturePresetsFolder = presetsTabs.pages[0].addFolder({
@@ -146,7 +147,18 @@ export function useTweakpane(
     Object.entries(presets.texture).forEach(([key, _preset]) => {
       texturePresetsFolder.addButton({
         title: key.charAt(0).toUpperCase() + key.slice(1),
-      }).on('click', () => applyPreset('texture', key as TexturePresetName))
+      }).on('click', () => {
+        isUpdatingFromPreset = true
+        applyPreset('texture', key as TexturePresetName)
+        // Tweakpaneの値を更新
+        if (pane) {
+          pane.refresh()
+        }
+        // 少し遅延させてフラグをリセット
+        setTimeout(() => {
+          isUpdatingFromPreset = false
+        }, 100)
+      })
     })
 
     const cameraPresetsFolder = presetsTabs.pages[0].addFolder({
@@ -158,7 +170,18 @@ export function useTweakpane(
     Object.entries(presets.camera).forEach(([key, _preset]) => {
       cameraPresetsFolder.addButton({
         title: key.charAt(0).toUpperCase() + key.slice(1),
-      }).on('click', () => applyPreset('camera', key as CameraPresetName))
+      }).on('click', () => {
+        isUpdatingFromPreset = true
+        applyPreset('camera', key as CameraPresetName)
+        // Tweakpaneの値を更新
+        if (pane) {
+          pane.refresh()
+        }
+        // 少し遅延させてフラグをリセット
+        setTimeout(() => {
+          isUpdatingFromPreset = false
+        }, 100)
+      })
     })
 
     // Textureタブ
@@ -174,6 +197,10 @@ export function useTweakpane(
       min: 12,
       max: 48,
       step: 2,
+    }).on('change', () => {
+      if (!isUpdatingFromPreset) {
+        // 手動変更時の処理（必要に応じて）
+      }
     })
 
     gridFolder.addBinding(backgroundAnimation.gridDensity, 'value', {
@@ -364,5 +391,6 @@ export function useTweakpane(
   return {
     initTweakpane,
     dispose,
+    pane: () => pane, // Paneインスタンスをゲッター関数として返す
   }
 }

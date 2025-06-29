@@ -57,7 +57,7 @@ import { TresCanvas } from '@tresjs/core'
 import { OrbitControls } from '@tresjs/cientos'
 import * as THREE from 'three'
 import { useMouse } from '@vueuse/core'
-import { presets, type TexturePresetName, type CameraPresetName } from './partial/preset'
+import { presets, DEFAULT_PRESETS, type TexturePresetName, type CameraPresetName } from './partial/preset'
 import { useBackgroundAnimation } from './partial/useBackgroundAnimation'
 import { useObjects } from './partial/useObjects'
 import { useObjectAnimation } from './partial/useObjectAnimation'
@@ -79,17 +79,17 @@ const animationParams: AnimationParams = {
   camera: {
     initialPosition: [-10, -10, 5] as [number, number, number],
     targetPosition: [0, 0, 0] as [number, number, number],
-    // 波形パラメータ
+    // 波形パラメータ（chaosプリセットをデフォルトに）
     wave: {
-      frequency: ref(0.005), // 周波数
-      phase: ref(0), // 位相
-      amplitude: ref(1), // 振幅
-      radius: ref(10), // 移動半径
-      transitionSpeed: ref(0.1), // 遷移速度
-      zoom: ref(1), // ズーム倍率
-      zoomFrequency: ref(0.2), // ズームの周波数
-      zoomAmplitude: ref(0.2), // ズームの振幅
-      frequencyThreshold: ref(0.3), // 周波数の閾値
+      frequency: ref(presets.camera.chaos.frequency), // 周波数
+      phase: ref(presets.camera.chaos.phase), // 位相
+      amplitude: ref(presets.camera.chaos.amplitude), // 振幅
+      radius: ref(presets.camera.chaos.radius), // 移動半径
+      transitionSpeed: ref(presets.camera.chaos.transitionSpeed), // 遷移速度
+      zoom: ref(presets.camera.chaos.zoom), // ズーム倍率
+      zoomFrequency: ref(presets.camera.chaos.zoomFrequency), // ズームの周波数
+      zoomAmplitude: ref(presets.camera.chaos.zoomAmplitude), // ズームの振幅
+      frequencyThreshold: ref(presets.camera.chaos.frequencyThreshold), // 周波数の閾値
       isActive: ref(false), // アクティブ状態
     },
     // モニタリング用の値
@@ -170,29 +170,24 @@ function animateCamera() {
   }
 }
 
-// 周波数波形の更新
+// 周波数波形の更新（メインアニメーションループに統合）
 function updateFrequencyWave() {
-  let lastUpdateTime = 0
-  const updateInterval = 100
-
-  function update() {
-    const now = performance.now()
-    if (now - lastUpdateTime >= updateInterval) {
-      const time = now / 1000
-      const { frequency, phase, amplitude } = animationParams.camera.wave
-      animationParams.camera.monitor.frequencyWave = Math.sin(time * frequency.value * Math.PI * 2 + phase.value) * amplitude.value
-      lastUpdateTime = now
-    }
-    requestAnimationFrame(update)
+  const now = performance.now()
+  if (now - lastUpdateTime >= 100) {
+    const time = now / 1000
+    const { frequency, phase, amplitude } = animationParams.camera.wave
+    animationParams.camera.monitor.frequencyWave = Math.sin(time * frequency.value * Math.PI * 2 + phase.value) * amplitude.value
   }
-
-  update()
 }
 
 // プリセット自動変更の状態管理
 const autoChangeEnabled = ref(true)
-const presetChangeInterval = ref(5000) // 5秒ごとに変更
+const presetChangeInterval = ref(200) // 0.3秒ごとに変更（より動的に）
 let presetChangeTimer: number | null = null
+
+// アイドル時のエフェクト管理
+const idleEffectInterval = 5000 // 5秒間操作がない場合
+let idleEffectTimer: number | null = null
 
 // 利用可能なプリセット名を取得
 const texturePresetNames = Object.keys(presets.texture) as TexturePresetName[]
@@ -248,12 +243,45 @@ function applyPreset(
 
 // ランダムなプリセットを選択して適用
 function getRandomPreset() {
-  const randomTexture = texturePresetNames[Math.floor(Math.random() * texturePresetNames.length)]
-  const randomCamera = cameraPresetNames[Math.floor(Math.random() * cameraPresetNames.length)]
+  // 相性の良いコンビネーションを定義
+  const presetCombinations = [
+    { texture: 'glitch', camera: 'chaos' }, // グリッチ × カオス（デフォルト）
+    { texture: 'matrix', camera: 'orbital' }, // マトリックス × 軌道
+    { texture: 'neon', camera: 'pulse' }, // ネオン × パルス
+    { texture: 'quantum', camera: 'helix' }, // 量子 × ヘリックス
+    { texture: 'cyber', camera: 'vortex' }, // サイバー × 渦
+    { texture: 'void', camera: 'pendulum' }, // ヴォイド × 振り子
+    { texture: 'glitch', camera: 'helix' }, // グリッチ × ヘリックス
+    { texture: 'matrix', camera: 'chaos' }, // マトリックス × カオス
+  ]
+
+  // ランダムまたはコンビネーションから選択
+  const useCombo = Math.random() > 0.3 // 70%の確率でコンビネーションを使用
+
+  let randomTexture: TexturePresetName
+  let randomCamera: CameraPresetName
+
+  if (useCombo && presetCombinations.length > 0) {
+    const combo = presetCombinations[Math.floor(Math.random() * presetCombinations.length)]
+    randomTexture = combo.texture as TexturePresetName
+    randomCamera = combo.camera as CameraPresetName
+  }
+  else {
+    randomTexture = texturePresetNames[Math.floor(Math.random() * texturePresetNames.length)]
+    randomCamera = cameraPresetNames[Math.floor(Math.random() * cameraPresetNames.length)]
+  }
 
   // テクスチャとカメラのプリセットを個別に適用
   applyPreset('texture', randomTexture)
   applyPreset('camera', randomCamera)
+
+  // Tweakpaneの値も更新
+  const paneInstance = pane()
+  if (paneInstance) {
+    paneInstance.refresh()
+  }
+
+  console.log(`Applied preset combination: ${randomTexture} + ${randomCamera}`)
 
   return {
     texture: randomTexture,
@@ -291,7 +319,7 @@ watch(autoChangeEnabled, (newValue) => {
   }
 })
 
-const { initTweakpane, dispose } = useTweakpane(
+const { initTweakpane, dispose, pane } = useTweakpane(
   backgroundAnimation,
   animationParams,
   showAxesHelper,
@@ -303,12 +331,80 @@ const { initTweakpane, dispose } = useTweakpane(
 // オブジェクトの初期化
 objects.value = generateObjects()
 
+// アニメーションループの管理
+let animationId: number | null = null
+
+// アイドル時のランダムエフェクト
+function createIdleEffect() {
+  const canvas = backgroundTexture.value?.image as HTMLCanvasElement
+  if (!canvas) return
+
+  // ランダムな位置に波紋を生成
+  const x = Math.random() * window.innerWidth
+  const y = Math.random() * window.innerHeight
+
+  // ランダムな波紋タイプと色を選択
+  const types: Array<'ring' | 'pulse' | 'shockwave'> = ['ring', 'pulse', 'shockwave']
+  const colors = ['#00ff41', '#ff00ff', '#00ffff', '#ff0080', '#ffff00']
+  const type = types[Math.floor(Math.random() * types.length)]
+  const color = colors[Math.floor(Math.random() * colors.length)]
+
+  addWave(x, y, type, color)
+}
+
+// アイドル状態のチェック
+function checkIdleState() {
+  const now = performance.now()
+  const timeSinceLastMove = now - lastMouseMoveTime.value
+
+  if (timeSinceLastMove >= idleEffectInterval) {
+    // 5秒以上操作がない場合、ランダムエフェクトを発生
+    createIdleEffect()
+
+    // 次のエフェクトまでのタイマーをリセット（1-3秒のランダム間隔）
+    if (idleEffectTimer) {
+      clearTimeout(idleEffectTimer)
+    }
+    idleEffectTimer = window.setTimeout(checkIdleState, 1000 + Math.random() * 2000)
+  }
+}
+
 // アニメーションループ
 function animate(time: number) {
-  requestAnimationFrame(animate)
+  animationId = requestAnimationFrame(animate)
   updateBackgroundAnimation()
   animateCamera()
   animateObjects(objects.value, time)
+  updateFrequencyWave() // 統合
+}
+
+// アニメーションの停止
+function stopAnimation() {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId)
+    animationId = null
+  }
+}
+
+// ウィンドウサイズ変更ハンドラの定義（クリーンアップ用）
+const handleResize = () => {
+  const canvas = createPatternCanvas()
+  if (canvas && backgroundTexture.value) {
+    // テクスチャの更新を一時停止
+    backgroundTexture.value.needsUpdate = false
+
+    // 新しいキャンバスを設定
+    backgroundTexture.value.image = canvas
+
+    // テクスチャの設定を再適用
+    backgroundTexture.value.magFilter = THREE.NearestFilter
+    backgroundTexture.value.minFilter = THREE.NearestFilter
+    backgroundTexture.value.center.set(0.5, 0.5)
+    updateTextureRepeat()
+
+    // テクスチャの更新を再開
+    backgroundTexture.value.needsUpdate = true
+  }
 }
 
 // Event handlers
@@ -328,35 +424,26 @@ onMounted(() => {
 
   // 初期マウス位置を設定
   lastMouseMoveTime.value = performance.now()
+  window.addEventListener('resize', handleResize)
 
-  // ウィンドウサイズが変更された時にキャンバスを更新
-  window.addEventListener('resize', () => {
-    const canvas = createPatternCanvas()
-    if (canvas && backgroundTexture.value) {
-      // テクスチャの更新を一時停止
-      backgroundTexture.value.needsUpdate = false
-
-      // 新しいキャンバスを設定
-      backgroundTexture.value.image = canvas
-
-      // テクスチャの設定を再適用
-      backgroundTexture.value.magFilter = THREE.NearestFilter
-      backgroundTexture.value.minFilter = THREE.NearestFilter
-      backgroundTexture.value.center.set(0.5, 0.5)
-      updateTextureRepeat()
-
-      // テクスチャの更新を再開
-      backgroundTexture.value.needsUpdate = true
-    }
-  })
-
+  // デフォルトプリセットを適用
+  applyPreset('texture', DEFAULT_PRESETS.texture)
+  applyPreset('camera', DEFAULT_PRESETS.camera)
   animate(performance.now())
   initTweakpane()
-  updateFrequencyWave() // 周波数波形の更新を開始
+
+  // アイドル状態のチェックを開始
+  idleEffectTimer = window.setTimeout(checkIdleState, idleEffectInterval)
 
   // マウス移動の監視
   watch([mouseX, mouseY], ([x, y]) => {
     lastMouseMoveTime.value = performance.now()
+
+    // アイドルタイマーをリセット
+    if (idleEffectTimer) {
+      clearTimeout(idleEffectTimer)
+    }
+    idleEffectTimer = window.setTimeout(checkIdleState, idleEffectInterval)
 
     // マウスの位置に波紋を追加
     const canvas = backgroundTexture.value?.image as HTMLCanvasElement
@@ -367,8 +454,29 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  // アニメーションの停止
+  stopAnimation()
+
+  // イベントリスナーの削除
+  window.removeEventListener('resize', handleResize)
+
+  // Tweakpaneのクリーンアップ
   dispose()
+
+  // プリセット自動変更の停止
   stopPresetAutoChange()
+
+  // アイドルエフェクトタイマーの停止
+  if (idleEffectTimer) {
+    clearTimeout(idleEffectTimer)
+    idleEffectTimer = null
+  }
+
+  // テクスチャの破棄
+  if (backgroundTexture.value) {
+    backgroundTexture.value.dispose()
+    backgroundTexture.value = null
+  }
 })
 </script>
 

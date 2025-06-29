@@ -20,7 +20,7 @@ const escapeQuotes = ref<'single' | 'double' | 'both'>('double')
 const quoteOptions = [
   { value: 'single', label: 'Single (\')' },
   { value: 'double', label: 'Double (")' },
-  { value: 'both', label: 'Both' }
+  { value: 'both', label: 'Both' },
 ]
 
 // 出力
@@ -30,7 +30,8 @@ const outputText = computed(() => {
   try {
     if (decodeMode.value) {
       return decode(inputText.value, encodingType.value)
-    } else {
+    }
+    else {
       return encode(inputText.value, encodingType.value)
     }
   }
@@ -43,23 +44,23 @@ const outputText = computed(() => {
 const encode = (text: string, type: string): string => {
   switch (type) {
     case 'url':
-      return urlComponentMode.value 
+      return urlComponentMode.value
         ? encodeURIComponent(text)
         : encodeURI(text)
-    
+
     case 'html':
       return encodeHTML(text)
-    
+
     case 'base64':
       // Convert string to base64
       return btoa(encodeURIComponent(text).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))))
-    
+
     case 'unicode':
       return encodeUnicode(text)
-    
+
     case 'escape':
       return escapeString(text)
-    
+
     default:
       return text
   }
@@ -72,24 +73,25 @@ const decode = (text: string, type: string): string => {
       return urlComponentMode.value
         ? decodeURIComponent(text)
         : decodeURI(text)
-    
+
     case 'html':
       return decodeHTML(text)
-    
+
     case 'base64':
       // Decode base64
       try {
         return decodeURIComponent(atob(text).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))
-      } catch {
+      }
+      catch {
         return 'Invalid base64'
       }
-    
+
     case 'unicode':
       return decodeUnicode(text)
-    
+
     case 'escape':
       return unescapeString(text)
-    
+
     default:
       return text
   }
@@ -120,7 +122,7 @@ const encodeHTML = (text: string): string => {
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',
-      "'": '&apos;',
+      '\'': '&apos;',
       '¢': '&cent;',
       '£': '&pound;',
       '¥': '&yen;',
@@ -148,7 +150,7 @@ const encodeHTML = (text: string): string => {
       '♥': '&hearts;',
       '♦': '&diams;',
     }
-    
+
     for (const [char, entity] of Object.entries(entities)) {
       encoded = encoded.replace(new RegExp(char, 'g'), entity)
     }
@@ -166,35 +168,36 @@ const decodeHTML = (text: string): string => {
 
 // Unicode エンコード
 const encodeUnicode = (text: string): string => {
-  return text.split('').map(char => {
+  return text.split('').map((char) => {
     const code = char.charCodeAt(0)
-    
+
     switch (unicodeFormat.value) {
       case 'codepoint':
         return `U+${code.toString(16).toUpperCase().padStart(4, '0')}`
-      
+
       case 'jsEscape':
         if (code > 127) {
           return `\\u${code.toString(16).padStart(4, '0')}`
         }
         return char
-      
+
       case 'cssEscape':
         if (code > 127) {
           return `\\${code.toString(16).padStart(6, '0')}`
         }
         return char
-      
+
       case 'pythonEscape':
         if (code > 127) {
           if (code <= 0xFFFF) {
             return `\\u${code.toString(16).padStart(4, '0')}`
-          } else {
+          }
+          else {
             return `\\U${code.toString(16).padStart(8, '0')}`
           }
         }
         return char
-      
+
       default:
         return char
     }
@@ -207,22 +210,22 @@ const decodeUnicode = (text: string): string => {
   text = text.replace(/U\+([0-9A-Fa-f]{4,6})/g, (_, hex) => {
     return String.fromCharCode(parseInt(hex, 16))
   })
-  
+
   // \uXXXX形式
   text = text.replace(/\\u([0-9A-Fa-f]{4})/g, (_, hex) => {
     return String.fromCharCode(parseInt(hex, 16))
   })
-  
+
   // \UXXXXXXXX形式（Python）
   text = text.replace(/\\U([0-9A-Fa-f]{8})/g, (_, hex) => {
     return String.fromCharCode(parseInt(hex, 16))
   })
-  
+
   // CSS形式 \XXXXXX
   text = text.replace(/\\([0-9A-Fa-f]{1,6})/g, (_, hex) => {
     return String.fromCharCode(parseInt(hex, 16))
   })
-  
+
   return text
 }
 
@@ -238,32 +241,34 @@ const escapeString = (text: string): string => {
     '\v': '\\v',
     '\\': '\\\\',
   }
-  
+
   if (escapeQuotes.value === 'single' || escapeQuotes.value === 'both') {
-    escapes["'"] = "\\'"
+    escapes['\''] = '\\\''
   }
-  
+
   if (escapeQuotes.value === 'double' || escapeQuotes.value === 'both') {
     escapes['"'] = '\\"'
   }
-  
+
   let escaped = text
   for (const [char, escape] of Object.entries(escapes)) {
     escaped = escaped.replace(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), escape)
   }
-  
+
   // 非ASCII文字をエスケープ
   escaped = escaped.replace(/[^\x20-\x7E]/g, (char) => {
     const code = char.charCodeAt(0)
     if (code <= 0xFF) {
       return `\\x${code.toString(16).padStart(2, '0')}`
-    } else if (code <= 0xFFFF) {
+    }
+    else if (code <= 0xFFFF) {
       return `\\u${code.toString(16).padStart(4, '0')}`
-    } else {
+    }
+    else {
       return `\\u{${code.toString(16)}}`
     }
   })
-  
+
   return escaped
 }
 
@@ -277,7 +282,7 @@ const unescapeString = (text: string): string => {
     .replace(/\\r/g, '\r')
     .replace(/\\t/g, '\t')
     .replace(/\\v/g, '\v')
-    .replace(/\\'/g, "'")
+    .replace(/\\'/g, '\'')
     .replace(/\\"/g, '"')
     .replace(/\\\\/g, '\\')
     .replace(/\\x([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
@@ -305,30 +310,30 @@ const charInfo = computed(() => {
 
 // サンプルテキスト
 const sampleTexts = [
-  { 
+  {
     name: 'URL with params',
     text: 'https://example.com/api?name=John Doe&email=john@example.com&tag=web development',
-    type: 'url'
+    type: 'url',
   },
-  { 
+  {
     name: 'HTML content',
     text: '<div class="container">\n  <h1>Title & Subtitle</h1>\n  <p>This is a "quoted" text with \'apostrophes\'.</p>\n  <span>© 2024 • All rights reserved™</span>\n</div>',
-    type: 'html'
+    type: 'html',
   },
-  { 
+  {
     name: 'JSON string',
     text: '{"name": "John Doe", "message": "Hello\\nWorld!", "path": "C:\\\\Users\\\\John"}',
-    type: 'escape'
+    type: 'escape',
   },
-  { 
+  {
     name: 'Unicode text',
     text: 'Hello 世界 🌍 Здравствуй мир नमस्ते दुनिया',
-    type: 'unicode'
+    type: 'unicode',
   },
-  { 
+  {
     name: 'Base64 data',
     text: 'SGVsbG8gV29ybGQhIPCfmIo=',
-    type: 'base64'
+    type: 'base64',
   },
 ]
 
@@ -393,7 +398,7 @@ useSeoMeta({
               { value: 'html', label: 'HTML', icon: 'heroicons:code-bracket' },
               { value: 'base64', label: 'Base64', icon: 'heroicons:key' },
               { value: 'unicode', label: 'Unicode', icon: 'heroicons:language' },
-              { value: 'escape', label: 'Escape', icon: 'heroicons:command-line' }
+              { value: 'escape', label: 'Escape', icon: 'heroicons:command-line' },
             ]"
             :key="type.value"
             :variant="encodingType === type.value ? 'default' : 'outline'"
@@ -461,7 +466,7 @@ useSeoMeta({
                 v-for="mode in [
                   { value: 'named', label: 'Named (&amp;)' },
                   { value: 'numeric', label: 'Numeric (&#38;)' },
-                  { value: 'hex', label: 'Hex (&#x26;)' }
+                  { value: 'hex', label: 'Hex (&#x26;)' },
                 ]"
                 :key="mode.value"
                 :variant="htmlEntityMode === mode.value ? 'default' : 'outline'"
@@ -483,7 +488,7 @@ useSeoMeta({
                   { value: 'codepoint', label: 'Code Point (U+0000)' },
                   { value: 'jsEscape', label: 'JavaScript (\\u0000)' },
                   { value: 'cssEscape', label: 'CSS (\\000000)' },
-                  { value: 'pythonEscape', label: 'Python (\\u0000)' }
+                  { value: 'pythonEscape', label: 'Python (\\u0000)' },
                 ]"
                 :key="format.value"
                 :variant="unicodeFormat === format.value ? 'default' : 'outline'"

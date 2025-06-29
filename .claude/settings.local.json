@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rm:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)",
+      "Bash(mv:*)",
+      "Bash(find:*)",
+      "Bash(for:*)",
+      "Bash(fi)",
+      "Bash(echo:*)",
+      "Bash(echo)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(rg:*)",
+      "Bash(sed:*)",
+      "Bash(gh pr create:*)",
+      "Bash(node:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(python3:*)",
+      "Bash(gemini:*)"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": false
+}

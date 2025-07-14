@@ -7,7 +7,6 @@ import {
   TooltipProvider,
 } from '~/components/ui/tooltip'
 import ToolsSidebar from '~/components/tools/ToolsSidebar.vue'
-import ToolsHeader from '~/components/tools/ToolsHeader.vue'
 
 const route = useRoute()
 const { tools } = useTools()
@@ -29,11 +28,7 @@ const currentTool = computed(() => {
           <!-- メインコンテンツ -->
           <SidebarInset class="flex-1">
             <!-- ヘッダー -->
-            <MyHeader class="sticky top-0 z-50">
-              <template #tools-footer>
-                <ToolsHeader :current-tool="currentTool" />
-              </template>
-            </MyHeader>
+            <MyHeader class="sticky top-0" />
             <main class="p-6">
               <Alert variant="destructive" class="mb-10">
                 <AlertCircle class="w-4 h-4" />

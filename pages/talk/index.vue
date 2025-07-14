@@ -1,65 +1,67 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
-import ArticleCard from '~/components/content/ArticleCard.vue'
-import { useBlogs } from '~/composables/useBlogs'
+import { useTalks } from '~/composables/useTalks'
 
 // データ取得
-const { data: allBlogData } = await useAsyncData(
-  'blogs',
-  () => queryCollection('blog')
+const { data: allTalksData } = await useAsyncData(
+  'talks',
+  () => queryCollection('talk')
     .where('draft', '=', false)
-    .order('created', 'DESC')
+    .order('event_date', 'DESC')
     .all(),
 )
 
 // コンポーザブルから状態とロジックを取得
 const {
   // データ
-  filteredPosts,
+  talkTypes,
+  filteredTalks,
   availableYears,
-  availableMonths,
   availableTags,
 
   // フィルター状態
   searchQuery,
   selectedYear,
-  selectedMonth,
+  selectedType,
   selectedTag,
   isLoading,
 
   // カウント
-  postCount,
-  totalPostCount,
+  talkCount,
+  totalTalkCount,
+  talkCountByYear,
+  talkCountByType,
+  talkCountByTag,
 
   // アクション
   setYear,
-  setMonth,
+  setType,
   setTag,
   resetFilters,
-} = useBlogs(allBlogData)
+} = useTalks(allTalksData)
 </script>
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-emerald-800/70 via-teal-500/70 to-green-200/70' }">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-purple-800/70 via-violet-500/70 to-pink-200/70' }">
       <template #title>
-        Blog
+        Talk
       </template>
       <template #description>
         <p class="text-center text-white/90 text-lg mb-8 max-w-3xl mx-auto">
-          {{ postCount === totalPostCount ? `${postCount}件の記事` : `${postCount} / ${totalPostCount}件の記事` }}
+          {{ talkCount === totalTalkCount ? `${talkCount}件の発表` : `${talkCount} / ${totalTalkCount}件の発表` }}
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">
           <Input
             v-model="searchQuery"
-            placeholder="タイトル、説明、タグで検索..."
+            placeholder="タイトル、イベント名、タグで検索..."
             variant="outline"
             size="lg" />
           <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
             <Button
-              v-if="searchQuery || selectedYear || selectedMonth || selectedTag"
+              v-if="searchQuery || selectedYear || selectedType || selectedTag"
               variant="outline" size="xs" rounded="full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
@@ -93,23 +95,22 @@ const {
             </SelectContent>
           </Select>
 
-          <!-- 月フィルター -->
+          <!-- タイプフィルター -->
           <Select
-            :model-value="selectedMonth"
-            :disabled="!selectedYear"
-            @update:model-value="(value) => setMonth(value)">
+            :model-value="selectedType"
+            @update:model-value="(value) => setType(value)">
             <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="月を選択" />
+              <SelectValue placeholder="タイプを選択" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem :value="null">
-                すべての月
+                すべてのタイプ
               </SelectItem>
               <SelectItem
-                v-for="month in availableMonths"
-                :key="month"
-                :value="month">
-                {{ month }}月
+                v-for="(typeInfo, typeKey) in talkTypes"
+                :key="typeKey"
+                :value="typeKey">
+                {{ typeInfo.name }}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -136,9 +137,9 @@ const {
         </div>
       </Card>
 
-      <!-- 記事一覧 -->
+      <!-- トーク一覧 -->
       <AsyncStateView
-        :fallback="filteredPosts?.length === 0">
+        :fallback="filteredTalks.length === 0">
         <template #loading>
         </template>
         <template #error>
@@ -147,7 +148,7 @@ const {
           <div class="text-center py-16 rounded-xl shadow-lg mt-6">
             <Icon name="heroicons:magnifying-glass" class="text-6xl mx-auto mb-6" />
             <h3 class="text-xl font-bold mb-2">
-              該当する記事が見つかりませんでした
+              該当する発表が見つかりませんでした
             </h3>
             <p class="mb-8 max-w-md mx-auto">
               検索条件を変更してみてください。
@@ -160,15 +161,15 @@ const {
         <template #default>
           <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             <li
-              v-for="(post, index) in filteredPosts"
-              :key="post._id">
-              <motion.div
+              v-for="(talk, index) in filteredTalks"
+              :key="talk.id">
+              <motion.ul
                 :initial="{ opacity: 0, y: 20 }"
                 :animate="{ opacity: 1, y: 0 }"
                 :transition="{ duration: 0.5, delay: index * 0.05 }">
-                <ArticleCard
-                  :data="post" />
-              </motion.div>
+                <TalkCard
+                  :data="talk" />
+              </motion.ul>
             </li>
           </ul>
         </template>
@@ -178,5 +179,4 @@ const {
 </template>
 
 <style scoped>
-
 </style>

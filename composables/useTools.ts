@@ -395,6 +395,15 @@ export const useTools = () => {
       route: '/tools/gitignore-generator',
       badge: 'New',
     },
+    {
+      id: 'keyboard-display',
+      name: 'キーボード入力表示',
+      description: 'リアルタイムキー入力の可視化・キーコード確認',
+      category: 'dev',
+      icon: 'ph:keyboard',
+      route: '/tools/keyboard-display',
+      badge: 'New',
+    },
 
     // 🔄 変換・コンバーター（追加）
     {

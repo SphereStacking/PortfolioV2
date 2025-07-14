@@ -26,5 +26,6 @@
     ],
     "deny": []
   },
-  "enableAllProjectMcpServers": false
+  "enableAllProjectMcpServers": false,
+  "includeCoAuthoredBy": false
 }

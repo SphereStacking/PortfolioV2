@@ -59,11 +59,8 @@ const getToolsForCategory = (key: string) => {
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton as-child tooltip="開発ツール">
-            <NuxtLink to="/tools" class="flex items-center gap-2 w-full">
-              <Icon name="heroicons:squares-2x2" class="h-5 w-5 shrink-0" />
-              <span class="font-semibold text-base">開発ツール</span>
-            </NuxtLink>
+          <SidebarMenuButton>
+            <SidebarTrigger />
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

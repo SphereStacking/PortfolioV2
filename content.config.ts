@@ -74,5 +74,23 @@ export default defineContentConfig({
         particleCount: z.number().optional(),
       }),
     }),
+    talk: defineCollection({
+      source: '6.talk/**/*.md',
+      type: 'page',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        event_name: z.string(),
+        event_date: z.string(),
+        location: z.string(),
+        type: z.enum(['conference', 'meetup', 'webinar', 'workshop']),
+        draft: z.boolean(),
+        image: z.string().optional(),
+        slides_url: z.string().optional(),
+        video_url: z.string().optional(),
+        tags: z.array(z.string()),
+        icons: z.array(z.string()),
+      }),
+    }),
   },
 })

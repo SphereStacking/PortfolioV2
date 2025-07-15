@@ -1,6 +1,5 @@
 export default {
   // Set the domain for the portfolio
-  domain: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   title: 'SphereStacking Portfolio',
   description: 'エンジニアリングとクリエイティブな作品を展示するポートフォリオサイト',
   // Custom sections for the portfolio

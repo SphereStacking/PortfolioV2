@@ -35,6 +35,14 @@ const date_span = computed(() => {
   }
   return props.data.period_start + ' ~ ' + props.data.period_end
 })
+
+const isImageUrl = computed(() => {
+  const icon = props.data.icon
+  return icon.startsWith('http://')
+    || icon.startsWith('https://')
+    || icon.startsWith('/')
+    || /\.(png|jpg|jpeg|svg|webp)$/i.test(icon)
+})
 </script>
 
 <template>
@@ -68,7 +76,13 @@ const date_span = computed(() => {
           <div class="col-span-full flex items-start gap-4">
             <div
               class="flex items-center justify-center shrink-0 rounded-full border border-transparent shadow-md backdrop-blur-md size-20 group-hover:shadow-primary/20 transition-all duration-300">
+              <img
+                v-if="isImageUrl"
+                :src="data.icon"
+                :alt="data.title"
+                class="size-12 object-contain">
               <Icon
+                v-else
                 :name="data.icon"
                 class="text-white text-5xl" />
             </div>

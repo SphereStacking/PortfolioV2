@@ -17,7 +17,7 @@ const { data: pinnedProjects } = await useAsyncData(() => queryCollection('proje
       </template>
     </PageHeader>
     <div class="container mx-auto mb-16 mt-8">
-      <ul class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <ul class="grid grid-cols-1 gap-4">
         <li
           v-for="(project, index) in pinnedProjects"
           :key="project.id">

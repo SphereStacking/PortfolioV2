@@ -69,7 +69,7 @@ const date_span = computed(() => {
         'overflow-hidden',
         open ? 'max-h-[5000px]' : 'max-h-0',
       ]">
-      <ul class="grid grid-cols-1 gap-4 xl:grid-cols-2 p-4">
+      <ul class="grid grid-cols-1 gap-4 p-4">
         <li
           v-for="(project, index) in data.projects"
           :key="index">

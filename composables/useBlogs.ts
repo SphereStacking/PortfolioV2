@@ -98,18 +98,18 @@ export const useBlogs = (allBlogData: Ref<BlogPost[] | null>) => {
   // 利用可能な月のリスト（選択された年に基づく）
   const availableMonths = computed(() => {
     if (!allPosts.value || !selectedYear.value) return []
-    
+
     const months = new Set<string>()
     allPosts.value.forEach((post) => {
       const postDate = new Date(post.created)
       const postYear = postDate.getFullYear().toString()
-      
+
       if (postYear === selectedYear.value) {
         const month = (postDate.getMonth() + 1).toString().padStart(2, '0')
         months.add(month)
       }
     })
-    
+
     return Array.from(months).sort()
   })
 

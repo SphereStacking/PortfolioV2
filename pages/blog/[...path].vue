@@ -30,7 +30,7 @@ if (isArchivePage) {
   if (pathParams.value[0]) query.year = pathParams.value[0]
   if (pathParams.value[1]) query.month = pathParams.value[1].padStart(2, '0')
   if (pathParams.value[2]) query.day = pathParams.value[2].padStart(2, '0')
-  
+
   await navigateTo({ path: '/blog', query })
 }
 

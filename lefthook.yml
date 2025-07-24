@@ -1,0 +1,20 @@
+# Lefthook configuration
+# https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: true
+  commands:
+    lint-fix:
+      run: npm run lint:fix
+      stage_fixed: true  # 修正されたファイルを自動的にステージング
+      
+commit-msg:
+  commands:
+    check-emoji:
+      run: |
+        # コミットメッセージが絵文字で始まっているかチェック
+        if ! grep -qE '^[✨🎨📝🐛♻️🔧➕➖🚚🔥⚡🔒🚧✅]' "$1"; then
+          echo "エラー: コミットメッセージは絵文字で始める必要があります"
+          echo "例: ✨ 新機能の追加"
+          exit 1
+        fi

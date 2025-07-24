@@ -50,6 +50,7 @@
     "@nuxtjs/color-mode": "^3.5.2",
     "@tweakpane/core": "^2.0.5",
     "@types/three": "^0.176.0",
-    "dayjs-nuxt": "^2.1.11"
+    "dayjs-nuxt": "^2.1.11",
+    "lefthook": "^1.12.2"
   }
 }

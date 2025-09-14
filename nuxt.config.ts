@@ -72,9 +72,9 @@ export default defineNuxtConfig({
   llms: llmsConfig,
   ogImage: {
     fonts: [
-      'Monomaniac+One:400',
-      'Monomaniac+One:700',
-      'Monomaniac+One:900',
+      'WDXL+Lubrifont+JP+N:400',
+      'WDXL+Lubrifont+JP+N:700',
+      'WDXL+Lubrifont+JP+N:900',
       'Zen+Maru+Gothic:700',
     ],
   },

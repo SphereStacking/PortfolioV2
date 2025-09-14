@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from '@tailwindcss/vite'
+import glsl from 'vite-plugin-glsl'
 import llmsConfig from './llms.config'
 
 export default defineNuxtConfig({
@@ -52,7 +53,16 @@ export default defineNuxtConfig({
     assetsInclude: ['**/*.glsl'],
     plugins: [
       tailwindcss(),
+      glsl({
+        include: [
+          '**/*.glsl',
+        ],
+        defaultExtension: 'glsl',
+      }),
     ],
+    optimizeDeps: {
+      include: ['monaco-editor'],
+    },
   },
   eslint: {
     config: {

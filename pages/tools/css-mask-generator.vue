@@ -461,7 +461,7 @@ const copyToClipboard = async (text: string) => {
       description: 'クリップボードにコピーしました',
     })
   }
-  catch (_err) {
+  catch {
     toast({
       description: 'コピーに失敗しました',
       variant: 'destructive',

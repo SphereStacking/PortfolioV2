@@ -437,7 +437,7 @@ const loadSampleImage = async (url: string) => {
 
     reader.readAsDataURL(blob)
   }
-  catch (_err) {
+  catch {
     error.value = 'サンプル画像の読み込みに失敗しました'
   }
 }

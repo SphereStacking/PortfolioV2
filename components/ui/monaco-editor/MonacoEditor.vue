@@ -6,25 +6,11 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 // Dynamically import monaco-editor only on client-side
-let monaco: any = null
-const editor: any = null
+let monaco: typeof import('monaco-editor') | null = null
 
 // Type definitions for better TypeScript support
-interface IStandaloneCodeEditor {
-  getValue(): string
-  setValue(value: string): void
-  onDidChangeModelContent(callback: () => void): void
-  updateOptions(options: any): void
-  getModel(): any
-  dispose(): void
-}
-
-interface MonacoNamespace {
-  editor: {
-    create(container: HTMLElement, options: any): IStandaloneCodeEditor
-    setModelLanguage(model: any, language: string): void
-  }
-}
+type IStandaloneCodeEditor = import('monaco-editor').editor.IStandaloneCodeEditor
+type IEditorConstructionOptions = import('monaco-editor').editor.IEditorConstructionOptions
 
 interface Props {
   modelValue: string
@@ -32,7 +18,7 @@ interface Props {
   theme?: string
   height?: string
   readOnly?: boolean
-  options?: any
+  options?: Partial<IEditorConstructionOptions>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -76,13 +62,13 @@ onMounted(async () => {
       hideCursorInOverviewRuler: true,
       overviewRulerBorder: false,
       scrollbar: {
-        vertical: 'visible',
-        horizontal: 'visible',
+        vertical: 'visible' as const,
+        horizontal: 'visible' as const,
         useShadows: false,
         verticalScrollbarSize: 10,
         horizontalScrollbarSize: 10,
       },
-      ...props.options,
+      ...(props.options || {}),
     })
 
     // Watch for content changes

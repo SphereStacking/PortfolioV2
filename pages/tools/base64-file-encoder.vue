@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -128,17 +128,17 @@ const convertAll = async () => {
 }
 
 // Base64をファイルに戻す
-const base64ToFile = (base64: string, fileName: string, mimeType: string): File => {
-  const byteCharacters = atob(base64.replace(/\s/g, ''))
-  const byteNumbers = new Array(byteCharacters.length)
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i)
-  }
-
-  const byteArray = new Uint8Array(byteNumbers)
-  return new File([byteArray], fileName, { type: mimeType })
-}
+// const base64ToFile = (base64: string, fileName: string, mimeType: string): File => {
+//   const byteCharacters = atob(base64.replace(/\s/g, ''))
+//   const byteNumbers = new Array(byteCharacters.length)
+//
+//   for (let i = 0; i < byteCharacters.length; i++) {
+//     byteNumbers[i] = byteCharacters.charCodeAt(i)
+//   }
+//
+//   const byteArray = new Uint8Array(byteNumbers)
+//   return new File([byteArray], fileName, { type: mimeType })
+// }
 
 // ファイルサイズフォーマット
 const formatFileSize = (bytes: number): string => {

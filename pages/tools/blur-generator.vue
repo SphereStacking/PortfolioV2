@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 import { useSeoMeta } from '#imports'
 

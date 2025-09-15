@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -104,6 +104,8 @@ const operationExplanation = computed(() => {
       return '左回転: ビットを左に回転し、溢れたビットを右端に移動します'
     case 'ROTATE_RIGHT':
       return '右回転: ビットを右に回転し、溢れたビットを左端に移動します'
+    default:
+      return ''
   }
 })
 
@@ -173,8 +175,8 @@ const samples = [
 const loadSample = (sample: typeof samples[0]) => {
   inputA.value = sample.a
   inputB.value = sample.b
-  operation.value = sample.op as any
-  inputBase.value = sample.base as any
+  operation.value = sample.op as typeof operation.value
+  inputBase.value = sample.base as typeof inputBase.value
 }
 
 // クリップボード操作
@@ -278,7 +280,7 @@ useSeoMeta({
                 </optgroup>
                 <optgroup label="シフト演算">
                   <option value="SHIFT_LEFT">
-                    左シフト (<<)
+                    左シフト (&lt;&lt;)
                   </option>
                   <option value="SHIFT_RIGHT">
                     右シフト (>>)
@@ -576,7 +578,7 @@ useSeoMeta({
               シフト演算
             </h3>
             <ul class="list-disc list-inside space-y-1">
-              <li>左シフト (<<): ビットを左に移動、2のn乗倍</li>
+              <li>左シフト (&lt;&lt;): ビットを左に移動、2のn乗倍</li>
               <li>右シフト (>>): ビットを右に移動、2のn乗で除算</li>
               <li>回転シフト: 溢れたビットを反対側に移動</li>
             </ul>

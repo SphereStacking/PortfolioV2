@@ -82,10 +82,10 @@ const jsonStats = computed(() => {
   try {
     const parsed = JSON.parse(inputJson.value)
 
-    const countElements = (obj: any): { objects: number, arrays: number, strings: number, numbers: number, booleans: number, nulls: number } => {
+    const countElements = (obj: unknown): { objects: number, arrays: number, strings: number, numbers: number, booleans: number, nulls: number } => {
       const stats = { objects: 0, arrays: 0, strings: 0, numbers: 0, booleans: 0, nulls: 0 }
 
-      const traverse = (item: any) => {
+      const traverse = (item: unknown) => {
         if (item === null) {
           stats.nulls++
         }
@@ -134,7 +134,7 @@ const jsonStats = computed(() => {
 })
 
 // ソートキー関数
-const sortObjectKeys = (obj: any): any => {
+const sortObjectKeys = (obj: unknown): unknown => {
   if (Array.isArray(obj)) {
     return obj.map(sortObjectKeys)
   }
@@ -144,7 +144,7 @@ const sortObjectKeys = (obj: any): any => {
       .reduce((result, key) => {
         result[key] = sortObjectKeys(obj[key])
         return result
-      }, {} as any)
+      }, {} as Record<string, unknown>)
   }
   return obj
 }

@@ -13,7 +13,7 @@ const { toast } = useToast()
 const imageUrl = ref<string>('')
 const fileName = ref('')
 const fileSize = ref(0)
-const metadata = ref<Record<string, any>>({})
+const metadata = ref<Record<string, unknown>>({})
 const basicInfo = ref({
   width: 0,
   height: 0,

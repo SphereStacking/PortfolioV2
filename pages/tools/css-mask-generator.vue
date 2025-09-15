@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -8,7 +8,7 @@ definePageMeta({
 
 // 状態管理
 const originalImage = ref<string>('')
-const processing = ref(false)
+// const processing = ref(false)
 const error = ref('')
 const outputFormat = ref<'css-mask' | 'clip-path' | 'svg-mask'>('clip-path')
 const maskShape = ref<'circle' | 'ellipse' | 'polygon' | 'custom'>('circle')

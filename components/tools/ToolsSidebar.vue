@@ -11,7 +11,6 @@ import {
   SidebarMenuButton,
   SidebarMenuBadge,
   SidebarHeader,
-  SidebarSeparator,
 } from '~/components/ui/sidebar'
 import {
   Collapsible,
@@ -36,11 +35,6 @@ const isCategoryVisible = (key: string) => {
 // カテゴリーの総数を取得
 const categoryCount = (key: string) => {
   return toolsByCategory[key]?.length || 0
-}
-
-// セパレーターを表示するかどうかを判定
-const shouldShowSeparator = (index: number, key: string) => {
-  return index < Object.keys(toolCategories).length - 1 && isCategoryVisible(key)
 }
 
 // ツールがアクティブかどうかを判定
@@ -69,7 +63,7 @@ const getToolsForCategory = (key: string) => {
     <SidebarContent>
       <!-- カテゴリー別ツール -->
       <template
-        v-for="(category, key, index) in toolCategories"
+        v-for="(category, key) in toolCategories"
         :key="key">
         <Collapsible
           v-show="isCategoryVisible(key)"

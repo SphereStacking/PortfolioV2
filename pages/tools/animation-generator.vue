@@ -628,6 +628,7 @@ useSeoMeta({
                   }">
                 </div>
               </div>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-else class="text-primary" v-html="generatedSVG"></div>
             </div>
           </CardContent>

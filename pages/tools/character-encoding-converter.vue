@@ -85,7 +85,7 @@ const detectEncoding = (data: Uint8Array): string => {
     }
 
     // Shift_JISチェック（簡易版）
-    if (shiftJisValid && byte >= 0x81 && byte <= 0x9F || byte >= 0xE0 && byte <= 0xFC) {
+    if (shiftJisValid && ((byte >= 0x81 && byte <= 0x9F) || (byte >= 0xE0 && byte <= 0xFC))) {
       if (i + 1 >= data.length) {
         shiftJisValid = false
       }
@@ -145,7 +145,7 @@ const stringToBytes = (str: string, encoding: string): Uint8Array => {
 
     return new Uint8Array(bytes)
   }
-  catch (e) {
+  catch {
     console.error('Encoding error:', e)
     throw new Error('エンコードに失敗しました')
   }
@@ -157,7 +157,7 @@ const bytesToString = (bytes: Uint8Array, encoding: string): string => {
     const decoder = new TextDecoder(encoding)
     return decoder.decode(bytes)
   }
-  catch (e) {
+  catch {
     // フォールバック
     try {
       const decoder = new TextDecoder('UTF-8')
@@ -206,7 +206,7 @@ const convert = () => {
       description: `${inputEncoding.value} → ${outputEncoding.value} への変換が完了しました`,
     })
   }
-  catch (e) {
+  catch {
     error.value = e instanceof Error ? e.message : '変換に失敗しました'
     toast({
       title: 'エラー',
@@ -339,7 +339,7 @@ const loadFile = async (event: Event) => {
       description: `${file.name} を読み込みました`,
     })
   }
-  catch (e) {
+  catch {
     toast({
       title: 'エラー',
       description: 'ファイルの読み込みに失敗しました',

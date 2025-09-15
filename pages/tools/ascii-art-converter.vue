@@ -615,6 +615,7 @@ useSeoMeta({
             :style="asciiStyle">
             {{ asciiArt }}
           </div>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div
             v-else
             :style="{ ...asciiStyle, color: 'inherit' }"

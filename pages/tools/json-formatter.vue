@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 
 definePageMeta({
   layout: 'tools',

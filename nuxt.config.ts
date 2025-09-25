@@ -10,7 +10,6 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/image',
     '@tresjs/nuxt',
-    'dayjs-nuxt',
     'nuxt-og-image',
     'motion-v/nuxt',
     '@nuxt/scripts',
@@ -18,6 +17,13 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     'nuxt-llms',
   ],
+  components: {
+    global: true,
+    dirs: ['~/components'],
+  },
+  imports: {
+    autoImport: true,
+  },
   devtools: {
     enabled: true,
     timeline: {
@@ -62,6 +68,7 @@ export default defineNuxtConfig({
     ],
     optimizeDeps: {
       include: ['monaco-editor'],
+      exclude: ['mermaid'],
     },
   },
   eslint: {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { $dayjs } = useNuxtApp()
+import dayjs from 'dayjs'
 
 const props = defineProps<{
   data: {
@@ -31,7 +31,7 @@ const props = defineProps<{
 
 const date_span = computed(() => {
   if (props.data.status === 'in_progress') {
-    return `${props.data.period_start} ~ ${$dayjs().format('YYYY-MM')}`
+    return `${props.data.period_start} ~ ${dayjs().format('YYYY-MM')}`
   }
   return props.data.period_start + ' ~ ' + props.data.period_end
 })

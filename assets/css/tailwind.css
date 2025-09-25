@@ -26,31 +26,31 @@ html {
   }
 
   h1 {
-    @apply text-2xl sm:text-3xl text-zinc-900 dark:text-zinc-100 italic font-[600] mb-6 mt-8;
+    @apply text-2xl sm:text-3xl text-zinc-900 dark:text-zinc-100 italic font-[600] mb-2 mt-8;
   }
 
   h2 {
-    @apply text-xl sm:text-2xl text-zinc-900 dark:text-zinc-100 mb-4 mt-8;
+    @apply text-xl sm:text-2xl text-zinc-900 dark:text-zinc-100 mb-2 mt-8;
   }
 
   h3 {
-    @apply text-lg sm:text-xl text-zinc-900 dark:text-zinc-100 mb-4 mt-6;
+    @apply text-lg sm:text-xl text-zinc-900 dark:text-zinc-100 mb-2 mt-6;
   }
 
   h4 {
-    @apply text-base sm:text-lg text-zinc-900 dark:text-zinc-100 mb-4 mt-6;
+    @apply text-base sm:text-lg text-zinc-900 dark:text-zinc-100 mb-2 mt-6;
   }
 
   h5 {
-    @apply text-base text-zinc-900 dark:text-zinc-100 mb-4 mt-6;
+    @apply text-base text-zinc-900 dark:text-zinc-100 mb-2 mt-6;
   }
 
   p {
-    @apply mb-4 mt-0;
+    @apply mb-2 mt-0;
   }
 
   ul, ol {
-    @apply mb-4 mt-4 pl-6;
+    @apply mb-2 mt-4 pl-6;
   }
 
   blockquote {
@@ -74,7 +74,7 @@ html {
   }
 
   a {
-    @apply text-teal-500 dark:text-teal-500 underline hover:text-teal-600;
+    @apply text-teal-500 dark:text-teal-500 hover:text-teal-600;
   }
 
   pre {
@@ -87,6 +87,124 @@ html {
 
   li {
     @apply mb-1;
+  }
+
+  /* Callout */
+  callout {
+    @apply block my-4 p-4 rounded-lg border-l-4 bg-muted/50;
+    display: block !important;
+  }
+
+  callout[type="info"] {
+    @apply border-l-blue-500 bg-blue-50 dark:bg-blue-950/50;
+  }
+
+  callout[type="warning"] {
+    @apply border-l-amber-500 bg-amber-50 dark:bg-amber-950/50;
+  }
+
+  callout[type="important"] {
+    @apply border-l-purple-500 bg-purple-50 dark:bg-purple-950/50;
+  }
+
+  callout[type="note"] {
+    @apply border-l-zinc-500 bg-zinc-50 dark:bg-zinc-950/50;
+  }
+
+  callout[type="danger"] {
+    @apply border-l-red-500 bg-red-50 dark:bg-red-950/50;
+  }
+
+  callout[type="tip"] {
+    @apply border-l-green-500 bg-green-50 dark:bg-green-950/50;
+  }
+
+  /* callout内の子要素の背景を透明にする */
+  callout * {
+    @apply bg-transparent;
+  }
+
+  /* callout内のcodeとpreは軽く背景色をつける */
+  callout code {
+    @apply bg-zinc-800/20 dark:bg-zinc-200/20 px-1 py-0.5 rounded text-sm;
+  }
+
+  callout pre {
+    @apply bg-zinc-800/10 dark:bg-zinc-200/10 p-3 rounded;
+  }
+
+  /* pre内のcodeは背景色なし */
+  .writing callout pre code,
+  callout pre code {
+    @apply bg-transparent px-0 py-0;
+    background-color: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  callout > p:first-child {
+    @apply mt-0;
+  }
+
+  callout > p:last-child {
+    @apply mb-0;
+  }
+
+  /* callout内のコードブロックの調整 */
+  callout > pre {
+    @apply mt-2 mb-2;
+  }
+
+  callout > pre:first-child {
+    @apply mt-0;
+  }
+
+  callout > pre:last-child {
+    @apply mb-0;
+  }
+
+  /* ネストされたpre要素への対応 */
+  callout pre {
+    @apply mt-2 mb-2;
+  }
+
+  callout p:has(> pre) {
+    @apply mb-0;
+  }
+
+  /* p要素とpre要素の間隔を最小化 */
+  callout p + pre {
+    @apply mt-1;
+  }
+
+  callout pre + p {
+    @apply mt-1;
+  }
+
+  /* callout内の全ての子要素のマージンを制御 */
+  callout > * {
+    @apply my-1;
+  }
+
+  callout > *:first-child {
+    @apply mt-0;
+  }
+
+  callout > *:last-child {
+    @apply mb-0;
+  }
+
+  /* callout内の子要素を適切にブロック表示 */
+  callout > p,
+  callout > pre,
+  callout > ul,
+  callout > ol {
+    @apply block;
+  }
+
+  /* callout内のstrong要素 */
+  callout strong {
+    @apply font-semibold;
   }
 }
 @custom-variant dark (&:is(.dark *));

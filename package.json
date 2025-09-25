@@ -28,7 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "eslint": "^9.25.1",
-    "lucide-vue-next": "^0.510.0",
+    "lucide-vue-next": "^0.544.0",
     "mermaid": "^9.4.3",
     "monaco-editor": "^0.53.0",
     "motion-v": "^1.0.1",

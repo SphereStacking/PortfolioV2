@@ -44,7 +44,7 @@ function parseSQL(sql: string): ParsedSQL | null {
 
     return null
   }
-  catch (e) {
+  catch {
     return null
   }
 }
@@ -122,7 +122,7 @@ function parseDELETE(sql: string): ParsedSQL {
 
 // WHERE句の変換
 function convertWhereClause(whereClause: string): object {
-  const conditions: any = {}
+  const conditions: Record<string, unknown> = {}
 
   // 簡単な条件のみサポート（= のみ）
   const parts = whereClause.split(/\s+AND\s+/i)
@@ -150,7 +150,7 @@ function convertWhereClause(whereClause: string): object {
 // ORDER BY句の変換
 function convertOrderBy(orderBy: string): object {
   const parts = orderBy.split(',')
-  const sort: any = {}
+  const sort: Record<string, unknown> = {}
 
   parts.forEach((part) => {
     const match = part.trim().match(/(\w+)(?:\s+(ASC|DESC))?/i)
@@ -182,7 +182,7 @@ function convertToMongoDB(parsed: ParsedSQL): object {
 }
 
 function convertSELECT(parsed: ParsedSQL, explanations: string[]): object {
-  const query: any = {}
+  const query: Record<string, unknown> = {}
 
   // find操作
   query.operation = 'find'
@@ -190,7 +190,7 @@ function convertSELECT(parsed: ParsedSQL, explanations: string[]): object {
 
   // フィールド選択
   if (parsed.fields[0] !== '*') {
-    const projection: any = {}
+    const projection: Record<string, unknown> = {}
     parsed.fields.forEach((field) => {
       projection[field.replace(/['"]/g, '')] = 1
     })
@@ -221,7 +221,7 @@ function convertSELECT(parsed: ParsedSQL, explanations: string[]): object {
 }
 
 function convertINSERT(parsed: ParsedSQL, explanations: string[]): object {
-  const query: any = {}
+  const query: Record<string, unknown> = {}
 
   query.operation = 'insertOne'
   query.collection = parsed.table
@@ -235,7 +235,7 @@ function convertINSERT(parsed: ParsedSQL, explanations: string[]): object {
 }
 
 function convertUPDATE(parsed: ParsedSQL, explanations: string[]): object {
-  const query: any = {}
+  const query: Record<string, unknown> = {}
 
   query.operation = 'updateMany'
   query.collection = parsed.table
@@ -258,7 +258,7 @@ function convertUPDATE(parsed: ParsedSQL, explanations: string[]): object {
 }
 
 function convertDELETE(parsed: ParsedSQL, explanations: string[]): object {
-  const query: any = {}
+  const query: Record<string, unknown> = {}
 
   query.operation = 'deleteMany'
   query.collection = parsed.table
@@ -302,8 +302,8 @@ const convertQuery = () => {
       description: 'MongoDBクエリに変換しました',
     })
   }
-  catch (e) {
-    error.value = e instanceof Error ? e.message : '変換に失敗しました'
+  catch {
+    error.value = '変換に失敗しました'
   }
 }
 
@@ -379,7 +379,7 @@ const generateExecutionExample = computed(() => {
 
     return example
   }
-  catch (e) {
+  catch {
     return ''
   }
 })

@@ -19,7 +19,7 @@
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
             <Button
               v-if="searchQuery"
-              variant="outline" size="xs" rounded="full"
+              variant="outline" size="sm" rounded="full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
             </Button>
@@ -170,30 +170,12 @@ import type { ShaderMetadata } from '~/composables/useShaderSources'
 import { shaders } from '~/composables/useShaderSources'
 import ShaderThumbnail from '~/components/content/ShaderThumbnail.vue'
 import ShaderViewer from '~/components/content/ShaderViewer.vue'
-import MonacoEditor from '~/components/ui/monaco-editor/MonacoEditor.vue'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from '~/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { Card } from '~/components/ui/card'
 
 // SEO
 useSeoMeta({
@@ -208,7 +190,7 @@ const isDialogOpen = ref(false)
 const selectedShader = ref<ShaderMetadata | null>(null)
 const searchQuery = ref('')
 const isLoading = ref(false)
-const codeTab = ref<'vertex' | 'fragment'>('vertex')
+// const codeTab = ref<'vertex' | 'fragment'>('vertex')
 
 // Filtered shaders
 const filteredShaders = computed(() => {
@@ -236,36 +218,10 @@ function resetFilters() {
   searchQuery.value = ''
 }
 
-// Shader sources
-const shaderSources = useShaderSources()
-
 // Methods
-function openShaderDetails(shader: any) {
+function openShaderDetails(shader: typeof shaders[number]) {
   selectedShader.value = shader.metadata
-  codeTab.value = 'vertex' // Reset to vertex tab
+  // codeTab.value = 'vertex' // Reset to vertex tab
   isDialogOpen.value = true
-}
-
-// Get shader code
-function getShaderCode(type: 'vertex' | 'fragment'): string {
-  if (!selectedShader.value) return ''
-  const shaderSet = shaderSources[selectedShader.value.id]
-  if (!shaderSet) return '// Shader code not found'
-  return shaderSet[type] || '// Shader code not found'
-}
-
-// Copy shader code to clipboard
-async function copyShaderCode(type: 'vertex' | 'fragment') {
-  const code = getShaderCode(type)
-  if (!code) return
-
-  try {
-    await navigator.clipboard.writeText(code)
-    // You could add a toast notification here if you have one
-    console.log(`${type} shader code copied to clipboard`)
-  }
-  catch (err) {
-    console.error('Failed to copy code:', err)
-  }
 }
 </script>

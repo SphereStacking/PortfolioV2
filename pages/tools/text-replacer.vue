@@ -211,7 +211,7 @@ const executeReplace = () => {
           }
         }
       }
-      catch (_err) {
+      catch {
         console.error(`Rule error: ${rule.find}`, err)
         error.value = `ルールエラー: "${rule.find}" - 正規表現が無効です`
       }
@@ -285,7 +285,7 @@ const previewDiff = computed(() => {
           }
         }
       }
-      catch (_err) {
+      catch {
         // エラーは無視
       }
     })
@@ -350,7 +350,7 @@ const importRules = (event: Event) => {
         })
       }
     }
-    catch (_err) {
+    catch {
       toast({
         title: 'エラー',
         description: 'ファイルの読み込みに失敗しました',

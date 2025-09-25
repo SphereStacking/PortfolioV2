@@ -8,13 +8,13 @@ import {
 } from '~/components/ui/tooltip'
 import ToolsSidebar from '~/components/tools/ToolsSidebar.vue'
 
-const route = useRoute()
-const { tools } = useTools()
+// const route = useRoute()
+// const { tools } = useTools()
 
 // 現在のツールを取得
-const currentTool = computed(() => {
-  return tools.find(tool => tool.route === route.path)
-})
+// const currentTool = computed(() => {
+//   return tools.find(tool => tool.route === route.path)
+// })
 </script>
 
 <template>

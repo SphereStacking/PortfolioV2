@@ -22,7 +22,7 @@ const encodeUrl = () => {
       ? encodeURIComponent(input.value)
       : encodeURI(input.value)
   }
-  catch (_error) {
+  catch {
     toast({
       title: 'エラー',
       description: 'エンコードに失敗しました',
@@ -37,7 +37,7 @@ const decodeUrl = () => {
       ? decodeURIComponent(input.value)
       : decodeURI(input.value)
   }
-  catch (_error) {
+  catch {
     toast({
       title: 'エラー',
       description: 'デコードに失敗しました',

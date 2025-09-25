@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -14,7 +14,7 @@ const fontWeight = ref<'normal' | 'bold'>('normal')
 const sampleText = ref('The quick brown fox jumps over the lazy dog')
 
 // カラー形式
-const colorFormat = ref<'hex' | 'rgb' | 'hsl'>('hex')
+// const colorFormat = ref<'hex' | 'rgb' | 'hsl'>('hex')
 
 // カラーブラインドシミュレーション
 const colorBlindMode = ref<'normal' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia'>('normal')

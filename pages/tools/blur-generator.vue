@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 import { useSeoMeta } from '#imports'
 
@@ -437,7 +437,7 @@ const loadSampleImage = async (url: string) => {
 
     reader.readAsDataURL(blob)
   }
-  catch (_err) {
+  catch {
     error.value = 'サンプル画像の読み込みに失敗しました'
   }
 }

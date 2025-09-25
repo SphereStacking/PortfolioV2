@@ -16,7 +16,7 @@ const chartType = ref<'bar' | 'line' | 'pie'>('bar')
 const showChart = ref(false)
 
 // 統計データ
-const statistics = ref<Record<string, any>>({})
+const statistics = ref<Record<string, unknown>>({})
 
 // CSV解析
 const parseCSV = (csvText: string): string[][] => {
@@ -93,7 +93,7 @@ const analyzeData = () => {
 
 // 統計計算
 const calculateStatistics = () => {
-  const stats: Record<string, any> = {}
+  const stats: Record<string, unknown> = {}
 
   headers.value.forEach((header, colIndex) => {
     const values = parsedData.value.map(row => row[colIndex]).filter(val => val !== undefined && val !== '')

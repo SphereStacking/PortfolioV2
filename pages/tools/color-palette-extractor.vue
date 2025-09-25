@@ -128,7 +128,7 @@ const extractColors = () => {
 
       isExtracting.value = false
     }
-    catch (error) {
+    catch {
       toast({
         title: 'エラー',
         description: '色の抽出に失敗しました',

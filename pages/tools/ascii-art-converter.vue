@@ -265,7 +265,7 @@ const loadSampleImage = async (url: string) => {
 
     reader.readAsDataURL(blob)
   }
-  catch (_err) {
+  catch {
     error.value = 'サンプル画像の読み込みに失敗しました'
   }
 }
@@ -615,6 +615,7 @@ useSeoMeta({
             :style="asciiStyle">
             {{ asciiArt }}
           </div>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div
             v-else
             :style="{ ...asciiStyle, color: 'inherit' }"

@@ -162,7 +162,7 @@ const autoDetectBackground = async () => {
       description: '手動で調整が必要な部分を修正してください',
     })
   }
-  catch (_err) {
+  catch {
     error.value = '背景検出に失敗しました'
     toast({
       title: 'エラー',

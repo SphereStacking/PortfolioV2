@@ -29,9 +29,6 @@ const {
   // カウント
   talkCount,
   totalTalkCount,
-  talkCountByYear,
-  talkCountByType,
-  talkCountByTag,
 
   // アクション
   setYear,

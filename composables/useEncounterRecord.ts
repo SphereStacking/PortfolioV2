@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 interface MeetingRecord {
   where: string
   firstEncounter: string
@@ -86,8 +88,7 @@ export const useEncounterRecord = () => {
   loadStoredData()
 
   const encounterMessage = computed(() => {
-    const { $dayjs } = useNuxtApp()
-    return `first encountered ${where.value} on ${$dayjs(firstEncounter.value).format('YYYY/MM/DD')}`
+    return `first encountered ${where.value} on ${dayjs(firstEncounter.value).format('YYYY/MM/DD')}`
   })
 
   return {

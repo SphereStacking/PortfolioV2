@@ -23,6 +23,7 @@
     "@tresjs/nuxt": "^3.0.8",
     "@tresjs/post-processing": "^2.3.1",
     "@unhead/vue": "^2.0.8",
+    "@vercel/speed-insights": "^1.2.0",
     "@vueuse/core": "^13.9.0",
     "better-sqlite3": "^12.2.0",
     "class-variance-authority": "^0.7.1",

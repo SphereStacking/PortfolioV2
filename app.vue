@@ -1,9 +1,12 @@
 <script setup>
-import { SpeedInsights } from "@vercel/speed-insights/nuxt"
+import { SpeedInsights } from '@vercel/speed-insights/nuxt'
+import { Analytics } from '@vercel/analytics/nuxt'
 </script>
+
 <template>
   <TooltipProvider>
-    <SpeedInsights/> 
+    <SpeedInsights />
+    <Analytics />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

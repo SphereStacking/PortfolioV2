@@ -1,41 +1,32 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
-import { useTalks } from '~/composables/useTalks'
+import type { Slide } from '~/types/slide'
+import { useSlides } from '~/composables/useSlides'
 
-// データ取得
-const { data: allTalksData } = await useAsyncData(
-  'talks',
-  () => queryCollection('talk')
-    .where('draft', '=', false)
-    .order('event_date', 'DESC')
-    .all(),
+// 外部APIからデータ取得
+const { data: allSlidesData, pending, error } = await useFetch<Slide[]>(
+  'https://slides.spherestacking.com/api/slides',
 )
 
 // コンポーザブルから状態とロジックを取得
 const {
   // データ
-  talkTypes,
-  filteredTalks,
+  filteredSlides,
   availableYears,
-  availableTags,
 
   // フィルター状態
   searchQuery,
   selectedYear,
-  selectedType,
-  selectedTag,
   isLoading,
 
   // カウント
-  talkCount,
-  totalTalkCount,
+  slideCount,
+  totalSlideCount,
 
   // アクション
   setYear,
-  setType,
-  setTag,
   resetFilters,
-} = useTalks(allTalksData)
+} = useSlides(allSlidesData)
 </script>
 
 <template>
@@ -46,19 +37,19 @@ const {
       </template>
       <template #description>
         <p class="text-center text-white/90 text-lg mb-8 max-w-3xl mx-auto">
-          {{ talkCount === totalTalkCount ? `${talkCount}件の発表` : `${talkCount} / ${totalTalkCount}件の発表` }}
+          {{ slideCount === totalSlideCount ? `${slideCount}件のスライド` : `${slideCount} / ${totalSlideCount}件のスライド` }}
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">
           <Input
             v-model="searchQuery"
-            placeholder="タイトル、イベント名、タグで検索..."
+            placeholder="タイトル、説明で検索..."
             variant="outline"
             size="lg" />
           <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
             <Button
-              v-if="searchQuery || selectedYear || selectedType || selectedTag"
+              v-if="searchQuery || selectedYear"
               variant="outline" size="xs" rounded="full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
@@ -91,89 +82,56 @@ const {
               </SelectItem>
             </SelectContent>
           </Select>
-
-          <!-- タイプフィルター -->
-          <Select
-            :model-value="selectedType"
-            @update:model-value="(value) => setType(value)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="タイプを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="null">
-                すべてのタイプ
-              </SelectItem>
-              <SelectItem
-                v-for="(typeInfo, typeKey) in talkTypes"
-                :key="typeKey"
-                :value="typeKey">
-                {{ typeInfo.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <!-- タグフィルター -->
-          <Select
-            :model-value="selectedTag"
-            @update:model-value="(value) => setTag(value)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="タグを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="null">
-                すべてのタグ
-              </SelectItem>
-              <SelectItem
-                v-for="tag in availableTags"
-                :key="tag"
-                :value="tag">
-                {{ tag }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </Card>
 
-      <!-- トーク一覧 -->
-      <AsyncStateView
-        :fallback="filteredTalks.length === 0">
-        <template #loading>
-        </template>
-        <template #error>
-        </template>
-        <template #fallback>
-          <div class="text-center py-16 rounded-xl shadow-lg mt-6">
-            <Icon name="heroicons:magnifying-glass" class="text-6xl mx-auto mb-6" />
-            <h3 class="text-xl font-bold mb-2">
-              該当する発表が見つかりませんでした
-            </h3>
-            <p class="mb-8 max-w-md mx-auto">
-              検索条件を変更してみてください。
-            </p>
-            <Button variant="default" color="primary" @click="resetFilters">
-              フィルターをリセット
-            </Button>
-          </div>
-        </template>
-        <template #default>
-          <ul class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <li
-              v-for="(talk, index) in filteredTalks"
-              :key="talk.id">
-              <motion.ul
-                :initial="{ opacity: 0, y: 20 }"
-                :animate="{ opacity: 1, y: 0 }"
-                :transition="{ duration: 0.5, delay: index * 0.05 }">
-                <TalkCard
-                  :data="talk" />
-              </motion.ul>
-            </li>
-          </ul>
-        </template>
-      </AsyncStateView>
+      <!-- ローディング状態 -->
+      <div v-if="pending" class="text-center py-16">
+        <Icon name="heroicons:arrow-path" class="text-4xl animate-spin mx-auto mb-4" />
+        <p class="text-muted-foreground">
+          スライドを読み込み中...
+        </p>
+      </div>
+
+      <!-- エラー状態 -->
+      <div v-else-if="error" class="text-center py-16 rounded-xl shadow-lg">
+        <Icon name="heroicons:exclamation-triangle" class="text-6xl mx-auto mb-6 text-destructive" />
+        <h3 class="text-xl font-bold mb-2">
+          データの取得に失敗しました
+        </h3>
+        <p class="mb-8 max-w-md mx-auto text-muted-foreground">
+          しばらくしてからもう一度お試しください。
+        </p>
+      </div>
+
+      <!-- スライド一覧 -->
+      <template v-else>
+        <div v-if="filteredSlides.length === 0" class="text-center py-16 rounded-xl shadow-lg mt-6">
+          <Icon name="heroicons:magnifying-glass" class="text-6xl mx-auto mb-6" />
+          <h3 class="text-xl font-bold mb-2">
+            該当するスライドが見つかりませんでした
+          </h3>
+          <p class="mb-8 max-w-md mx-auto">
+            検索条件を変更してみてください。
+          </p>
+          <Button variant="default" color="primary" @click="resetFilters">
+            フィルターをリセット
+          </Button>
+        </div>
+
+        <ul v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <li
+            v-for="(slide, index) in filteredSlides"
+            :key="slide.slug">
+            <motion.div
+              :initial="{ opacity: 0, y: 20 }"
+              :animate="{ opacity: 1, y: 0 }"
+              :transition="{ duration: 0.5, delay: index * 0.05 }">
+              <TalkCard :data="slide" />
+            </motion.div>
+          </li>
+        </ul>
+      </template>
     </div>
   </div>
 </template>
-
-<style scoped>
-</style>

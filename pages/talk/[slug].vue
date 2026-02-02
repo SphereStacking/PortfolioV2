@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Slide } from '~/types/slide'
+import { formatDateJa } from '~/utils/date'
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -15,23 +16,15 @@ const slide = computed(() => {
   return slides.value.find(s => s.slug === slug)
 })
 
-// 404の場合はエラー
-if (!pending.value && !slide.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: 'Slide Not Found',
-  })
-}
-
-// 日付フォーマット関数
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+// 404の場合はエラー（SSR/CSR両対応）
+watchEffect(() => {
+  if (!pending.value && !slide.value && !error.value) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Slide Not Found',
+    })
+  }
+})
 
 // SEO
 useSeoMeta({
@@ -71,7 +64,7 @@ useSeoMeta({
             {{ slide.description }}
           </p>
           <p class="text-center text-white/70 text-sm">
-            {{ formatDate(slide.date) }}
+            {{ formatDateJa(slide.date) }}
           </p>
         </template>
       </PageHeader>
@@ -82,6 +75,7 @@ useSeoMeta({
           <div class="aspect-video">
             <iframe
               :src="slide.link"
+              :title="slide.title"
               class="w-full h-full border-0"
               allowfullscreen></iframe>
           </div>

@@ -94,7 +94,7 @@ const {
       </div>
 
       <!-- エラー状態 -->
-      <div v-else-if="error" class="text-center py-16 rounded-xl shadow-lg">
+      <div v-else-if="error" class="text-center py-16 rounded-xl shadow-lg bg-card">
         <Icon name="heroicons:exclamation-triangle" class="text-6xl mx-auto mb-6 text-destructive" />
         <h3 class="text-xl font-bold mb-2">
           データの取得に失敗しました

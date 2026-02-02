@@ -1,21 +1,12 @@
 <script setup lang="ts">
 import type { Slide } from '~/types/slide'
+import { formatDateJa } from '~/utils/date'
 
 interface Props {
   data: Slide
 }
 
 defineProps<Props>()
-
-// 日付フォーマット関数
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
 </script>
 
 <template>
@@ -44,7 +35,7 @@ const formatDate = (dateStr: string) => {
         {{ data.description }}
       </p>
       <p class="text-xs text-muted mt-1">
-        {{ formatDate(data.date) }}
+        {{ formatDateJa(data.date) }}
       </p>
     </div>
   </NuxtLink>

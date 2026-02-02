@@ -1,5 +1,6 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import { refDebounced } from '@vueuse/core'
 import type { Slide } from '~/types/slide'
 
 export const useSlides = (allSlidesData: Ref<Slide[] | null>) => {
@@ -9,23 +10,20 @@ export const useSlides = (allSlidesData: Ref<Slide[] | null>) => {
   // フィルター状態
   const searchQuery = ref('')
   const selectedYear = ref<string | null>(null)
-  const isLoading = ref(false)
 
-  // URLクエリパラメータから初期値を設定
-  watchEffect(() => {
+  // URLクエリパラメータから初期値を設定（マウント時に一度だけ）
+  onMounted(() => {
     searchQuery.value = (route.query.q as string) || ''
     selectedYear.value = (route.query.year as string) || null
   })
 
-  // 検索入力時の遅延処理
-  const debouncedSearch = ref(searchQuery.value)
-  watch(searchQuery, (newValue) => {
-    isLoading.value = true
-    setTimeout(() => {
-      debouncedSearch.value = newValue
-      isLoading.value = false
-      updateUrlQuery()
-    }, 300)
+  // VueUseのrefDebouncedを使用
+  const debouncedSearch = refDebounced(searchQuery, 300)
+  const isLoading = computed(() => searchQuery.value !== debouncedSearch.value)
+
+  // デバウンス後の検索クエリ変更時にURLを更新
+  watch(debouncedSearch, () => {
+    updateUrlQuery()
   })
 
   // URLクエリパラメータを更新

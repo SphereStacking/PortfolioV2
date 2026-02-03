@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
 const props = defineProps<{
   data: {
     id: string
@@ -29,11 +27,11 @@ const props = defineProps<{
   }
 }>()
 
-const date_span = computed(() => {
+const dateSpan = computed(() => {
   if (props.data.status === 'in_progress') {
-    return `${props.data.period_start} ~ ${dayjs().format('YYYY-MM')}`
+    return `${props.data.period_start} ~ 現在`
   }
-  return props.data.period_start + ' ~ ' + props.data.period_end
+  return `${props.data.period_start} ~ ${props.data.period_end}`
 })
 
 const isImageUrl = computed(() => {
@@ -43,134 +41,101 @@ const isImageUrl = computed(() => {
     || icon.startsWith('/')
     || /\.(png|jpg|jpeg|svg|webp)$/i.test(icon)
 })
+
+// 概要テキストを結合
+const overviewText = computed(() => {
+  return props.data.overview.join(' ')
+})
 </script>
 
 <template>
-  <Card
+  <div
     :id="data.title"
-    size="sm"
-    :class="[
-      'group relative flex flex-col gap-1 backdrop-blur-sm',
-    ]">
-    <CardHeader>
-      <div class="flex items-center justify-between gap-2 flex-col md:flex-row">
-        <h1 class="flex items-center gap-2">
-          <span class="text-lg font-semibold ">
-            {{ data.title }}
-          </span>
-        </h1>
-        <div class="flex items-center gap-2">
-          <Badge
-            v-for="tag in data.tags"
-            :key="tag"
-            color="neutral">
-            {{ tag }}
-          </Badge>
-        </div>
+    class="group flex flex-col md:flex-row overflow-hidden rounded-md border border-white/10 shadow-md shadow-zinc-950/50 transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-blue-500/10">
+    <!-- 左側: グラデーション背景 + アイコン + 日付 -->
+    <div
+      class="relative flex shrink-0 flex-col items-center justify-center gap-2 p-4 md:w-32 overflow-hidden"
+      :style="{
+        backgroundImage: `
+          linear-gradient(-30deg, rgba(59,130,246,0.3) 10%, rgba(59,130,246,0.5) 30%, rgba(6,182,212,0.6) 40%, rgba(20,184,166,0.5) 50%, rgba(59,130,246,0.2) 70%)
+        `,
+      }">
+      <!-- アイコン -->
+      <div class="flex size-14 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+        <img
+          v-if="isImageUrl"
+          :src="data.icon"
+          :alt="data.title"
+          class="size-9 object-contain">
+        <Icon
+          v-else
+          :name="data.icon"
+          class="text-3xl text-white/80" />
       </div>
-    </CardHeader>
-    <CardContent>
-      <div
-        class="flex flex-col justify-center overflow-hidden rounded-lg">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div class="col-span-full flex items-start gap-4">
-            <div
-              class="flex items-center justify-center shrink-0 rounded-full border border-transparent shadow-md backdrop-blur-md size-20 group-hover:shadow-primary/20 transition-all duration-300">
-              <img
-                v-if="isImageUrl"
-                :src="data.icon"
-                :alt="data.title"
-                class="size-12 object-contain">
-              <Icon
-                v-else
-                :name="data.icon"
-                class="text-white text-5xl" />
-            </div>
-            <p class="h-full text-sm flex flex-col justify-center">
-              <template v-for="overview in data.overview" :key="overview">
-                <span>
-                  {{ overview }}
-                </span>
-              </template>
-            </p>
-          </div>
 
-          <div class="col-span-1 flex items-center gap-2 border p-2 rounded-lg">
-            <Badge
-              color="neutral"
-              class="w-20 flex-shrink-0 justify-center h-full"
-              variant="outline">
-              期間
-            </Badge>
-            <div class="whitespace-nowrap text-xs">
-              {{ date_span }}
-            </div>
-          </div>
-          <div class="col-span-1 flex items-center gap-2 border p-2 rounded-lg">
-            <Badge
-              color="neutral"
-              class="w-20 flex-shrink-0 justify-center h-full"
-              variant="outline">
-              役割
-            </Badge>
-            <div class="text-sm">
-              {{ data.role }}
-            </div>
-          </div>
-          <div class="col-span-1 flex items-center gap-2 border p-2 rounded-lg">
-            <Badge
-              color="neutral"
-              class="w-20 flex-shrink-0 justify-center h-full"
-              variant="outline">
-              体制
-            </Badge>
-            <div class="text-sm">
-              {{ data.team }}
-            </div>
-          </div>
-          <div class="col-span-full  h-full w-full flex items-center gap-2 border  p-2 rounded-lg">
-            <Badge
-              class="w-20 flex-shrink-0 justify-center h-full"
-              color="neutral"
-              variant="outline">
-              担当
-            </Badge>
-            <div class="flex flex-wrap gap-2">
-              <span
-                v-for="task in data.tasks"
-                :key="task"
-                class="text-sm">
-                {{ task }}
-              </span>
-            </div>
-          </div>
-          <div class="col-span-full  h-full w-full flex items-center gap-2 border p-2 rounded-lg">
-            <Badge
-              class="w-20 flex-shrink-0 justify-center h-full"
-              color="neutral"
-              variant="outline">
-              技術
-            </Badge>
-            <div class="flex flex-wrap gap-2">
-              <SkillIcon
-                v-for="stack in data.stacks"
-                :key="stack"
-                :stack="stack"
-                class="h-10 min-w-10" />
-            </div>
-          </div>
-          <div class="col-span-full flex flex-wrap gap-2 justify-end">
+      <!-- 日付 -->
+      <span class="text-xs text-white/70 text-center whitespace-nowrap">
+        {{ dateSpan }}
+      </span>
+    </div>
+
+    <!-- 右側: コンテンツ -->
+    <div class="flex flex-1 flex-col gap-2 p-4">
+      <!-- タイトル -->
+      <h3 class="text-base font-m-plus-rounded-1c font-semibold line-clamp-2">
+        {{ data.title }}
+      </h3>
+
+      <!-- タグ -->
+      <div v-if="data.tags.length" class="flex flex-wrap items-center gap-1.5">
+        <Badge
+          v-for="tag in data.tags"
+          :key="tag"
+          variant="secondary"
+          class="text-xs">
+          {{ tag }}
+        </Badge>
+      </div>
+
+      <!-- 概要 -->
+      <p class="text-sm text-muted-foreground line-clamp-2">
+        {{ overviewText }}
+      </p>
+
+      <!-- 技術スタック + 詳細情報 -->
+      <div class="flex items-end justify-between gap-4">
+        <!-- 技術スタック（左） -->
+        <div v-if="data.stacks.length" class="flex flex-wrap items-center gap-1.5">
+          <SkillIcon
+            v-for="stack in data.stacks"
+            :key="stack"
+            :stack="stack"
+            class="size-6" />
+        </div>
+
+        <!-- 詳細情報（右・縦並び） -->
+        <div class="flex shrink-0 flex-col items-end gap-1 text-xs text-muted-foreground">
+          <span v-if="data.role" class="flex items-center gap-1">
+            <Icon name="heroicons:user" class="size-4" />
+            {{ data.role }}
+          </span>
+          <span v-if="data.team" class="flex items-center gap-1">
+            <Icon name="heroicons:user-group" class="size-4" />
+            {{ data.team }}
+          </span>
+          <template v-if="data.links?.length">
             <NuxtLink
               v-for="link in data.links"
               :key="link.label"
               :to="link.url"
               target="_blank"
-              class="text-xs hover:underline hover:text-emerald-500">
-              {{ link.label }} <Icon name="mdi:arrow-top-right-bold-box-outline" class="size-5" />
+              class="flex items-center gap-1 transition-colors hover:text-blue-400">
+              <Icon name="heroicons:arrow-top-right-on-square" class="size-3" />
+              {{ link.label }}
             </NuxtLink>
-          </div>
+          </template>
         </div>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

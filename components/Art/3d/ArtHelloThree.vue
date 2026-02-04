@@ -79,17 +79,17 @@ const animationParams: AnimationParams = {
   camera: {
     initialPosition: [-10, -10, 5] as [number, number, number],
     targetPosition: [0, 0, 0] as [number, number, number],
-    // 波形パラメータ（chaosプリセットをデフォルトに）
+    // 波形パラメータ（calmプリセットをデフォルトに）
     wave: {
-      frequency: ref(presets.camera.chaos.frequency), // 周波数
-      phase: ref(presets.camera.chaos.phase), // 位相
-      amplitude: ref(presets.camera.chaos.amplitude), // 振幅
-      radius: ref(presets.camera.chaos.radius), // 移動半径
-      transitionSpeed: ref(presets.camera.chaos.transitionSpeed), // 遷移速度
-      zoom: ref(presets.camera.chaos.zoom), // ズーム倍率
-      zoomFrequency: ref(presets.camera.chaos.zoomFrequency), // ズームの周波数
-      zoomAmplitude: ref(presets.camera.chaos.zoomAmplitude), // ズームの振幅
-      frequencyThreshold: ref(presets.camera.chaos.frequencyThreshold), // 周波数の閾値
+      frequency: ref(presets.camera.calm.frequency), // 周波数
+      phase: ref(presets.camera.calm.phase), // 位相
+      amplitude: ref(presets.camera.calm.amplitude), // 振幅
+      radius: ref(presets.camera.calm.radius), // 移動半径
+      transitionSpeed: ref(presets.camera.calm.transitionSpeed), // 遷移速度
+      zoom: ref(presets.camera.calm.zoom), // ズーム倍率
+      zoomFrequency: ref(presets.camera.calm.zoomFrequency), // ズームの周波数
+      zoomAmplitude: ref(presets.camera.calm.zoomAmplitude), // ズームの振幅
+      frequencyThreshold: ref(presets.camera.calm.frequencyThreshold), // 周波数の閾値
       isActive: ref(false), // アクティブ状態
     },
     // モニタリング用の値
@@ -181,8 +181,8 @@ function updateFrequencyWave() {
 }
 
 // プリセット自動変更の状態管理
-const autoChangeEnabled = ref(true)
-const presetChangeInterval = ref(200) // 0.3秒ごとに変更（より動的に）
+const autoChangeEnabled = ref(false) // 自動変更は無効化
+const presetChangeInterval = ref(60000) // 60秒ごとに変更（穏やかに）
 let presetChangeTimer: number | null = null
 
 // アイドル時のエフェクト管理

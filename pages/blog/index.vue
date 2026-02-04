@@ -46,8 +46,8 @@ const {
         Blog
       </template>
       <template #description>
-        <p class="text-center text-white/90 text-lg mb-8 max-w-3xl mx-auto">
-          {{ postCount === totalPostCount ? `${postCount}件の記事` : `${postCount} / ${totalPostCount}件の記事` }}
+        <p class="text-center text-white/50 text-xs tracking-[0.3em] uppercase mb-8">
+          {{ postCount }} Articles
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">

@@ -78,12 +78,8 @@ const {
         Career
       </template>
       <template #description>
-        <p class="mx-auto mb-8 max-w-3xl text-center text-lg text-white/90">
-          {{
-            careerCount === totalCareerCount
-              ? `${careerCount}社 / ${projectCount}件のプロジェクト`
-              : `${careerCount} / ${totalCareerCount}社 / ${projectCount} / ${totalProjectCount}件のプロジェクト`
-          }}
+        <p class="text-center text-white/50 text-xs tracking-[0.3em] uppercase mb-8">
+          {{ careerCount }} Companies · {{ projectCount }} Projects
         </p>
 
         <div class="relative z-10 mx-auto max-w-2xl">

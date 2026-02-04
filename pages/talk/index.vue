@@ -36,8 +36,8 @@ const {
         Talk
       </template>
       <template #description>
-        <p class="text-center text-white/90 text-lg mb-8 max-w-3xl mx-auto">
-          {{ slideCount === totalSlideCount ? `${slideCount}件のスライド` : `${slideCount} / ${totalSlideCount}件のスライド` }}
+        <p class="text-center text-white/50 text-xs tracking-[0.3em] uppercase mb-8">
+          {{ slideCount }} Slides
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">

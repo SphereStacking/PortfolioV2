@@ -1,152 +1,106 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
 import { useMyStack } from '~/composables/useMyStack'
 
-// コンポーザブルからすべての状態とロジックを取得
 const {
-  // データ
   techTypes,
-  getTag,
-  getTechType,
-
-  // フィルター状態
   searchQuery,
   debouncedSearch,
   selectedType,
   isLoading,
-
-  // 計算されたデータ
   filteredTechnologies,
   techCount,
   totalTechCount,
-  techCountByType,
-
-  // アクション
   setTechType,
   resetFilters,
 } = useMyStack()
+
+const categories = computed(() => {
+  return techTypes.value.map(type => ({
+    id: type.id,
+    name: type.fullName,
+    displayName: type.name,
+    icon: type.icon,
+    color: type.color,
+  }))
+})
+
+const handleSelectCategory = (categoryId: string) => {
+  setTechType(categoryId)
+}
 </script>
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-teal-800/70 via-teal-500/70 to-teal-200/80' }">
+    <PageHeader :ui="{ headerColor: 'bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900' }">
       <template #title>
-        My Tech Stack
+        Stack
       </template>
       <template #description>
-        <p class="text-center text-white/90 text-lg mb-8 max-w-3xl mx-auto">
-          {{ techCount === totalTechCount ? `${techCount}件の技術スタック` : `${techCount} / ${totalTechCount}件の技術スタック` }}
+        <p class="text-center text-white/50 text-xs tracking-[0.3em] uppercase mb-8">
+          {{ techCount }} Technologies
         </p>
 
-        <div class="max-w-2xl mx-auto relative z-10">
+        <div class="max-w-sm mx-auto relative z-10">
           <Input
             v-model="searchQuery"
-            placeholder="技術名やタグで検索..."
+            placeholder="Search..."
             variant="outline"
-            size="lg" />
-          <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
-            <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
-            <Button
+            size="lg"
+            class="bg-white/5 border-white/10 text-white placeholder:text-white/30" />
+          <div class="flex items-center absolute right-3 top-1/2 -translate-y-1/2">
+            <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin text-white/50" />
+            <button
               v-if="searchQuery || selectedType"
-              variant="outline" size="xs" rounded="full"
+              type="button"
+              class="p-1 rounded-full hover:bg-white/10 transition-colors"
               @click="resetFilters">
-              <Icon name="heroicons:x-mark" />
-            </Button>
+              <Icon name="heroicons:x-mark" class="size-4 text-white/50" />
+            </button>
           </div>
         </div>
       </template>
     </PageHeader>
+
     <div class="container mx-auto px-4 -mt-8 relative z-10">
-      <Card class="p-4 mb-8 flex flex-wrap gap-2">
-        <!-- タイプフィルター -->
+      <!-- フィルター -->
+      <Card class="mb-12 p-5">
         <div class="flex flex-wrap gap-2">
-          <!-- すべて表示ボタン -->
-          <Button variant="outline" @click="resetFilters">
-            <Icon name="heroicons:eye" />
-            すべて
-            <Badge>{{ totalTechCount }}</Badge>
-          </Button>
-          <Button
-            v-for="type in techTypes"
-            :key="type.id"
-            variant="outline"
-            @click="setTechType(type.id)">
-            <Icon :name="type.icon" />
-            {{ type.name }}
-            <Badge>{{ techCountByType[type.id] || 0 }}</Badge>
-          </Button>
+          <button
+            v-for="category in categories"
+            :key="category.id"
+            type="button"
+            class="px-3 py-1 text-[11px] tracking-wider uppercase rounded-full border transition-all duration-200"
+            :class="[
+              selectedType === category.id
+                ? 'bg-foreground text-background border-foreground'
+                : 'bg-transparent text-muted-foreground/60 border-transparent hover:text-foreground',
+            ]"
+            @click="handleSelectCategory(category.id)">
+            {{ category.displayName }}
+          </button>
         </div>
       </Card>
 
-      <!-- 技術スタック一覧 -->
-      <AsyncStateView
-        :fallback="filteredTechnologies.length === 0">
-        <template #loading>
-        </template>
-        <template #error>
-        </template>
-        <template #fallback>
-          <div class="text-center py-16 rounded-xl shadow-lg mt-6">
-            <Icon name="heroicons:magnifying-glass" class="text-6xl mx-auto mb-6" />
-            <h3 class="text-xl font-bold mb-2">
-              該当する技術が見つかりませんでした
-            </h3>
-            <p class="mb-8 max-w-md mx-auto">
-              「{{ debouncedSearch }}」に一致する技術やタグは見つかりませんでした。検索条件を変更してみてください。
-            </p>
-            <Button variant="default" color="primary" @click="resetFilters">
-              フィルターをリセット
-            </Button>
-          </div>
-        </template>
-        <template #default>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <motion.div
-              v-for="(tech, index) in filteredTechnologies" :key="tech.id"
-              :initial="{ opacity: 0, y: 20 }"
-              :animate="{ opacity: 1, y: 0 }"
-              :transition="{ duration: 0.5, delay: index * 0.05 }"
-              class="size-full">
-              <Card class="group size-full gap-2 p-4">
-                <NuxtLink
-                  :to="tech.link ?? '#'"
-                  target="_blank"
-                  class="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-opacity duration-300">
-                  <div
-                    class="w-14 h-14 rounded-lg flex items-center justify-center overflow-hidden">
-                    <SkillIcon :stack="tech.id" />
-                  </div>
-                  <div class="space-y-2">
-                    <CardTitle>
-                      {{ tech.name }}
-                    </CardTitle>
-                    <CardDescription>
-                      <Icon :name="techTypes.find(t => t.id === getTechType(tech))?.icon || 'heroicons:code-bracket'" class="mr-1" />
-                      {{ techTypes.find(t => t.id === getTechType(tech))?.name || '技術' }}
-                    </CardDescription>
-                  </div>
-                </NuxtLink>
-                <!-- タグ一覧 -->
-                <div v-if="tech.tags && tech.tags.length > 0" class="mt-4">
-                  <div class="flex flex-wrap gap-2">
-                    <Badge
-                      v-for="tagId in tech.tags"
-                      :key="tagId"
-                      :color="getTag(tagId)?.color || 'neutral'"
-                      variant="outline"
-                      size="sm">
-                      {{ getTag(tagId)?.name }}
-                    </Badge>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-        </template>
-      </AsyncStateView>
+      <!-- 技術スタック -->
+      <StackBlueprint
+        v-if="filteredTechnologies.length > 0"
+        :technologies="filteredTechnologies"
+        :categories="categories"
+        :selected-type="selectedType"
+        @select-category="handleSelectCategory" />
+
+      <!-- 該当なし -->
+      <div v-else class="text-center py-24">
+        <p class="text-xs text-muted-foreground/40 tracking-wide">
+          No results for "{{ debouncedSearch }}"
+        </p>
+        <button
+          type="button"
+          class="mt-4 text-[11px] tracking-wider uppercase text-muted-foreground/60 hover:text-foreground transition-colors"
+          @click="resetFilters">
+          Reset
+        </button>
+      </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-</style>

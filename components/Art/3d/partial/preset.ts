@@ -25,7 +25,7 @@ export type CameraPreset = {
 }
 
 export type TexturePresetName = 'matrix' | 'neon' | 'quantum' | 'glitch' | 'cyber' | 'void'
-export type CameraPresetName = 'orbital' | 'pendulum' | 'helix' | 'chaos' | 'vortex' | 'pulse'
+export type CameraPresetName = 'orbital' | 'pendulum' | 'helix' | 'chaos' | 'vortex' | 'pulse' | 'calm'
 
 export type Presets = {
   texture: Record<TexturePresetName, TexturePreset>
@@ -34,8 +34,8 @@ export type Presets = {
 
 // デフォルトプリセットの設定
 export const DEFAULT_PRESETS = {
-  texture: 'glitch' as TexturePresetName,
-  camera: 'chaos' as CameraPresetName,
+  texture: 'void' as TexturePresetName,
+  camera: 'calm' as CameraPresetName,
 }
 
 export const presets: Presets = {
@@ -179,6 +179,17 @@ export const presets: Presets = {
       zoomFrequency: 0.3,
       zoomAmplitude: 0.2,
       frequencyThreshold: 0.3,
+    },
+    calm: {
+      frequency: 0.004, // ゆっくりした回転
+      phase: 0,
+      amplitude: 0.5, // 適度な振幅
+      radius: 14, // 適度な距離
+      transitionSpeed: 0.03, // 滑らかな遷移
+      zoom: 1.0,
+      zoomFrequency: 0.02, // ゆっくりしたズーム
+      zoomAmplitude: 0.06, // 控えめなズーム変化
+      frequencyThreshold: 0.15,
     },
   },
 }

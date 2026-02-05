@@ -73,7 +73,7 @@ const {
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-blue-800/70 via-cyan-500/70 to-teal-200/70' }">
+    <PageHeader theme="career">
       <template #title>
         Career
       </template>

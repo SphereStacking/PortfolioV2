@@ -14,7 +14,7 @@ defineProps<Props>()
     :to="`/talk/${data.slug}`"
     :aria-label="data.title"
     class="flex cursor-pointer flex-col gap-2">
-    <div class="relative overflow-hidden rounded-md border border-white/10 shadow-md shadow-zinc-950/50 transition-colors duration-200 hover:border-white/20">
+    <div class="relative overflow-hidden rounded-md border border-white/10 transition-colors duration-200 hover:border-white/20">
       <div
         class="aspect-video flex flex-col gap-2 justify-center items-center py-10 px-10 transition-transform duration-300 hover:scale-110"
         :style="{

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-purple-800/70 via-blue-600/70 to-pink-500/70' }">
+    <PageHeader theme="art">
       <template #title>
         Shader Gallery
       </template>

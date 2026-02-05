@@ -31,7 +31,7 @@ const {
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-purple-800/70 via-violet-500/70 to-pink-200/70' }">
+    <PageHeader theme="talk">
       <template #title>
         Talk
       </template>

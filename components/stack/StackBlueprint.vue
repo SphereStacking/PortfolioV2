@@ -59,7 +59,7 @@ const visibleCategories = computed(() => {
           type="button"
           class="group text-left"
           @click="emit('select-category', category.id)">
-          <span class="text-[11px] tracking-[0.2em] uppercase text-muted-foreground/40 group-hover:text-muted-foreground transition-colors">
+          <span class="text-[11px] tracking-[0.2em] uppercase text-muted-foreground/70 group-hover:text-muted-foreground transition-colors">
             {{ category.displayName }}
           </span>
         </button>

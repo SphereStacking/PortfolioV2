@@ -3,7 +3,7 @@
 
 <template>
   <div class="min-h-screen pb-16">
-    <PageHeader :ui="{ headerColor: 'bg-gradient-to-r from-teal-800/70 via-teal-500/70 to-teal-200/70' }">
+    <PageHeader theme="art">
       <template #title>
         3D Art
       </template>

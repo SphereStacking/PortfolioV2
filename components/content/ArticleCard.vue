@@ -19,7 +19,7 @@ defineProps<Props>()
     :to="data.path"
     :aria-label="data.title"
     class="flex cursor-pointer flex-col gap-2">
-    <div class="relative overflow-hidden rounded-md border border-white/10 shadow-md shadow-zinc-950/50 transition-colors duration-200 hover:border-white/20">
+    <div class="relative overflow-hidden rounded-md border border-white/10 transition-colors duration-200 hover:border-white/20">
       <template v-if="data.image">
         <div class="aspect-video overflow-hidden">
           <NuxtImg

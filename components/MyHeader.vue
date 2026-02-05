@@ -22,7 +22,7 @@ const { navigationCategories } = useNavigation()
 <template>
   <header class="relative backdrop-blur-xs z-50">
     <!-- ヘッダー -->
-    <div class="h-16 sticky top-0 border-b border-gray-200">
+    <div class="h-16 sticky top-0 border-b border-zinc-800 dark:border-gray-200">
       <div class="container h-full md:mx-auto px-2">
         <div class="flex items-center justify-between gap-3 h-full">
           <!-- 左側 -->

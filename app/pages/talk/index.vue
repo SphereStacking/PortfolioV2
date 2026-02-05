@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
-import type { Slide } from '~/types/slide'
+import type { Slide } from '~~/types/slide'
 import { useSlides } from '~/composables/useSlides'
 
 // 外部APIからデータ取得

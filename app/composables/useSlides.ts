@@ -1,7 +1,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import { refDebounced } from '@vueuse/core'
-import type { Slide } from '~/types/slide'
+import type { Slide } from '~~/types/slide'
 
 export const useSlides = (allSlidesData: Ref<Slide[] | null>) => {
   const route = useRoute()

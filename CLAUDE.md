@@ -1,40 +1,53 @@
 # CLAUDE.md
 
-このファイルは、このリポジトリでコードを扱う際のClaude Code (claude.ai/code)へのガイダンスを提供します。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 開発コマンド
 
 ```bash
 # HMR付き開発サーバー
-npm run dev
+pnpm dev
 
 # 本番ビルド
-npm run build
+pnpm build
 
 # 静的サイト生成
-npm run generate
+pnpm generate
 
 # 本番ビルドのプレビュー
-npm run preview
+pnpm preview
 
 # コードのLint
-npm run lint
+pnpm lint
 
 # Lintの自動修正
-npm run lint:fix
+pnpm lint:fix
 ```
 
 ## アーキテクチャ概要
 
-これはコンテンツ管理機能を備えたNuxt 3ポートフォリオウェブサイトです。現在、UIフレームワークをNuxtUIからshadcn-vueへ移行中です。
+コンテンツ管理機能を備えたNuxt 4ポートフォリオウェブサイト。
 
 ### 主要技術
-- **フレームワーク**: TypeScript付きNuxt 3
-- **UIコンポーネント**: shadcn-vue（NuxtUIから移行中）
+- **フレームワーク**: Nuxt 4（compatibilityVersion: 4）+ TypeScript
+- **パッケージマネージャー**: pnpm（Rolldown-Viteで高速ビルド）
+- **UIコンポーネント**: shadcn-vue + reka-ui
 - **スタイリング**: Tailwind CSS v4
 - **3Dグラフィックス**: @tresjs/nuxt経由のThree.js
 - **コンテンツ**: マークダウンベースの@nuxt/content
-- **アニメーション**: motion-vとtweakpane
+- **アニメーション**: motion-v、tweakpane
+
+### ディレクトリ構造（Nuxt 4）
+```
+app/                  # アプリケーションコード（Nuxt 4形式）
+├── components/       # Vueコンポーネント
+├── composables/      # カスタムcomposables
+├── pages/            # ページコンポーネント
+├── layouts/          # レイアウト
+└── assets/           # CSS、画像など
+content/              # マークダウンコンテンツ
+public/               # 静的ファイル
+```
 
 ### コンテンツ構造
 コンテンツは`/content/`以下のコレクションで整理されています：
@@ -44,28 +57,25 @@ npm run lint:fix
 - **me**: 個人情報と技術スタック（JSONファイル）
 
 ### コンポーネント構成
-- **UIコンポーネント**: shadcn-vueパターンに従った`/components/ui/`に配置
+- **UIコンポーネント**: `app/components/ui/`にshadcn-vueパターンで配置
 - **機能コンポーネント**: ドメイン別に整理（career/、project/、content/）
-- **Composables**: `/composables/`内のカスタムVue composables
-- **ストア**: `/stores/`内の状態管理（必要に応じて）
+- **Composables**: `app/composables/`内のカスタムVue composables
 
-### 現在の移行状況
-プロジェクトはNuxtUIからshadcn-vueへ移行中です。UIコンポーネントを扱う際は：
-1. `/components/ui/`からshadcn-vueコンポーネントを使用
-2. New Yorkスタイルテーマ設定に従う
-3. CSS変数でZincを基本色として使用（`/assets/css/tailwind.css`参照）
-4. 既存のshadcn-vueコンポーネントとの一貫性を保つ
+### shadcn-vue使用ガイド
+- `app/components/ui/`からshadcn-vueコンポーネントを使用
+- New Yorkスタイルテーマ設定
+- CSS変数でZincを基本色として使用（`app/assets/css/tailwind.css`参照）
 
 ### 重要なパターン
-- カラーモードサポートは`/components/modules/colorMode/`のカスタムモジュールで実装
-- OG画像は`/components/OgImage/`のコンポーネントを使用して生成
-- 3Dアニメーションは`/components/Art/partial/`のカスタムcomposablesを使用
-- コンテンツクエリは`content.config.ts`で定義された型付きコレクションを使用すべき
+- カラーモードサポートは`app/components/modules/colorMode/`のカスタムモジュールで実装
+- OG画像は`app/components/OgImage/`のコンポーネントを使用して生成
+- 3Dアニメーションは`app/components/Art/partial/`のカスタムcomposablesを使用
+- コンテンツクエリは`content.config.ts`で定義された型付きコレクションを使用
 
 ## 開発ガイドライン
 
 ### コード実装後の必須作業
-- **Lintの実行**: コード実装完了後、必ず `npm run lint:fix` を実行してコードを整形する
+- **Lintの実行**: コード実装完了後、必ず `pnpm lint:fix` を実行してコードを整形する
 
 ### Composablesの実装方針
 - **VueUseを優先的に使用**: カスタムcomposableを実装する前に、VueUseに同等の機能があるか確認すること
@@ -94,7 +104,7 @@ npm run lint:fix
   3. **スタイルはコンポーネントに閉じ込める**: グローバルCSSは避け、scopedスタイルを使用
 
 - **テーマ色の使用**:
-  - **テーマ変数の参照**: `/assets/css/tailwind.css`に定義されているCSS変数を使用
+  - **テーマ変数の参照**: `app/assets/css/tailwind.css`に定義されているCSS変数を使用
   - **セマンティックな色を優先**: 直接的な色指定（例：`text-gray-500`）ではなく、テーマ変数を使用
     - `text-foreground` / `bg-background` - 基本的なテキストと背景
     - `text-muted-foreground` / `bg-muted` - 二次的なテキストと背景

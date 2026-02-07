@@ -30,7 +30,8 @@ pnpm lint:fix
 
 ### 主要技術
 - **フレームワーク**: Nuxt 4（compatibilityVersion: 4）+ TypeScript
-- **パッケージマネージャー**: pnpm（Rolldown-Viteで高速ビルド）
+- **パッケージマネージャー**: pnpm
+- **ビルドツール**: Rolldown-Vite（Vite互換のRust製高速バンドラー）
 - **UIコンポーネント**: shadcn-vue + reka-ui
 - **スタイリング**: Tailwind CSS v4
 - **3Dグラフィックス**: @tresjs/nuxt経由のThree.js
@@ -38,7 +39,7 @@ pnpm lint:fix
 - **アニメーション**: motion-v、tweakpane
 
 ### ディレクトリ構造（Nuxt 4）
-```
+```text
 app/                  # アプリケーションコード（Nuxt 4形式）
 ├── components/       # Vueコンポーネント
 ├── composables/      # カスタムcomposables

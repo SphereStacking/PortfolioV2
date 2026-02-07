@@ -1,4 +1,4 @@
-import type { Tool } from '~/types/tool'
+import type { Tool } from '~~/types/tool'
 
 export const useTools = () => {
   const tools: Tool[] = [

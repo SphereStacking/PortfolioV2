@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
-import technologies from '~/content/me/stack/technologies.json'
-import categories from '~/content/me/stack/categories.json'
-import tags from '~/content/me/stack/tags.json'
+import technologies from '~~/content/me/stack/technologies.json'
+import categories from '~~/content/me/stack/categories.json'
+import tags from '~~/content/me/stack/tags.json'
 
 // UIカラーの型定義
 type UiColor = 'primary' | 'secondary' | 'neutral' | 'info' | 'success' | 'error' | 'warning'

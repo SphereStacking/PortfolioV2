@@ -1,4 +1,4 @@
-import me from '~/content/me/me.json'
+import me from '~~/content/me/me.json'
 
 export const useMyProfile = () => {
   return {

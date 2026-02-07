@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toolCategories, type Tool } from '~/types/tool'
+import { toolCategories, type Tool } from '~~/types/tool'
 import {
   Sidebar,
   SidebarContent,

@@ -51,7 +51,10 @@ export default defineNuxtConfig({
       // enabled: false,
     },
   },
-  compatibilityDate: '2024-11-01',
+  future: {
+    compatibilityVersion: 4,
+  },
+  compatibilityDate: '2025-02-06',
   nitro: {
     minify: true,
   },
@@ -101,7 +104,7 @@ export default defineNuxtConfig({
      * Directory that the component lives in.
      * @default "./components/ui"
      */
-    componentDir: './components/ui',
+    componentDir: '~/components/ui',
   },
   tres: {
     devtools: true,

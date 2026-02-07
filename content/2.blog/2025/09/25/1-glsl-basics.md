@@ -1,6 +1,6 @@
 ---
-title: "GLSL勉強日記 #1 基本のき"
-description: "GLSLを勉強し始めました。基本的な変数宣言、修飾子（uniform、varying、attribute）、データ型について学んだことをまとめました。"
+title: GLSL入門 #1 - uniform/varying/attribute修飾子とデータ型を完全解説
+description: GLSL初心者向けに基本的な変数宣言、修飾子（uniform、varying、attribute）、データ型について解説。シェーダープログラミングの第一歩を踏み出すための基礎知識をまとめました。
 navigation: true
 draft: false
 created: 2025-09-25
@@ -83,7 +83,7 @@ uniform vec2 u_resolution;   // 画面の解像度（幅, 高さ）
 uniform vec2 u_mouse;        // マウス位置（0〜1に正規化）
 ```
 
-- **uniform** = 「一様な」という意味
+- **uniform** =「一様な」という意味
 - 画面上のどのピクセルを計算していても、同じ値
 
 #### データの流れ

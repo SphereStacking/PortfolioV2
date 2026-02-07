@@ -1,0 +1,51 @@
+{
+  "plugins": {},
+  "filters": {},
+  "rules": {
+    "preset-ja-technical-writing": {
+      "sentence-length": {
+        "max": 150
+      },
+      "max-comma": {
+        "max": 4
+      },
+      "max-ten": {
+        "max": 4
+      },
+      "max-kanji-continuous-len": {
+        "max": 15
+      },
+      "no-exclamation-question-mark": false,
+      "no-doubled-joshi": {
+        "strict": false,
+        "allow": [
+          "か",
+          "が",
+          "に",
+          "で",
+          "も",
+          "は"
+        ]
+      },
+      "ja-no-weak-phrase": false,
+      "ja-no-successive-word": false,
+      "ja-no-mixed-period": false,
+      "no-mix-dearu-desumasu": {
+        "preferInList": "ですます"
+      },
+      "ja-no-redundant-expression": {
+        "allowNodeTypes": [
+          "BlockQuote",
+          "Code",
+          "Comment"
+        ]
+      }
+    },
+    "preset-ja-spacing": {
+      "ja-space-between-half-and-full-width": {
+        "space": "never"
+      },
+      "ja-space-around-code": false
+    }
+  }
+}

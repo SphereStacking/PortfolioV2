@@ -1,6 +1,6 @@
 ---
-title: "viewportに入った時にイケてる演出できるコンポーネント"
-description: "viewportに入った時だけアニメーションを適用してほしくてvueのtransitionのwrapperコンポーネントを作成した"
+title: IntersectionObserverで実現するスクロール連動アニメーション - Vue 3実装ガイド
+description: ビューポート内での要素の出入りに応じてアニメーションを自動トリガー。IntersectionObserverとVue Transitionを組み合わせて、スムーズなスクロール演出を実現する方法を解説します。
 navigation: true
 draft: false
 created: 2024-03-20
@@ -85,7 +85,7 @@ watch(isVisible, async (newVal) => {
 
 ### 使い方
 
-例1 四角のが横から回りながら出現
+例1四角のが横から回りながら出現
 
 ```vue
 <TransitionInViewportObserver
@@ -98,7 +98,7 @@ leave-to-class="opacity-0">
 </TransitionInViewportObserver>
 ```
 
-例2 左右からslideしながら出現
+例2左右からslideしながら出現
 
 ```vue
 <TransitionInViewportObserver
@@ -116,7 +116,7 @@ leave-to-class="opacity-0">
 </TransitionInViewportObserver>
 ```
 
-例3 下からslideしながら出現
+例3下からslideしながら出現
 
 ```vue
 <TransitionInViewportObserver

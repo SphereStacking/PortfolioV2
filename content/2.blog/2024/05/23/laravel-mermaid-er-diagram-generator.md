@@ -1,6 +1,6 @@
 ---
-title: "LaravelでMermaid形式のER図を生成するカスタムコマンド"
-description: LaravelのプロジェクトでデータベースのスキーマからMermaid形式のER図を自動生成します。
+title: Laravel × Mermaidで自動ER図生成 - スキーマ変更が楽になるカスタムコマンド
+description: LaravelプロジェクトでデータベースのスキーマからMermaid形式のER図を自動生成するカスタムコマンドを実装。DB管理の手間を削減し、ドキュメントの自動更新を実現します。
 navigation: true
 draft: false
 created: 2024-05-23
@@ -217,6 +217,6 @@ protected $commands = [
 
 ## まとめ
 
-これで、LaravelのデータベーススキーマからMermaid形式のER図を自動生成することができるようになりました:crocodile:
+これで、LaravelのデータベーススキーマからMermaid形式のER図を自動生成できるようになりました:crocodile:
 
 DBに変更を加えた時のer図ちまちま更新ともおさらばです。

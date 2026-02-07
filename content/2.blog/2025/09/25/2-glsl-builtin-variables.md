@@ -1,6 +1,6 @@
 ---
-title: "GLSL勉強日記 #2 GLSLの組み込み変数"
-description: "GLSLの組み込み変数について学んだことをまとめました。gl_FragCoord、gl_FragColorなどの基本的な組み込み変数の使い方と、ピクセル中心の概念、0-1正規化の必要性について解説します。"
+title: GLSL入門 #2 - gl_FragCoord/gl_FragColorの仕組みと正規化テクニック
+description: GLSLの組み込み変数（gl_FragCoord、gl_FragColor）の使い方を解説。ピクセル中心の概念、0-1正規化の必要性、Modern GLSLとの違いについて詳しく説明します。
 navigation: true
 draft: false
 created: 2025-09-25

@@ -361,7 +361,7 @@ const convert = () => {
             error.value = 'Schema validation failed:\n' + validation.errors.join('\n')
           }
         }
-        catch (e) {
+        catch {
           error.value = 'Invalid JSON Schema'
         }
       }

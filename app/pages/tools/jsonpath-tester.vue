@@ -9,19 +9,19 @@ definePageMeta({
 // 状態管理
 const jsonInput = ref('')
 const jsonPath = ref('')
-const results = ref<any[]>([])
+const results = ref<unknown[]>([])
 const error = ref('')
 const syntaxError = ref('')
 const prettify = ref(true)
 const showLineNumbers = ref(true)
 
 // JSONPath評価エンジン（簡易実装）
-function evaluateJsonPath(data: any, path: string): any[] {
+function evaluateJsonPath(data: unknown, path: string): unknown[] {
   if (!path || path === '$') {
     return [data]
   }
 
-  const results: any[] = []
+  const results: unknown[] = []
 
   try {
     // パスを正規化
@@ -33,7 +33,7 @@ function evaluateJsonPath(data: any, path: string): any[] {
       let current = [data]
 
       for (const segment of segments) {
-        const nextCurrent: any[] = []
+        const nextCurrent: unknown[] = []
 
         for (const item of current) {
           if (item === null || item === undefined) continue
@@ -81,7 +81,7 @@ function evaluateJsonPath(data: any, path: string): any[] {
                 nextCurrent.push(...Object.values(item))
               }
             }
-            else if (item.hasOwnProperty(segment)) {
+            else if (Object.hasOwn(item, segment)) {
               nextCurrent.push(item[segment])
             }
           }
@@ -96,7 +96,7 @@ function evaluateJsonPath(data: any, path: string): any[] {
     else if (normalizedPath.startsWith('[')) {
       const match = normalizedPath.match(/\[['"](.+?)['"]\]/)
       if (match && match[1]) {
-        if (data.hasOwnProperty(match[1])) {
+        if (Object.hasOwn(data, match[1])) {
           results.push(data[match[1]])
         }
       }
@@ -275,7 +275,7 @@ const loadSample = (sample: typeof sampleData[0]) => {
 }
 
 // 結果のフォーマット
-const formatResult = (result: any): string => {
+const formatResult = (result: unknown): string => {
   if (prettify.value) {
     return JSON.stringify(result, null, 2)
   }
@@ -306,7 +306,7 @@ const exportResults = () => {
 }
 
 // 行番号付きテキストエリア
-const jsonWithLineNumbers = computed(() => {
+const _jsonWithLineNumbers = computed(() => {
   if (!showLineNumbers.value) return jsonInput.value
 
   const lines = jsonInput.value.split('\n')
@@ -583,7 +583,7 @@ useSeoMeta({
             <Icon name="heroicons:information-circle" class="w-4 h-4" />
             <AlertDescription>
               このツールは基本的なJSONPath機能のみサポートしています。
-              フィルター式（[?(@.price < 10)]）などの高度な機能は実装されていません。
+              フィルター式（[?(@.price &lt; 10)]）などの高度な機能は実装されていません。
             </AlertDescription>
           </Alert>
         </div>

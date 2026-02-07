@@ -29,7 +29,7 @@ const {
 
   // カウント
   postCount,
-  totalPostCount,
+  totalPostCount: _totalPostCount,
 
   // アクション
   setYear,

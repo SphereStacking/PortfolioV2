@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -205,7 +205,7 @@ const generatedTags = computed(() => {
 
 // 構造化データ (JSON-LD)
 const structuredData = computed(() => {
-  const data: any = {
+  const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
   }
 
@@ -294,8 +294,8 @@ const fullHtmlHead = computed(() => {
   return parts.join('\n')
 })
 
-// プレビュー画像のアスペクト比
-const imageAspectRatio = computed(() => {
+// プレビュー画像のアスペクト比（将来の機能拡張用に保持）
+const _imageAspectRatio = computed(() => {
   const width = parseInt(ogData.value.imageWidth) || 1200
   const height = parseInt(ogData.value.imageHeight) || 630
   return `${width}:${height}`

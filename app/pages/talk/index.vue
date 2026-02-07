@@ -21,7 +21,7 @@ const {
 
   // カウント
   slideCount,
-  totalSlideCount,
+  totalSlideCount: _totalSlideCount,
 
   // アクション
   setYear,

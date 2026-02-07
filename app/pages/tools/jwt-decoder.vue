@@ -9,7 +9,7 @@ interface JWTHeader {
   alg?: string
   typ?: string
   kid?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface JWTPayload {
@@ -20,7 +20,7 @@ interface JWTPayload {
   nbf?: number
   iat?: number
   jti?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // 状態管理
@@ -56,7 +56,7 @@ const base64UrlDecode = (str: string) => {
         .join(''),
     )
   }
-  catch (e) {
+  catch {
     throw new Error('Invalid base64url encoding')
   }
 }
@@ -172,7 +172,7 @@ const knownClaims = {
 }
 
 // JSONを整形
-const formatJSON = (obj: any) => {
+const formatJSON = (obj: unknown) => {
   if (!prettyPrint.value) {
     return JSON.stringify(obj)
   }

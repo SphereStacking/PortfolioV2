@@ -120,21 +120,21 @@ const compressImage = async (imageFile: ImageFile) => {
 
     // 出力フォーマット決定
     let mimeType = imageFile.file.type
-    let extension = imageFile.file.name.split('.').pop()
+    let _extension = imageFile.file.name.split('.').pop()
 
     if (outputFormat.value !== 'original') {
       switch (outputFormat.value) {
         case 'jpeg':
           mimeType = 'image/jpeg'
-          extension = 'jpg'
+          _extension = 'jpg'
           break
         case 'webp':
           mimeType = 'image/webp'
-          extension = 'webp'
+          _extension = 'webp'
           break
         case 'png':
           mimeType = 'image/png'
-          extension = 'png'
+          _extension = 'png'
           break
       }
     }

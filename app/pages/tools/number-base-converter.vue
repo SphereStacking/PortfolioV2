@@ -28,13 +28,7 @@ const results = computed(() => {
     const cleanValue = inputValue.value.replace(/^(0x|0X|0b|0B|0o|0O)/, '')
     const decimal = parseInt(cleanValue, inputBase.value)
 
-    if (isNaN(decimal)) {
-      error.value = '無効な数値です'
-      return {}
-    }
-
-    if (decimal < 0) {
-      error.value = '負の数はサポートされていません'
+    if (isNaN(decimal) || decimal < 0) {
       return {}
     }
 
@@ -47,8 +41,7 @@ const results = computed(() => {
       decimal: decimal,
     }
   }
-  catch (e) {
-    error.value = '変換エラーが発生しました'
+  catch {
     return {}
   }
 })
@@ -70,6 +63,16 @@ const validateInput = () => {
       error.value = `基数${inputBase.value}では '${char}' は無効な文字です`
       return
     }
+  }
+
+  // 数値として有効かチェック
+  const decimal = parseInt(cleanValue, inputBase.value)
+  if (isNaN(decimal)) {
+    error.value = '無効な数値です'
+    return
+  }
+  if (decimal < 0) {
+    error.value = '負の数はサポートされていません'
   }
 }
 
@@ -102,6 +105,20 @@ const bitOperations = computed(() => {
     and15: (num & 15).toString(2),
     or8: (num | 8).toString(2),
     xor255: (num ^ 255).toString(2),
+  }
+})
+
+// ビット演算のラベル
+const bitOpLabels = computed(() => {
+  const d = results.value.decimal
+  if (!d) return null
+  return {
+    not: `NOT (~${d})`,
+    leftShift: `左シフト (${d} ≪ 1)`,
+    rightShift: `右シフト (${d} ≫ 1)`,
+    and15: `AND (${d} & 15)`,
+    or8: `OR (${d} | 8)`,
+    xor255: `XOR (${d} ^ 255)`,
   }
 })
 
@@ -300,37 +317,37 @@ useSeoMeta({
         <div class="space-y-3">
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span class="font-medium">NOT (~{{ results.decimal }})</span>
+              <span class="font-medium">{{ bitOpLabels.not }}</span>
               <div class="font-mono text-muted-foreground">
                 {{ bitOperations.not }}
               </div>
             </div>
             <div>
-              <span class="font-medium">左シフト ({{ results.decimal }} << 1)</span>
+              <span class="font-medium">{{ bitOpLabels.leftShift }}</span>
               <div class="font-mono text-muted-foreground">
                 {{ bitOperations.leftShift1 }}
               </div>
             </div>
             <div>
-              <span class="font-medium">右シフト ({{ results.decimal }} >> 1)</span>
+              <span class="font-medium">{{ bitOpLabels.rightShift }}</span>
               <div class="font-mono text-muted-foreground">
                 {{ bitOperations.rightShift1 }}
               </div>
             </div>
             <div>
-              <span class="font-medium">AND ({{ results.decimal }} & 15)</span>
+              <span class="font-medium">{{ bitOpLabels.and15 }}</span>
               <div class="font-mono text-muted-foreground">
                 {{ bitOperations.and15 }}
               </div>
             </div>
             <div>
-              <span class="font-medium">OR ({{ results.decimal }} | 8)</span>
+              <span class="font-medium">{{ bitOpLabels.or8 }}</span>
               <div class="font-mono text-muted-foreground">
                 {{ bitOperations.or8 }}
               </div>
             </div>
             <div>
-              <span class="font-medium">XOR ({{ results.decimal }} ^ 255)</span>
+              <span class="font-medium">{{ bitOpLabels.xor255 }}</span>
               <div class="font-mono text-muted-foreground">
                 {{ bitOperations.xor255 }}
               </div>

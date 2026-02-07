@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -22,12 +22,12 @@ interface ValidationResult {
 interface ValidationError {
   path: string
   message: string
-  value?: any
-  schema?: any
+  value?: unknown
+  schema?: unknown
 }
 
 // 簡易JSON Schema バリデーター
-const validateJSON = (data: any, schema: any, path = ''): ValidationError[] => {
+const validateJSON = (data: unknown, schema: Record<string, unknown>, path = ''): ValidationError[] => {
   const errors: ValidationError[] = []
 
   // 型チェック
@@ -206,7 +206,7 @@ const validateJSON = (data: any, schema: any, path = ''): ValidationError[] => {
 }
 
 // JSON型の判定
-const getJSONType = (value: any): string => {
+const getJSONType = (value: unknown): string => {
   if (value === null) return 'null'
   if (Array.isArray(value)) return 'array'
   if (typeof value === 'object') return 'object'
@@ -241,13 +241,13 @@ const validateFormat = (value: string, format: string): string | null => {
 }
 
 // JSONからスキーマを生成
-const generateSchema = (data: any): any => {
+const generateSchema = (data: unknown): Record<string, unknown> => {
   if (data === null) {
     return { type: 'null' }
   }
 
   if (Array.isArray(data)) {
-    const schema: any = { type: 'array' }
+    const schema: Record<string, unknown> = { type: 'array' }
     if (data.length > 0) {
       // 最初の要素を基準にスキーマを生成
       schema.items = generateSchema(data[0])
@@ -256,22 +256,23 @@ const generateSchema = (data: any): any => {
   }
 
   if (typeof data === 'object') {
-    const schema: any = {
-      type: 'object',
-      properties: {},
-      required: [],
-    }
+    const properties: Record<string, unknown> = {}
+    const required: string[] = []
 
     for (const [key, value] of Object.entries(data)) {
-      schema.properties[key] = generateSchema(value)
-      schema.required.push(key)
+      properties[key] = generateSchema(value)
+      required.push(key)
     }
 
-    return schema
+    return {
+      type: 'object',
+      properties,
+      required,
+    }
   }
 
   if (typeof data === 'string') {
-    const schema: any = { type: 'string' }
+    const schema: Record<string, unknown> = { type: 'string' }
 
     // フォーマットの推測
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data)) {
@@ -610,17 +611,17 @@ useSeoMeta({
 
           <div class="space-y-2">
             <Alert
-              v-for="(error, index) in validationResult.errors"
+              v-for="(validationError, index) in validationResult.errors"
               :key="index"
-              :variant="getErrorSeverity(error) === 'error' ? 'destructive' : 'default'">
+              :variant="getErrorSeverity(validationError) === 'error' ? 'destructive' : 'default'">
               <Icon
-                :name="getErrorSeverity(error) === 'error' ? 'heroicons:x-circle' : 'heroicons:exclamation-triangle'"
+                :name="getErrorSeverity(validationError) === 'error' ? 'heroicons:x-circle' : 'heroicons:exclamation-triangle'"
                 class="w-4 h-4" />
-              <AlertTitle>{{ error.path }}</AlertTitle>
+              <AlertTitle>{{ validationError.path }}</AlertTitle>
               <AlertDescription>
-                {{ error.message }}
-                <span v-if="error.value !== undefined" class="block mt-1 font-mono text-xs">
-                  値: {{ JSON.stringify(error.value) }}
+                {{ validationError.message }}
+                <span v-if="validationError.value !== undefined" class="block mt-1 font-mono text-xs">
+                  値: {{ JSON.stringify(validationError.value) }}
                 </span>
               </AlertDescription>
             </Alert>

@@ -14,6 +14,12 @@ interface GradientStop {
   position: number
 }
 
+interface GradientPreset {
+  type?: 'linear' | 'radial' | 'conic'
+  angle?: number
+  stops: GradientStop[]
+}
+
 // 状態管理
 const gradientType = ref<'linear' | 'radial' | 'conic'>('linear')
 const angle = ref(90)
@@ -27,7 +33,7 @@ const stops = ref<GradientStop[]>([
   { color: '#8b5cf6', position: 100 },
 ])
 
-const selectPreset = (preset: any) => {
+const _selectPreset = (preset: GradientPreset) => {
   gradientType.value = preset.type || 'linear'
   if (preset.angle !== undefined) angle.value = preset.angle
   stops.value = preset.stops.map((s: GradientStop) => ({ ...s }))
@@ -87,7 +93,7 @@ const tailwindCode = computed(() => {
 })
 
 // SVGグラデーション生成用のID
-const svgGradientId = 'gradient-' + Date.now()
+const _svgGradientId = 'gradient-' + Date.now()
 
 // クリップボードにコピー
 const { copy } = useClipboard()

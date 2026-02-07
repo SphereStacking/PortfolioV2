@@ -58,7 +58,7 @@ const generatePassword = () => {
   const hasUppercase = !includeUppercase.value || /[A-Z]/.test(result)
   const hasLowercase = !includeLowercase.value || /[a-z]/.test(result)
   const hasNumbers = !includeNumbers.value || /[0-9]/.test(result)
-  const hasSymbols = !includeSymbols.value || /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(result)
+  const hasSymbols = !includeSymbols.value || /[!@#$%^&*()_+\-=[\]{}|;:,.<>?]/.test(result)
 
   if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSymbols) {
     generatePassword()

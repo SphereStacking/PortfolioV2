@@ -181,7 +181,7 @@ const generatePalette = computed(() => {
         rgbToHex(...Object.values(hslToRgb((hsl.h + 270) % 360, hsl.s, hsl.l))),
       )
       break
-    case 'monochromatic':
+    case 'monochromatic': {
       // モノクロマティック（明度違い）
       const steps = [20, 40, 60, 80]
       steps.forEach((step) => {
@@ -190,6 +190,7 @@ const generatePalette = computed(() => {
         )
       })
       break
+    }
   }
 
   return colors

@@ -9,7 +9,7 @@ const {
   isLoading,
   filteredTechnologies,
   techCount,
-  totalTechCount,
+  totalTechCount: _totalTechCount,
   setTechType,
   resetFilters,
 } = useMyStack()

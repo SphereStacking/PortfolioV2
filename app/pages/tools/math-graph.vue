@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -46,7 +46,7 @@ const evaluateExpression = (expression: string, x: number): number => {
     const result = new Function('Math', `return ${expr}`)(Math)
     return isFinite(result) ? result : NaN
   }
-  catch (e) {
+  catch {
     return NaN
   }
 }
@@ -125,7 +125,7 @@ const drawGraph = () => {
     ctx.beginPath()
 
     let firstPoint = true
-    const step = (xMax.value - xMin.value) / canvasWidth
+    const _step = (xMax.value - xMin.value) / canvasWidth
 
     for (let pixelX = 0; pixelX <= canvasWidth; pixelX++) {
       const x = xMin.value + pixelX / xScale
@@ -334,7 +334,7 @@ onMounted(() => {
 const { copy } = useClipboard()
 const { toast } = useToast()
 
-const copyToClipboard = async (text: string) => {
+const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
     toast({

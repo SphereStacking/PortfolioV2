@@ -6,7 +6,7 @@ definePageMeta({
   layout: 'tools',
 })
 
-const { tools, getToolsByCategory } = useTools()
+const { tools: _tools, getToolsByCategory } = useTools()
 
 // カテゴリー別にツールをグループ化
 const toolsByCategory = Object.keys(toolCategories).reduce((acc, category) => {

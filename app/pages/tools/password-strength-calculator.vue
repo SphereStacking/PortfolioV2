@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -587,7 +587,7 @@ useSeoMeta({
               強度レベルの目安
             </h3>
             <ul class="space-y-1">
-              <li><strong class="text-red-600">非常に弱い（< 20ビット）:</strong> 数秒で解読可能</li>
+              <li><strong class="text-red-600">非常に弱い（&lt; 20ビット）:</strong> 数秒で解読可能</li>
               <li><strong class="text-orange-600">弱い（20-40ビット）:</strong> 数時間〜数日で解読可能</li>
               <li><strong class="text-yellow-600">普通（40-60ビット）:</strong> 数ヶ月〜数年で解読可能</li>
               <li><strong class="text-green-600">強い（60-80ビット）:</strong> 数十年〜数世紀必要</li>

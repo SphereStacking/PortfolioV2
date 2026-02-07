@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -67,9 +67,9 @@ const logFormats = {
 const parseLogTimestamp = (timestamp: string): Date => {
   try {
     // Apache/Nginx format: [dd/MMM/yyyy:HH:mm:ss +0000]
-    const match = timestamp.match(/(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2}) ([\+\-]\d{4})/)
+    const match = timestamp.match(/(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2}) ([+-]\d{4})/)
     if (match) {
-      const [, day, monthStr, year, hour, minute, second, timezone] = match
+      const [, day, monthStr, year, hour, minute, second, _timezone] = match
       const monthMap: Record<string, number> = {
         Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
         Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
@@ -78,7 +78,7 @@ const parseLogTimestamp = (timestamp: string): Date => {
       return new Date(parseInt(year), month, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second))
     }
   }
-  catch (e) {
+  catch {
     console.warn('Failed to parse timestamp:', timestamp)
   }
   return new Date()
@@ -251,7 +251,7 @@ const sampleLogs = {
 
 // サンプル読み込み
 const loadSample = (format: keyof typeof sampleLogs) => {
-  logFormat.value = format as any
+  logFormat.value = format
   logData.value = sampleLogs[format]
   parseLogs()
 }
@@ -321,7 +321,7 @@ const formatDate = (date: Date): string => {
 const { copy } = useClipboard()
 const { toast } = useToast()
 
-const copyToClipboard = async (text: string) => {
+const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
     toast({

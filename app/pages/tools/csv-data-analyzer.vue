@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -407,7 +407,7 @@ watch([chartData, chartType, showChart], () => {
 const { copy } = useClipboard()
 const { toast } = useToast()
 
-const copyToClipboard = async (text: string) => {
+const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
     toast({

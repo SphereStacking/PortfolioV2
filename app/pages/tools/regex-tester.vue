@@ -34,7 +34,7 @@ const regex = computed(() => {
   try {
     return new RegExp(pattern.value, flagString.value)
   }
-  catch (_e) {
+  catch {
     return null
   }
 })
@@ -87,7 +87,7 @@ const replacedString = computed(() => {
   try {
     return testString.value.replace(regex.value, replacementString.value)
   }
-  catch (_e) {
+  catch {
     return ''
   }
 })
@@ -382,11 +382,11 @@ useSeoMeta({
       <CardContent>
         <div class="space-y-1 text-sm">
           <div
-            v-for="ref in references"
-            :key="ref.char"
+            v-for="refItem in references"
+            :key="refItem.char"
             class="flex justify-between py-1">
-            <code class="font-mono">{{ ref.char }}</code>
-            <span class="text-muted-foreground text-xs">{{ ref.desc }}</span>
+            <code class="font-mono">{{ refItem.char }}</code>
+            <span class="text-muted-foreground text-xs">{{ refItem.desc }}</span>
           </div>
         </div>
       </CardContent>

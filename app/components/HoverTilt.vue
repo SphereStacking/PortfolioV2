@@ -29,7 +29,7 @@ const mousePosition = ref({ x: 50, y: 50 })
 const isHovered = ref(false)
 
 // ジャイロセンサー
-const { alpha, beta, gamma, isSupported: isGyroSupported } = useDeviceOrientation()
+const { alpha: _alpha, beta, gamma, isSupported: isGyroSupported } = useDeviceOrientation()
 
 // タッチデバイス判定
 const isTouchDevice = ref(false)

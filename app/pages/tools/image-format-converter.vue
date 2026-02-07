@@ -245,7 +245,7 @@ const convertImage = async () => {
     }
     img.src = originalImage.value
   }
-  catch (error) {
+  catch {
     toast({
       title: 'エラー',
       description: '画像の変換に失敗しました',
@@ -315,7 +315,7 @@ const loadSampleImage = async (url: string) => {
     const file = new File([blob], 'sample.jpg', { type: 'image/jpeg' })
     handleFile(file)
   }
-  catch (error) {
+  catch {
     toast({
       title: 'エラー',
       description: 'サンプル画像の読み込みに失敗しました',

@@ -133,7 +133,7 @@ const extractMetadata = async (file: File) => {
 }
 
 // 簡易的なExifデータ抽出
-const extractExifData = (dataView: DataView, offset: number, length: number): Record<string, string> => {
+const extractExifData = (dataView: DataView, offset: number, _length: number): Record<string, string> => {
   const exifData: Record<string, string> = {}
 
   // Exifヘッダーの確認

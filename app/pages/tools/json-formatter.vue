@@ -108,7 +108,7 @@ const jsonStats = computed(() => {
         }
       }
 
-      traverse(parsed)
+      traverse(obj)
       return stats
     }
 
@@ -207,7 +207,7 @@ const unescapeJson = () => {
   try {
     formattedJson.value = JSON.parse(inputJson.value)
   }
-  catch (e) {
+  catch {
     error.value = 'Invalid escaped JSON string'
   }
 }

@@ -263,8 +263,8 @@ const presets = [
 
 const applyPreset = (preset: typeof presets[0]) => {
   const config = preset.config
-  textType.value = config.textType as any
-  unitType.value = config.unitType as any
+  textType.value = config.textType as typeof textType.value
+  unitType.value = config.unitType as typeof unitType.value
   count.value = config.count
   includeHTML.value = config.includeHTML
   if (config.htmlTag) htmlTag.value = config.htmlTag

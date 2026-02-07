@@ -420,7 +420,7 @@ code, pre {
 })
 
 // 使用例のHTML
-const generateHTML = computed(() => {
+const _generateHTML = computed(() => {
   if (!selectedPairData.value) return ''
 
   return `<!DOCTYPE html>

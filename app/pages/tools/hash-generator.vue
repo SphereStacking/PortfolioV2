@@ -118,7 +118,7 @@ const calculateHashes = async () => {
         const hashBuffer = await crypto.subtle.digest(algo, dataBuffer)
         hashResults.value[name as keyof typeof hashResults.value] = bufferToHex(hashBuffer)
       }
-      catch (e) {
+      catch {
         hashResults.value[name as keyof typeof hashResults.value] = 'エラー'
       }
     }
@@ -147,7 +147,7 @@ const calculateHashes = async () => {
           const signature = await crypto.subtle.sign('HMAC', key, dataBuffer)
           hmacResults.value[algo.name as keyof typeof hmacResults.value] = bufferToHex(signature)
         }
-        catch (e) {
+        catch {
           hmacResults.value[algo.name as keyof typeof hmacResults.value] = 'エラー'
         }
       }

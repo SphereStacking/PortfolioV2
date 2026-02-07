@@ -18,7 +18,7 @@ const useInterface = ref(true)
 const includeOptional = ref(true)
 const error = ref('')
 
-const jsonToType = (obj: any, name: string, indent: number = 0): string => {
+const jsonToType = (obj: unknown, name: string, indent: number = 0): string => {
   const spaces = '  '.repeat(indent)
   const typeKeyword = useInterface.value ? 'interface' : 'type'
   const assignment = useInterface.value ? '' : ' ='
@@ -119,7 +119,7 @@ const generateTypes = () => {
 
     // ネストされたインターフェースの抽出
     const nestedTypes: string[] = []
-    const extractNested = (obj: any, parentName: string) => {
+    const extractNested = (obj: unknown, parentName: string) => {
       if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
         Object.entries(obj).forEach(([key, value]) => {
           if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -173,7 +173,7 @@ const formatJson = () => {
     const parsed = JSON.parse(jsonInput.value)
     jsonInput.value = JSON.stringify(parsed, null, 2)
   }
-  catch (_e) {
+  catch {
     toast({
       title: 'エラー',
       description: 'JSONのフォーマットに失敗しました',

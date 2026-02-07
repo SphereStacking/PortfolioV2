@@ -10,7 +10,7 @@ definePageMeta({
 const inputText = ref('')
 const encodingType = ref<'url' | 'html' | 'base64' | 'unicode' | 'escape'>('url')
 const decodeMode = ref(false)
-const preserveLineBreaks = ref(true)
+const _preserveLineBreaks = ref(true)
 const urlComponentMode = ref(false)
 const htmlEntityMode = ref<'named' | 'numeric' | 'hex'>('named')
 const unicodeFormat = ref<'codepoint' | 'jsEscape' | 'cssEscape' | 'pythonEscape'>('jsEscape')
@@ -105,12 +105,14 @@ const encodeHTML = (text: string): string => {
 
   if (htmlEntityMode.value === 'numeric') {
     // 数値参照に変換
+    // eslint-disable-next-line no-control-regex
     encoded = encoded.replace(/[^\x00-\x7F]/g, (char) => {
       return `&#${char.charCodeAt(0)};`
     })
   }
   else if (htmlEntityMode.value === 'hex') {
     // 16進数参照に変換
+    // eslint-disable-next-line no-control-regex
     encoded = encoded.replace(/[^\x00-\x7F]/g, (char) => {
       return `&#x${char.charCodeAt(0).toString(16)};`
     })

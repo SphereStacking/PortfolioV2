@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -19,7 +19,7 @@ interface Field {
   id: string
   name: string
   type: string
-  options?: any
+  options?: unknown
 }
 
 const fields = ref<Field[]>([
@@ -33,7 +33,7 @@ const dataTypes = {
   // ID系
   id: { name: 'ID（連番）', generate: (index: number) => index + 1 },
   uuid: { name: 'UUID', generate: () => generateUUID() },
-  
+
   // 人物系
   fullName: { name: '氏名', generate: () => generateFullName() },
   firstName: { name: '名前', generate: () => generateFirstName() },
@@ -41,35 +41,35 @@ const dataTypes = {
   email: { name: 'メールアドレス', generate: () => generateEmail() },
   phone: { name: '電話番号', generate: () => generatePhone() },
   age: { name: '年齢', generate: () => generateAge() },
-  
+
   // 住所系
   address: { name: '住所', generate: () => generateAddress() },
   city: { name: '市区町村', generate: () => generateCity() },
   prefecture: { name: '都道府県', generate: () => generatePrefecture() },
   zipCode: { name: '郵便番号', generate: () => generateZipCode() },
   country: { name: '国', generate: () => generateCountry() },
-  
+
   // 会社系
   company: { name: '会社名', generate: () => generateCompany() },
   jobTitle: { name: '役職', generate: () => generateJobTitle() },
   department: { name: '部署', generate: () => generateDepartment() },
-  
+
   // 商品系
   productName: { name: '商品名', generate: () => generateProductName() },
   price: { name: '価格', generate: () => generatePrice() },
   category: { name: 'カテゴリ', generate: () => generateCategory() },
-  
+
   // 日時系
   date: { name: '日付', generate: () => generateDate() },
   datetime: { name: '日時', generate: () => generateDateTime() },
   timestamp: { name: 'タイムスタンプ', generate: () => generateTimestamp() },
-  
+
   // 基本型
   boolean: { name: 'ブール値', generate: () => seededRandom() > 0.5 },
   number: { name: '数値', generate: () => Math.floor(seededRandom() * 1000) },
   text: { name: 'テキスト', generate: () => generateText() },
   url: { name: 'URL', generate: () => generateURL() },
-  
+
   // その他
   gender: { name: '性別', generate: () => generateGender() },
   bloodType: { name: '血液型', generate: () => generateBloodType() },
@@ -86,11 +86,11 @@ const japaneseData = {
   jobTitles: ['課長', '部長', '主任', '係長', '取締役', '専務', '常務', 'マネージャー', 'リーダー', 'エンジニア', 'デザイナー', 'ディレクター', 'プランナー', 'コンサルタント', 'アナリスト'],
   departments: ['営業部', '開発部', '企画部', '総務部', '人事部', '経理部', 'マーケティング部', '製造部', '品質管理部', 'カスタマーサポート部'],
   productNames: ['ノートPC', 'スマートフォン', 'タブレット', 'ヘッドホン', 'カメラ', 'プリンター', 'モニター', 'キーボード', 'マウス', 'スピーカー'],
-  categories: ['家電', '食品', '衣類', '書籍', 'スポーツ用品', '化粧品', '雑貨', 'ゲーム', '音楽', '映画']
+  categories: ['家電', '食品', '衣類', '書籍', 'スポーツ用品', '化粧品', '雑貨', 'ゲーム', '音楽', '映画'],
 }
 
 // ランダム生成関数（シード対応）
-const getRandom = <T>(array: T[]): T => {
+function getRandom<T>(array: T[]): T {
   return array[Math.floor(seededRandom() * array.length)]
 }
 
@@ -210,7 +210,7 @@ const generateText = (): string => {
     '春はあけぼの。やうやう白くなりゆく山際、少し明かりて、紫だちたる雲の細くたなびきたる。',
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     'サンプルテキストです。',
-    '今日は良い天気ですね。'
+    '今日は良い天気ですね。',
   ]
   return getRandom(texts)
 }
@@ -239,7 +239,7 @@ const addField = () => {
   fields.value.push({
     id,
     name: `field_${fields.value.length + 1}`,
-    type: 'text'
+    type: 'text',
   })
 }
 
@@ -274,7 +274,8 @@ const setSeed = (value: string) => {
       hash = hash & hash // 32bit整数に変換
     }
     seed = Math.abs(hash) % 233280
-  } else {
+  }
+  else {
     seed = Math.random() * 233280
   }
 }
@@ -294,18 +295,18 @@ const generateData = () => {
     setSeed(seedValue.value)
 
     const count = recordCount.value[0]
-    const records: any[] = []
+    const records: Record<string, unknown>[] = []
 
     for (let i = 0; i < count; i++) {
-      const record: any = {}
-      
-      fields.value.forEach(field => {
+      const record: Record<string, unknown> = {}
+
+      fields.value.forEach((field) => {
         const type = dataTypes[field.type]
         if (type) {
           record[field.name] = type.generate(i)
         }
       })
-      
+
       records.push(record)
     }
 
@@ -315,42 +316,45 @@ const generateData = () => {
         generatedData.value = JSON.stringify(records, null, 2)
         break
 
-      case 'csv':
+      case 'csv': {
         const headers = fields.value.map(f => f.name)
-        const csvRows = records.map(record => 
-          headers.map(header => {
-            const value = record[header]
+        const csvRows = records.map(rec =>
+          headers.map((header) => {
+            const value = rec[header]
             // CSV用にエスケープ
             if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
               return `"${value.replace(/"/g, '""')}"`
             }
             return value
-          }).join(',')
+          }).join(','),
         )
         generatedData.value = [headers.join(','), ...csvRows].join('\n')
         break
+      }
 
-      case 'sql':
+      case 'sql': {
         const tableCols = fields.value.map(f => f.name).join(', ')
-        const values = records.map(record => {
-          const vals = fields.value.map(field => {
-            const value = record[field.name]
+        const values = records.map((rec) => {
+          const vals = fields.value.map((field) => {
+            const value = rec[field.name]
             if (typeof value === 'string') {
-              return `'${value.replace(/'/g, "''")}'`
+              return `'${value.replace(/'/g, '\'\'')}'`
             }
             return value
           }).join(', ')
           return `(${vals})`
         }).join(',\n  ')
-        
+
         generatedData.value = `INSERT INTO ${tableName.value} (${tableCols}) VALUES\n  ${values};`
         break
+      }
     }
 
     toast({
       description: `${count}件のダミーデータを生成しました`,
     })
-  } catch (e) {
+  }
+  catch (e) {
     error.value = 'データ生成中にエラーが発生しました'
     console.error('Data generation error:', e)
   }
@@ -368,8 +372,8 @@ const presets = {
       { id: '5', name: 'age', type: 'age' },
       { id: '6', name: 'gender', type: 'gender' },
       { id: '7', name: 'address', type: 'address' },
-      { id: '8', name: 'created_at', type: 'datetime' }
-    ]
+      { id: '8', name: 'created_at', type: 'datetime' },
+    ],
   },
   product: {
     name: '商品情報',
@@ -379,8 +383,8 @@ const presets = {
       { id: '3', name: 'category', type: 'category' },
       { id: '4', name: 'price', type: 'price' },
       { id: '5', name: 'description', type: 'text' },
-      { id: '6', name: 'created_at', type: 'datetime' }
-    ]
+      { id: '6', name: 'created_at', type: 'datetime' },
+    ],
   },
   employee: {
     name: '従業員情報',
@@ -391,9 +395,9 @@ const presets = {
       { id: '4', name: 'company', type: 'company' },
       { id: '5', name: 'department', type: 'department' },
       { id: '6', name: 'job_title', type: 'jobTitle' },
-      { id: '7', name: 'hire_date', type: 'date' }
-    ]
-  }
+      { id: '7', name: 'hire_date', type: 'date' },
+    ],
+  },
 }
 
 const loadPreset = (presetName: keyof typeof presets) => {
@@ -410,7 +414,7 @@ const downloadData = () => {
   const mimeTypes = {
     json: 'application/json',
     csv: 'text/csv',
-    sql: 'text/plain'
+    sql: 'text/plain',
   }
 
   const blob = new Blob([generatedData.value], { type: mimeTypes[outputFormat.value] })
@@ -432,7 +436,8 @@ const copyToClipboard = async (text: string) => {
     toast({
       description: 'クリップボードにコピーしました',
     })
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Failed to copy:', err)
     toast({
       description: 'コピーに失敗しました',
@@ -505,16 +510,17 @@ useSeoMeta({
                 <select
                   v-model="field.type"
                   class="w-full px-3 py-2 text-sm border rounded-md bg-background">
-                  <optgroup v-for="(group, groupName) in {
-                    'ID系': ['id', 'uuid'],
-                    '人物系': ['fullName', 'firstName', 'lastName', 'email', 'phone', 'age', 'gender'],
-                    '住所系': ['address', 'city', 'prefecture', 'zipCode', 'country'],
-                    '会社系': ['company', 'jobTitle', 'department'],
-                    '商品系': ['productName', 'price', 'category'],
-                    '日時系': ['date', 'datetime', 'timestamp'],
-                    '基本型': ['boolean', 'number', 'text', 'url'],
-                    'その他': ['bloodType', 'status']
-                  }" :key="groupName" :label="groupName">
+                  <optgroup
+                    v-for="(group, groupName) in {
+                      ID系: ['id', 'uuid'],
+                      人物系: ['fullName', 'firstName', 'lastName', 'email', 'phone', 'age', 'gender'],
+                      住所系: ['address', 'city', 'prefecture', 'zipCode', 'country'],
+                      会社系: ['company', 'jobTitle', 'department'],
+                      商品系: ['productName', 'price', 'category'],
+                      日時系: ['date', 'datetime', 'timestamp'],
+                      基本型: ['boolean', 'number', 'text', 'url'],
+                      その他: ['bloodType', 'status'],
+                    }" :key="groupName" :label="groupName">
                     <option v-for="type in group" :key="type" :value="type">
                       {{ dataTypes[type]?.name }}
                     </option>

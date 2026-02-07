@@ -60,9 +60,9 @@ const {
 
   // カウント
   careerCount,
-  totalCareerCount,
+  totalCareerCount: _totalCareerCount,
   projectCount,
-  totalProjectCount,
+  totalProjectCount: _totalProjectCount,
 
   // アクション
   setYear,

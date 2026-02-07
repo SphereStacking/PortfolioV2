@@ -51,7 +51,7 @@ const overviewText = computed(() => {
 <template>
   <div
     :id="data.title"
-    class="group flex flex-col md:flex-row overflow-hidden rounded-md border border-white/10 shadow-md shadow-zinc-950/50 transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-blue-500/10">
+    class="group flex flex-col md:flex-row overflow-hidden rounded-lg border border-border/50 bg-card transition-all duration-300 hover:border-border hover:bg-card/80">
     <!-- 左側: グラデーション背景 + アイコン + 日付 -->
     <div
       class="relative flex shrink-0 flex-col items-center justify-center gap-2 p-4 md:w-32 overflow-hidden"

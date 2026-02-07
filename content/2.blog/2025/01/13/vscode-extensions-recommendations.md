@@ -1,6 +1,6 @@
 ---
-title: VSCode拡張機能おすすめ40選 - 開発効率を高める厳選リスト
-description: JavaScript/TypeScript/Vue開発者が選ぶ必須＆推奨拡張機能。パフォーマンス、開発体験、デバッグ効率を大幅に向上させる40個の厳選リストをカテゴリ別に紹介します。
+title: VSCode拡張機能おすすめ24選 - 開発効率を高める厳選リスト
+description: JavaScript/TypeScript/Vue開発者が選ぶ必須＆推奨拡張機能。パフォーマンス、開発体験、デバッグ効率を大幅に向上させる24個の厳選リストをカテゴリ別に紹介します。
 navigation: true
 draft: false
 created: 2025-01-13

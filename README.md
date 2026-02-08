@@ -34,7 +34,7 @@ pnpm textlint   # 文章チェック
 
 ## デプロイ
 
-Cloudflare Pagesにデプロイ
+Vercelにデプロイ
 
 ## ライセンス
 

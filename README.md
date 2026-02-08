@@ -1,76 +1,41 @@
-# Nuxt Minimal Starter
+# Portfolio
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+個人ポートフォリオサイト
 
-## Setup
+## 使用技術
 
-Make sure to install dependencies:
+- **フレームワーク**: Nuxt 4 + TypeScript
+- **パッケージマネージャー**: pnpm
+- **UIコンポーネント**: shadcn-vue + reka-ui
+- **スタイリング**: Tailwind CSS v4
+- **3Dグラフィックス**: TresJS (Three.js)
+- **コンテンツ管理**: @nuxt/content
+
+## セットアップ
 
 ```bash
-# npm
-npm install
-
-# pnpm
+# 依存関係のインストール
 pnpm install
 
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
+# 開発サーバーの起動
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+## コマンド
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+pnpm dev        # 開発サーバー
+pnpm build      # 本番ビルド
+pnpm generate   # 静的サイト生成
+pnpm preview    # プレビュー
+pnpm lint:fix   # Lint自動修正
+pnpm textlint   # 文章チェック
 ```
 
-Locally preview production build:
+## デプロイ
 
-```bash
-# npm
-npm run preview
+Vercelにデプロイ
 
-# pnpm
-pnpm preview
+## ライセンス
 
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-# PortfolioV2
+MIT

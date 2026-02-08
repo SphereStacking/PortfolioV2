@@ -1,6 +1,6 @@
 ---
-title: "VitePressからNuxt Contentポートフォリオを段階的に進化させた話"
-description: "VitePressで構築したポートフォリオサイトをNuxt Contentでリビルドし、さらにshadcn-vueでモダンなUIに刷新した開発記録。技術選定の理由と実装のポイントを解説。"
+title: VitePress → Nuxt Content → shadcn-vue - ポートフォリオ3段階進化の記録
+description: VitePressで構築したポートフォリオサイトをNuxt Contentでリビルドし、shadcn-vueでモダンなUIに刷新した開発記録。各段階での技術選定の理由と実装のポイントを解説します。
 navigation: true
 draft: false
 created: 2025-05-06
@@ -58,7 +58,7 @@ icons:
 2025年5月上旬、以下の技術スタックで新しいポートフォリオサイトを構築しました：
 
 - **フレームワーク**: Nuxt 3
-- **コンテンツ管理**: @nuxt/content
+- **コンテンツ管理**: @Nuxt/content
 - **UIライブラリ**: NuxtUI
 - **スタイリング**: Tailwind CSS v3
 
@@ -99,7 +99,7 @@ const pinnedProjects = await queryCollection('project')
   .all()
 ```
 
-各コンテンツタイプには、`content.config.ts`で型定義を行い、フロントマターの構造を厳密に管理：
+各コンテンツタイプには、`content.config.ts`で型定義し、フロントマターの構造を厳密に管理しています。
 
 ```markdown
 ---

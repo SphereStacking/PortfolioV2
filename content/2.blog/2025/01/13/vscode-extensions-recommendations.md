@@ -1,6 +1,6 @@
 ---
-title: "VSCode 拡張機能の個人的まとめ"
-description: "個人的に使用頻度が高くおすすめのVSCode拡張機能をまとめました。"
+title: VSCode拡張機能おすすめ24選 - 開発効率を高める厳選リスト
+description: JavaScript/TypeScript/Vue開発者が選ぶ必須＆推奨拡張機能。パフォーマンス、開発体験、デバッグ効率を大幅に向上させる24個の厳選リストをカテゴリ別に紹介します。
 navigation: true
 draft: false
 created: 2025-01-13
@@ -36,7 +36,7 @@ icons:
   - 赤線などのエラー情報がホバーしなくても表示されるようになります。
   
 - [GitHub Markdown Preview](https://marketplace.visualstudio.com/items?itemName=bierner.github-markdown-preview)
-  - Markdown関連はこれを入れれば他の拡張機能は不要です。
+  - Markdown関連はこれを入れればほかの拡張機能は不要です。
   
 - [Comment Translate](https://marketplace.visualstudio.com/items?itemName=intellsmi.comment-translate)
   - 翻訳が非常に楽になります。

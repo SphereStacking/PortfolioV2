@@ -1,6 +1,6 @@
 ---
-title: vue3で table表示用のラッパーコンポーネントを作成してみた
-description: vue3で table表示用のラッパーコンポーネントを作成してみた
+title: Vue 3でシンプルなデータテーブルコンポーネントを実装する
+description: ライブラリを使わずにVue 3でシンプルなテーブルコンポーネントを実装。カラム定義とデータ駆動のアプローチで再利用性を高めた実装例を解説します。
 navigation: true
 draft: false
 created: 2023-10-18

@@ -1,6 +1,6 @@
 ---
-title: Slack BoltでAPP開発を始めるためのローカル開発環境の構築ガイド"
-description: Slack Boltを使用してローカル開発環境を構築する方法を説明します。Dockerを利用したセットアップ手順や、ngrokを用いた外部アクセスの設定をステップバイステップで進めていきます
+title: Slack Bolt × Docker × ngrok - ローカル開発環境構築ガイド
+description: Slack Boltを使用してローカル開発環境を構築する方法を解説。Dockerを利用したセットアップ手順や、ngrokを用いた外部アクセスの設定をステップバイステップで進めていきます。
 navigation: true
 draft: false
 created: 2024-04-19
@@ -19,7 +19,7 @@ icons:
 
 # slack Bolt ローカル開発環境
 
-slack cliの時代のようですがそれを知らずににドッカーでローカル環境構築してしまいました..
+slack cliの時代のようですがそれを知らずにDockerでローカル環境構築してしまいました。
 
 ソースコードはこちらをcloneしてください。
 
@@ -47,8 +47,8 @@ docker-compose run app npm install @slack/bolt
 
 1. アプリの作成
    1. https://api.slack.com/apps
-   2. Create New App を押下
-   3. From scratch を押下
+   2. Create New Appを押下
+   3. From scratchを押下
    4. App Nameの記入
    5. Pick a workspace to develop your app in: でセットアップ先のワークスペースを選択
    6. 画面下部のSAVEボタンを押下し保存
@@ -61,7 +61,7 @@ docker-compose run app npm install @slack/bolt
    2. Bot User OAuth Tokenを控える
 4. Slack Appのが操作可能な範囲を設定
    1. OAuth & Permissions->Scopes
-   2. Add an OAuth Scope ボタンを押下して適宜追加
+   2. Add an OAuth Scopeボタンを押下して適宜追加
 5. リポジトリのセットアップ
    1. 控えた値をenvに書き込む
       1. 2-1 SLACK_BOT_TOKEN

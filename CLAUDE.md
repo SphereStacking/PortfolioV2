@@ -22,6 +22,12 @@ pnpm lint
 
 # Lintの自動修正
 pnpm lint:fix
+
+# コンテンツ（Markdown）の文章チェック
+pnpm textlint
+
+# コンテンツの文章を自動修正
+pnpm textlint:fix
 ```
 
 ## アーキテクチャ概要

@@ -5,8 +5,11 @@ pre-commit:
   parallel: true
   commands:
     lint-fix:
-      run: npm run lint:fix
+      run: npx pnpm lint:fix
       stage_fixed: true  # 修正されたファイルを自動的にステージング
+    textlint:
+      glob: "content/**/*.md"
+      run: npx pnpm textlint {staged_files}
       
 commit-msg:
   commands:

@@ -4,12 +4,11 @@ import { Analytics } from '@vercel/analytics/nuxt'
 </script>
 
 <template>
-  <TooltipProvider>
+  <UApp>
     <SpeedInsights />
     <Analytics />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <ToastContainer />
-  </TooltipProvider>
+  </UApp>
 </template>

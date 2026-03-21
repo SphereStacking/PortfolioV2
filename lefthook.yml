@@ -6,11 +6,11 @@ pre-commit:
   commands:
     lint-fix:
       glob: "*.{js,ts,vue}"
-      run: npx eslint --fix {staged_files}
+      run: pnpm eslint --fix {staged_files}
       stage_fixed: true
     textlint:
       glob: "content/**/*.md"
-      run: npx pnpm textlint {staged_files}
+      run: pnpm textlint {staged_files}
       
 commit-msg:
   commands:

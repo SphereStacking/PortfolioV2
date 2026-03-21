@@ -452,19 +452,19 @@ watch([maskShape, polygonSides, rotation, cornerRadius], () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch {
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -502,277 +502,271 @@ useSeoMeta({
     </div>
 
     <!-- 画像アップロード -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Image Upload</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div v-if="!originalImage">
-          <div
-            class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
-            :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
-            @drop="handleDrop"
-            @dragover="handleDragOver"
-            @dragleave="handleDragLeave">
-            <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p class="text-muted-foreground mb-2">
-              Drag & drop or click to upload an image
-            </p>
-            <p class="text-xs text-muted-foreground mb-4">
-              PNG, JPEG, WebP supported
-            </p>
-            <label>
-              <input
-                type="file"
-                accept="image/*"
-                class="hidden"
-                @change="handleImageUpload">
-              <Button variant="outline" as="span">
-                Choose Image
-              </Button>
-            </label>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Image Upload
+        </h3>
+      </template>
+      <div v-if="!originalImage">
+        <div
+          class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+          :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
+          @drop="handleDrop"
+          @dragover="handleDragOver"
+          @dragleave="handleDragLeave">
+          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p class="text-muted-foreground mb-2">
+            Drag & drop or click to upload an image
+          </p>
+          <p class="text-xs text-muted-foreground mb-4">
+            PNG, JPEG, WebP supported
+          </p>
+          <label>
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleImageUpload">
+            <UButton variant="outline" as="span">
+              Choose Image
+            </UButton>
+          </label>
+        </div>
+      </div>
+
+      <div v-else class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-muted-foreground">
+            <p>Size: {{ imageInfo.width }} × {{ imageInfo.height }}px</p>
+            <p>Aspect Ratio: {{ imageInfo.aspectRatio }}</p>
           </div>
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="reset">
+            <Icon name="heroicons:x-mark" class="w-4 h-4 mr-2" />
+            Clear
+          </UButton>
         </div>
 
-        <div v-else class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="text-sm text-muted-foreground">
-              <p>Size: {{ imageInfo.width }} × {{ imageInfo.height }}px</p>
-              <p>Aspect Ratio: {{ imageInfo.aspectRatio }}</p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              @click="reset">
-              <Icon name="heroicons:x-mark" class="w-4 h-4 mr-2" />
-              Clear
-            </Button>
-          </div>
-
-          <Alert v-if="error" variant="destructive">
-            <Icon name="heroicons:exclamation-triangle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
-        </div>
-      </CardContent>
-    </Card>
+        <UAlert
+          v-if="error" color="error" icon="heroicons:exclamation-triangle"
+          :description="error" />
+      </div>
+    </UCard>
 
     <!-- 設定とプレビュー -->
     <div v-if="originalImage" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 設定 -->
       <div class="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Shape Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Shape Settings
+            </h3>
+          </template>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium mb-2 block">Shape Type</label>
+              <div class="grid grid-cols-2 gap-2">
+                <UButton
+                  v-for="shape in [
+                    { value: 'circle', label: 'Circle', icon: 'heroicons:ellipsis-horizontal-circle' },
+                    { value: 'ellipse', label: 'Ellipse', icon: 'heroicons:ellipsis-horizontal' },
+                    { value: 'polygon', label: 'Polygon', icon: 'heroicons:stop' },
+                    { value: 'custom', label: 'Custom', icon: 'heroicons:pencil' },
+                  ]"
+                  :key="shape.value"
+                  :variant="maskShape === shape.value ? 'default' : 'outline'"
+                  size="sm"
+                  @click="maskShape = shape.value">
+                  <Icon :name="shape.icon" class="w-4 h-4 mr-2" />
+                  {{ shape.label }}
+                </UButton>
+              </div>
+            </div>
+
+            <!-- Polygon設定 -->
+            <div v-if="maskShape === 'polygon'" class="space-y-4">
               <div>
-                <label class="text-sm font-medium mb-2 block">Shape Type</label>
-                <div class="grid grid-cols-2 gap-2">
-                  <Button
-                    v-for="shape in [
-                      { value: 'circle', label: 'Circle', icon: 'heroicons:ellipsis-horizontal-circle' },
-                      { value: 'ellipse', label: 'Ellipse', icon: 'heroicons:ellipsis-horizontal' },
-                      { value: 'polygon', label: 'Polygon', icon: 'heroicons:stop' },
-                      { value: 'custom', label: 'Custom', icon: 'heroicons:pencil' },
-                    ]"
-                    :key="shape.value"
-                    :variant="maskShape === shape.value ? 'default' : 'outline'"
-                    size="sm"
-                    @click="maskShape = shape.value">
-                    <Icon :name="shape.icon" class="w-4 h-4 mr-2" />
-                    {{ shape.label }}
-                  </Button>
-                </div>
+                <label class="text-sm font-medium mb-2 block">
+                  Sides: {{ polygonSides[0] }}
+                </label>
+                <Slider
+                  :model-value="polygonSides"
+                  :min="3"
+                  :max="12"
+                  :step="1"
+                  class="w-full"
+                  @update:model-value="polygonSides = $event" />
               </div>
-
-              <!-- Polygon設定 -->
-              <div v-if="maskShape === 'polygon'" class="space-y-4">
-                <div>
-                  <label class="text-sm font-medium mb-2 block">
-                    Sides: {{ polygonSides[0] }}
-                  </label>
-                  <Slider
-                    :model-value="polygonSides"
-                    :min="3"
-                    :max="12"
-                    :step="1"
-                    class="w-full"
-                    @update:model-value="polygonSides = $event" />
-                </div>
-                <div>
-                  <label class="text-sm font-medium mb-2 block">
-                    Rotation: {{ rotation[0] }}°
-                  </label>
-                  <Slider
-                    :model-value="rotation"
-                    :min="0"
-                    :max="360"
-                    :step="15"
-                    class="w-full"
-                    @update:model-value="rotation = $event" />
-                </div>
-              </div>
-
-              <!-- Custom設定 -->
-              <div v-if="maskShape === 'custom'" class="space-y-4">
-                <Alert>
-                  <Icon name="heroicons:information-circle" class="w-4 h-4" />
-                  <AlertDescription>
-                    Click on the preview to add points. Need at least 3 points to create a shape.
-                  </AlertDescription>
-                </Alert>
-                <div class="flex items-center justify-between">
-                  <p class="text-sm text-muted-foreground">
-                    Points: {{ customPoints.length }}
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    @click="resetCustomPoints">
-                    Reset Points
-                  </Button>
-                </div>
-                <div class="flex items-center gap-2">
-                  <Button
-                    :variant="isDrawingCustom ? 'default' : 'outline'"
-                    size="sm"
-                    @click="isDrawingCustom = !isDrawingCustom">
-                    <Icon name="heroicons:pencil" class="w-4 h-4 mr-2" />
-                    {{ isDrawingCustom ? 'Drawing' : 'Start Drawing' }}
-                  </Button>
-                </div>
+              <div>
+                <label class="text-sm font-medium mb-2 block">
+                  Rotation: {{ rotation[0] }}°
+                </label>
+                <Slider
+                  :model-value="rotation"
+                  :min="0"
+                  :max="360"
+                  :step="15"
+                  class="w-full"
+                  @update:model-value="rotation = $event" />
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Output Format</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-2">
-              <Button
-                v-for="format in [
-                  { value: 'clip-path', label: 'CSS Clip-Path', description: 'Best browser support' },
-                  { value: 'css-mask', label: 'CSS Mask', description: 'More flexible options' },
-                  { value: 'svg-mask', label: 'SVG Mask', description: 'Complex shapes & effects' },
-                ]"
-                :key="format.value"
-                :variant="outputFormat === format.value ? 'default' : 'outline'"
-                class="w-full justify-start"
-                @click="outputFormat = format.value">
-                <div class="text-left">
-                  <p class="font-medium">
-                    {{ format.label }}
-                  </p>
-                  <p class="text-xs text-muted-foreground">
-                    {{ format.description }}
-                  </p>
-                </div>
-              </Button>
+            <!-- Custom設定 -->
+            <div v-if="maskShape === 'custom'" class="space-y-4">
+              <UAlert icon="heroicons:information-circle" description="Click on the preview to add points. Need at least 3 points to create a shape." />
+              <div class="flex items-center justify-between">
+                <p class="text-sm text-muted-foreground">
+                  Points: {{ customPoints.length }}
+                </p>
+                <UButton
+                  size="sm"
+                  variant="outline"
+                  @click="resetCustomPoints">
+                  Reset Points
+                </UButton>
+              </div>
+              <div class="flex items-center gap-2">
+                <UButton
+                  :variant="isDrawingCustom ? 'default' : 'outline'"
+                  size="sm"
+                  @click="isDrawingCustom = !isDrawingCustom">
+                  <Icon name="heroicons:pencil" class="w-4 h-4 mr-2" />
+                  {{ isDrawingCustom ? 'Drawing' : 'Start Drawing' }}
+                </UButton>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </UCard>
+
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Output Format
+            </h3>
+          </template>
+          <div class="space-y-2">
+            <UButton
+              v-for="format in [
+                { value: 'clip-path', label: 'CSS Clip-Path', description: 'Best browser support' },
+                { value: 'css-mask', label: 'CSS Mask', description: 'More flexible options' },
+                { value: 'svg-mask', label: 'SVG Mask', description: 'Complex shapes & effects' },
+              ]"
+              :key="format.value"
+              :variant="outputFormat === format.value ? 'default' : 'outline'"
+              class="w-full justify-start"
+              @click="outputFormat = format.value">
+              <div class="text-left">
+                <p class="font-medium">
+                  {{ format.label }}
+                </p>
+                <p class="text-xs text-muted-foreground">
+                  {{ format.description }}
+                </p>
+              </div>
+            </UButton>
+          </div>
+        </UCard>
       </div>
 
       <!-- プレビュー -->
       <div class="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Preview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <p class="text-sm font-medium mb-2">
-                    Original
-                  </p>
-                  <canvas
-                    ref="canvasRef"
-                    class="w-full h-auto border rounded"
-                    style="max-width: 100%; height: auto;"></canvas>
-                </div>
-                <div>
-                  <p class="text-sm font-medium mb-2">
-                    Masked
-                  </p>
-                  <canvas
-                    ref="previewCanvas"
-                    class="w-full h-auto border rounded cursor-crosshair"
-                    style="max-width: 100%; height: auto;"
-                    @click="addCustomPoint"></canvas>
-                </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Preview
+            </h3>
+          </template>
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm font-medium mb-2">
+                  Original
+                </p>
+                <canvas
+                  ref="canvasRef"
+                  class="w-full h-auto border rounded"
+                  style="max-width: 100%; height: auto;"></canvas>
+              </div>
+              <div>
+                <p class="text-sm font-medium mb-2">
+                  Masked
+                </p>
+                <canvas
+                  ref="previewCanvas"
+                  class="w-full h-auto border rounded cursor-crosshair"
+                  style="max-width: 100%; height: auto;"
+                  @click="addCustomPoint"></canvas>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </UCard>
 
         <!-- 生成されたコード -->
-        <Card v-if="cssCode">
-          <CardHeader>
+        <UCard v-if="cssCode">
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>Generated Code</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                Generated Code
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(cssCode)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssCode }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssCode }}</code></pre>
+        </UCard>
       </div>
     </div>
 
     <!-- 使用例 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Examples & Tips</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Common Use Cases
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Profile pictures with custom shapes</li>
-              <li>Hero images with diagonal cuts</li>
-              <li>Product images with rounded corners</li>
-              <li>Gallery thumbnails with creative shapes</li>
-              <li>Logo containers with brand-specific shapes</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Browser Support
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>clip-path:</strong> Supported in all modern browsers</li>
-              <li><strong>mask-image:</strong> Requires -webkit- prefix for Safari</li>
-              <li><strong>SVG masks:</strong> Excellent support, most flexible</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Performance Tips
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Use clip-path for simple shapes (best performance)</li>
-              <li>SVG masks for complex shapes and gradients</li>
-              <li>Avoid animating complex masks on mobile</li>
-              <li>Consider using will-change for animated masks</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Examples & Tips
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Common Use Cases
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Profile pictures with custom shapes</li>
+            <li>Hero images with diagonal cuts</li>
+            <li>Product images with rounded corners</li>
+            <li>Gallery thumbnails with creative shapes</li>
+            <li>Logo containers with brand-specific shapes</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Browser Support
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>clip-path:</strong> Supported in all modern browsers</li>
+            <li><strong>mask-image:</strong> Requires -webkit- prefix for Safari</li>
+            <li><strong>SVG masks:</strong> Excellent support, most flexible</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Performance Tips
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Use clip-path for simple shapes (best performance)</li>
+            <li>SVG masks for complex shapes and gradients</li>
+            <li>Avoid animating complex masks on mobile</li>
+            <li>Consider using will-change for animated masks</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

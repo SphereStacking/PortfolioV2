@@ -397,20 +397,20 @@ const customKeyframesExample = `@keyframes customAnimation {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -447,288 +447,296 @@ useSeoMeta({
     </div>
 
     <!-- アニメーションタイプ選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>アニメーションタイプ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex gap-2">
-          <Button
-            v-for="type in ['css', 'svg']"
-            :key="type"
-            :variant="animationType === type ? 'default' : 'outline'"
-            @click="animationType = type">
-            {{ type.toUpperCase() }}アニメーション
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          アニメーションタイプ
+        </h3>
+      </template>
+
+      <div class="flex gap-2">
+        <UButton
+          v-for="type in ['css', 'svg']"
+          :key="type"
+          :variant="animationType === type ? 'default' : 'outline'"
+          @click="animationType = type">
+          {{ type.toUpperCase() }}アニメーション
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 設定パネル -->
       <div class="space-y-6">
         <!-- アニメーション選択 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>アニメーション選択</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-2">
-                <Button
-                  v-for="anim in (animationType === 'css' ? cssAnimations : svgAnimations)"
-                  :key="anim.id"
-                  :variant="selectedAnimation === anim.id ? 'default' : 'outline'"
-                  size="sm"
-                  @click="selectedAnimation = anim.id">
-                  {{ anim.name }}
-                </Button>
-              </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              アニメーション選択
+            </h3>
+          </template>
 
-              <div v-if="animationType === 'css' && selectedAnimation === 'custom'">
-                <div class="flex items-center justify-between mb-2">
-                  <label class="text-sm font-medium">カスタムキーフレーム</label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    @click="customKeyframes = customKeyframesExample">
-                    例を読み込む
-                  </Button>
-                </div>
-                <textarea
-                  v-model="customKeyframes"
-                  placeholder="@keyframes customAnimation { ... }"
-                  class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-                  spellcheck="false"></textarea>
-              </div>
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-2">
+              <UButton
+                v-for="anim in (animationType === 'css' ? cssAnimations : svgAnimations)"
+                :key="anim.id"
+                :variant="selectedAnimation === anim.id ? 'default' : 'outline'"
+                size="sm"
+                @click="selectedAnimation = anim.id">
+                {{ anim.name }}
+              </UButton>
             </div>
-          </CardContent>
-        </Card>
+
+            <div v-if="animationType === 'css' && selectedAnimation === 'custom'">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium">カスタムキーフレーム</label>
+                <UButton
+                  variant="ghost"
+                  size="sm"
+                  @click="customKeyframes = customKeyframesExample">
+                  例を読み込む
+                </UButton>
+              </div>
+              <textarea
+                v-model="customKeyframes"
+                placeholder="@keyframes customAnimation { ... }"
+                class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+                spellcheck="false"></textarea>
+            </div>
+          </div>
+        </UCard>
 
         <!-- CSSアニメーション設定 -->
-        <Card v-if="animationType === 'css'">
-          <CardHeader>
-            <CardTitle>アニメーション設定</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <div>
-                <label class="text-sm font-medium mb-2 block">
-                  再生時間: {{ duration }}ms
-                </label>
-                <Slider
-                  :model-value="[duration]"
-                  :min="100"
-                  :max="5000"
-                  :step="100"
-                  class="w-full"
-                  @update:model-value="duration = $event?.[0] ?? duration" />
-              </div>
+        <UCard v-if="animationType === 'css'">
+          <template #header>
+            <h3 class="font-semibold">
+              アニメーション設定
+            </h3>
+          </template>
 
-              <div>
-                <label class="text-sm font-medium mb-2 block">イージング</label>
-                <select
-                  v-model="easing"
-                  class="w-full px-3 py-2 border rounded-md bg-background">
-                  <option v-for="ease in easingFunctions" :key="ease.value" :value="ease.value">
-                    {{ ease.label }}
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">
-                  遅延: {{ delay }}ms
-                </label>
-                <Slider
-                  :model-value="[delay]"
-                  :min="0"
-                  :max="2000"
-                  :step="100"
-                  class="w-full"
-                  @update:model-value="delay = $event?.[0] ?? delay" />
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">繰り返し回数</label>
-                <Input
-                  v-model="iterationCount"
-                  placeholder="1, 2, 3... または infinite" />
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">再生方向</label>
-                <select
-                  v-model="direction"
-                  class="w-full px-3 py-2 border rounded-md bg-background">
-                  <option value="normal">
-                    通常
-                  </option>
-                  <option value="reverse">
-                    逆再生
-                  </option>
-                  <option value="alternate">
-                    交互
-                  </option>
-                  <option value="alternate-reverse">
-                    交互逆再生
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">フィルモード</label>
-                <select
-                  v-model="fillMode"
-                  class="w-full px-3 py-2 border rounded-md bg-background">
-                  <option value="none">
-                    なし
-                  </option>
-                  <option value="forwards">
-                    終了時の状態を保持
-                  </option>
-                  <option value="backwards">
-                    開始時の状態を適用
-                  </option>
-                  <option value="both">
-                    両方
-                  </option>
-                </select>
-              </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium mb-2 block">
+                再生時間: {{ duration }}ms
+              </label>
+              <Slider
+                :model-value="[duration]"
+                :min="100"
+                :max="5000"
+                :step="100"
+                class="w-full"
+                @update:model-value="duration = $event?.[0] ?? duration" />
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <label class="text-sm font-medium mb-2 block">イージング</label>
+              <select
+                v-model="easing"
+                class="w-full px-3 py-2 border rounded-md bg-background">
+                <option v-for="ease in easingFunctions" :key="ease.value" :value="ease.value">
+                  {{ ease.label }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-sm font-medium mb-2 block">
+                遅延: {{ delay }}ms
+              </label>
+              <Slider
+                :model-value="[delay]"
+                :min="0"
+                :max="2000"
+                :step="100"
+                class="w-full"
+                @update:model-value="delay = $event?.[0] ?? delay" />
+            </div>
+
+            <div>
+              <label class="text-sm font-medium mb-2 block">繰り返し回数</label>
+              <UInput
+                v-model="iterationCount"
+                placeholder="1, 2, 3... または infinite" />
+            </div>
+
+            <div>
+              <label class="text-sm font-medium mb-2 block">再生方向</label>
+              <select
+                v-model="direction"
+                class="w-full px-3 py-2 border rounded-md bg-background">
+                <option value="normal">
+                  通常
+                </option>
+                <option value="reverse">
+                  逆再生
+                </option>
+                <option value="alternate">
+                  交互
+                </option>
+                <option value="alternate-reverse">
+                  交互逆再生
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-sm font-medium mb-2 block">フィルモード</label>
+              <select
+                v-model="fillMode"
+                class="w-full px-3 py-2 border rounded-md bg-background">
+                <option value="none">
+                  なし
+                </option>
+                <option value="forwards">
+                  終了時の状態を保持
+                </option>
+                <option value="backwards">
+                  開始時の状態を適用
+                </option>
+                <option value="both">
+                  両方
+                </option>
+              </select>
+            </div>
+          </div>
+        </UCard>
       </div>
 
       <!-- プレビューとコード -->
       <div class="space-y-6">
         <!-- プレビュー -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>プレビュー</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                プレビュー
+              </h3>
+              <UButton
                 size="sm"
                 variant="outline"
                 @click="togglePreview">
                 <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
                 再生
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="h-64 flex items-center justify-center bg-muted rounded-md">
-              <div v-if="animationType === 'css'">
-                <div
-                  class="w-24 h-24 bg-primary rounded-md"
-                  :style="{
-                    animation: previewActive && selectedAnimation !== 'custom'
-                      ? `${selectedAnimation} ${duration}ms ${easing} ${delay}ms ${iterationCount} ${direction} ${fillMode}`
-                      : undefined,
-                  }">
-                </div>
+          </template>
+
+          <div class="h-64 flex items-center justify-center bg-muted rounded-md">
+            <div v-if="animationType === 'css'">
+              <div
+                class="w-24 h-24 bg-primary rounded-md"
+                :style="{
+                  animation: previewActive && selectedAnimation !== 'custom'
+                    ? `${selectedAnimation} ${duration}ms ${easing} ${delay}ms ${iterationCount} ${direction} ${fillMode}`
+                    : undefined,
+                }">
               </div>
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <div v-else class="text-primary" v-html="generatedSVG"></div>
             </div>
-          </CardContent>
-        </Card>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-else class="text-primary" v-html="generatedSVG"></div>
+          </div>
+        </UCard>
 
         <!-- 生成されたコード -->
-        <Card v-if="animationType === 'css'">
-          <CardHeader>
+        <UCard v-if="animationType === 'css'">
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>CSSコード</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                CSSコード
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(generatedCSS)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedCSS }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
 
-        <Card v-if="animationType === 'css'">
-          <CardHeader>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedCSS }}</code></pre>
+        </UCard>
+
+        <UCard v-if="animationType === 'css'">
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>JavaScript版</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                JavaScript版
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(generatedJavaScript)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedJavaScript }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
 
-        <Card v-if="animationType === 'svg'">
-          <CardHeader>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedJavaScript }}</code></pre>
+        </UCard>
+
+        <UCard v-if="animationType === 'svg'">
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>SVGコード</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                SVGコード
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(generatedSVG)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedSVG }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedSVG }}</code></pre>
+        </UCard>
 
         <!-- リセット -->
         <div class="flex justify-end">
-          <Button
+          <UButton
             variant="outline"
             size="sm"
             @click="reset">
             リセット
-          </Button>
+          </UButton>
         </div>
       </div>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>アニメーションについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              パフォーマンスのヒント
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>transform と opacity のアニメーションが最も高速</li>
-              <li>will-change プロパティで事前に最適化可能</li>
-              <li>大量の要素には CSS より JavaScript の方が効率的</li>
-              <li>GPU アクセラレーションを活用する</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              ブラウザ対応
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>CSS アニメーション: 全モダンブラウザ対応</li>
-              <li>Web Animations API: Chrome, Firefox, Safari 対応</li>
-              <li>SVG アニメーション: 全モダンブラウザ対応</li>
-              <li>ベンダープレフィックスは自動付与を推奨</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          アニメーションについて
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            パフォーマンスのヒント
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>transform と opacity のアニメーションが最も高速</li>
+            <li>will-change プロパティで事前に最適化可能</li>
+            <li>大量の要素には CSS より JavaScript の方が効率的</li>
+            <li>GPU アクセラレーションを活用する</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            ブラウザ対応
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>CSS アニメーション: 全モダンブラウザ対応</li>
+            <li>Web Animations API: Chrome, Firefox, Safari 対応</li>
+            <li>SVG アニメーション: 全モダンブラウザ対応</li>
+            <li>ベンダープレフィックスは自動付与を推奨</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

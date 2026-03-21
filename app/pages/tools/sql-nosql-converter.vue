@@ -298,7 +298,7 @@ const convertQuery = () => {
     const mongodb = convertToMongoDB(parsed)
     mongodbQuery.value = JSON.stringify(mongodb, null, 2)
 
-    toast({
+    toast.add({
       description: 'MongoDBクエリに変換しました',
     })
   }
@@ -386,20 +386,20 @@ const generateExecutionExample = computed(() => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -423,259 +423,255 @@ useSeoMeta({
     </div>
 
     <!-- 警告 -->
-    <Alert>
-      <Icon name="heroicons:information-circle" class="w-4 h-4" />
-      <AlertTitle>変換の制限について</AlertTitle>
-      <AlertDescription>
-        このツールは基本的なSQL文の変換のみサポートしています。
-        複雑なJOINやサブクエリ、関数などは完全に変換されない場合があります。
-      </AlertDescription>
-    </Alert>
+    <UAlert
+      icon="heroicons:information-circle"
+      title="変換の制限について"
+      description="このツールは基本的なSQL文の変換のみサポートしています。複雑なJOINやサブクエリ、関数などは完全に変換されない場合があります。" />
 
     <!-- サンプルクエリ -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルクエリ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <Button
-            v-for="sample in sampleQueries"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルクエリ
+        </h3>
+      </template>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        <UButton
+          v-for="sample in sampleQueries"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- SQL入力 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>SQL クエリ</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <textarea
-              v-model="sqlQuery"
-              placeholder="SELECT * FROM users WHERE age > 25 ORDER BY name ASC LIMIT 10"
-              class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-              spellcheck="false"></textarea>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            SQL クエリ
+          </h3>
+        </template>
+        <div class="space-y-4">
+          <textarea
+            v-model="sqlQuery"
+            placeholder="SELECT * FROM users WHERE age > 25 ORDER BY name ASC LIMIT 10"
+            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+            spellcheck="false"></textarea>
 
-            <div v-if="error" class="text-destructive text-sm">
-              {{ error }}
-            </div>
-
-            <Button class="w-full" @click="convertQuery">
-              <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
-              MongoDBクエリに変換
-            </Button>
+          <div v-if="error" class="text-destructive text-sm">
+            {{ error }}
           </div>
-        </CardContent>
-      </Card>
+
+          <UButton class="w-full" @click="convertQuery">
+            <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
+            MongoDBクエリに変換
+          </UButton>
+        </div>
+      </UCard>
 
       <!-- MongoDB出力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>MongoDB クエリ</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              MongoDB クエリ
+            </h3>
+            <UButton
               v-if="mongodbQuery"
               size="sm"
               variant="ghost"
               @click="copyToClipboard(mongodbQuery)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <textarea
-              v-model="mongodbQuery"
-              readonly
-              placeholder="変換されたMongoDBクエリがここに表示されます"
-              class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-              spellcheck="false"></textarea>
+        </template>
+        <div class="space-y-4">
+          <textarea
+            v-model="mongodbQuery"
+            readonly
+            placeholder="変換されたMongoDBクエリがここに表示されます"
+            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+            spellcheck="false"></textarea>
 
-            <!-- 変換説明 -->
-            <div v-if="explanation.length > 0" class="space-y-2">
-              <h4 class="font-medium text-sm">
-                変換の説明:
-              </h4>
-              <ul class="text-sm text-muted-foreground space-y-1">
-                <li v-for="(item, index) in explanation" :key="index" class="flex items-start gap-2">
-                  <Icon name="heroicons:arrow-right" class="w-3 h-3 mt-0.5 flex-shrink-0" />
-                  {{ item }}
-                </li>
-              </ul>
-            </div>
+          <!-- 変換説明 -->
+          <div v-if="explanation.length > 0" class="space-y-2">
+            <h4 class="font-medium text-sm">
+              変換の説明:
+            </h4>
+            <ul class="text-sm text-muted-foreground space-y-1">
+              <li v-for="(item, index) in explanation" :key="index" class="flex items-start gap-2">
+                <Icon name="heroicons:arrow-right" class="w-3 h-3 mt-0.5 flex-shrink-0" />
+                {{ item }}
+              </li>
+            </ul>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- 実行例 -->
-    <Card v-if="generateExecutionExample">
-      <CardHeader>
+    <UCard v-if="generateExecutionExample">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>MongoDB Shell 実行例</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            MongoDB Shell 実行例
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="copyToClipboard(generateExecutionExample)">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm font-mono">{{ generateExecutionExample }}</pre>
-      </CardContent>
-    </Card>
+      </template>
+      <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm font-mono">{{ generateExecutionExample }}</pre>
+    </UCard>
 
     <!-- 対応表 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>SQL ↔ MongoDB 対応表</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>SQL操作</TableHead>
-                <TableHead>MongoDB操作</TableHead>
-                <TableHead>説明</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  SELECT
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  find()
-                </TableCell>
-                <TableCell class="text-sm">
-                  ドキュメントの検索
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  INSERT
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  insertOne() / insertMany()
-                </TableCell>
-                <TableCell class="text-sm">
-                  ドキュメントの挿入
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  UPDATE
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  updateOne() / updateMany()
-                </TableCell>
-                <TableCell class="text-sm">
-                  ドキュメントの更新
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  DELETE
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  deleteOne() / deleteMany()
-                </TableCell>
-                <TableCell class="text-sm">
-                  ドキュメントの削除
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  WHERE
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  filter条件
-                </TableCell>
-                <TableCell class="text-sm">
-                  検索条件の指定
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  ORDER BY
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  sort()
-                </TableCell>
-                <TableCell class="text-sm">
-                  結果のソート（1:昇順, -1:降順）
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  LIMIT
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  limit()
-                </TableCell>
-                <TableCell class="text-sm">
-                  結果件数の制限
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono text-sm">
-                  JOIN
-                </TableCell>
-                <TableCell class="font-mono text-sm">
-                  $lookup (集約パイプライン)
-                </TableCell>
-                <TableCell class="text-sm">
-                  コレクション間の結合
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          SQL ↔ MongoDB 対応表
+        </h3>
+      </template>
+      <div class="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>SQL操作</TableHead>
+              <TableHead>MongoDB操作</TableHead>
+              <TableHead>説明</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                SELECT
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                find()
+              </TableCell>
+              <TableCell class="text-sm">
+                ドキュメントの検索
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                INSERT
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                insertOne() / insertMany()
+              </TableCell>
+              <TableCell class="text-sm">
+                ドキュメントの挿入
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                UPDATE
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                updateOne() / updateMany()
+              </TableCell>
+              <TableCell class="text-sm">
+                ドキュメントの更新
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                DELETE
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                deleteOne() / deleteMany()
+              </TableCell>
+              <TableCell class="text-sm">
+                ドキュメントの削除
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                WHERE
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                filter条件
+              </TableCell>
+              <TableCell class="text-sm">
+                検索条件の指定
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                ORDER BY
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                sort()
+              </TableCell>
+              <TableCell class="text-sm">
+                結果のソート（1:昇順, -1:降順）
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                LIMIT
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                limit()
+              </TableCell>
+              <TableCell class="text-sm">
+                結果件数の制限
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell class="font-mono text-sm">
+                JOIN
+              </TableCell>
+              <TableCell class="font-mono text-sm">
+                $lookup (集約パイプライン)
+              </TableCell>
+              <TableCell class="text-sm">
+                コレクション間の結合
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    </UCard>
 
     <!-- 注意事項 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>データモデリングの違い</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              リレーショナル vs ドキュメント
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>SQLは正規化されたテーブル構造</li>
-              <li>MongoDBは非正規化されたドキュメント構造</li>
-              <li>JOINの代わりに埋め込みドキュメントや配列を使用</li>
-              <li>スキーマが柔軟で、フィールドの追加が容易</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              移行時の考慮点
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>データの非正規化を検討する</li>
-              <li>配列やサブドキュメントの活用</li>
-              <li>インデックス戦略の見直し</li>
-              <li>アプリケーションロジックの調整</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          データモデリングの違い
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            リレーショナル vs ドキュメント
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>SQLは正規化されたテーブル構造</li>
+            <li>MongoDBは非正規化されたドキュメント構造</li>
+            <li>JOINの代わりに埋め込みドキュメントや配列を使用</li>
+            <li>スキーマが柔軟で、フィールドの追加が容易</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            移行時の考慮点
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>データの非正規化を検討する</li>
+            <li>配列やサブドキュメントの活用</li>
+            <li>インデックス戦略の見直し</li>
+            <li>アプリケーションロジックの調整</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

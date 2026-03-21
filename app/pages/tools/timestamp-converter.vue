@@ -239,22 +239,22 @@ const clearInput = () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string, name: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       title: 'コピーしました',
       description: `${name}をクリップボードにコピーしました`,
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -283,222 +283,225 @@ useSeoMeta({
     </div>
 
     <!-- プリセットセクション -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-        <CardDescription>よく使う日時をすぐに選択できます</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            size="sm"
-            variant="outline"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            プリセット
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使う日時をすぐに選択できます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          size="sm"
+          variant="outline"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
     <!-- 入力パネル -->
     <div class="space-y-6">
       <!-- 入力タイプ選択 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>入力形式</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            <label class="flex items-center gap-3">
-              <input
-                v-model="inputType"
-                value="timestamp"
-                type="radio"
-                class="text-primary">
-              <div>
-                <div class="font-medium">タイムスタンプ</div>
-                <div class="text-sm text-muted-foreground">Unix時間（秒またはミリ秒）</div>
-              </div>
-            </label>
-            <label class="flex items-center gap-3">
-              <input
-                v-model="inputType"
-                value="datetime"
-                type="radio"
-                class="text-primary">
-              <div>
-                <div class="font-medium">日時</div>
-                <div class="text-sm text-muted-foreground">年月日と時刻を入力</div>
-              </div>
-            </label>
-            <label class="flex items-center gap-3">
-              <input
-                v-model="inputType"
-                value="iso"
-                type="radio"
-                class="text-primary">
-              <div>
-                <div class="font-medium">ISO 8601</div>
-                <div class="text-sm text-muted-foreground">国際標準フォーマット</div>
-              </div>
-            </label>
-          </div>
-        </CardContent>
-      </Card>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            入力形式
+          </h3>
+        </template>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3">
+            <input
+              v-model="inputType"
+              value="timestamp"
+              type="radio"
+              class="text-primary">
+            <div>
+              <div class="font-medium">タイムスタンプ</div>
+              <div class="text-sm text-muted-foreground">Unix時間（秒またはミリ秒）</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-3">
+            <input
+              v-model="inputType"
+              value="datetime"
+              type="radio"
+              class="text-primary">
+            <div>
+              <div class="font-medium">日時</div>
+              <div class="text-sm text-muted-foreground">年月日と時刻を入力</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-3">
+            <input
+              v-model="inputType"
+              value="iso"
+              type="radio"
+              class="text-primary">
+            <div>
+              <div class="font-medium">ISO 8601</div>
+              <div class="text-sm text-muted-foreground">国際標準フォーマット</div>
+            </div>
+          </label>
+        </div>
+      </UCard>
 
       <!-- 入力フィールド -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>値を入力</CardTitle>
+            <h3 class="font-semibold">
+              値を入力
+            </h3>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 size="sm"
                 variant="outline"
                 @click="useCurrentTime">
                 <Icon name="heroicons:clock" class="w-4 h-4 mr-1" />
                 現在時刻
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="clearInput">
                 <Icon name="heroicons:x-mark" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <!-- タイムスタンプ入力 -->
-          <div v-if="inputType === 'timestamp'" class="space-y-3">
-            <Input
-              v-model="inputValue"
-              type="text"
-              placeholder="例: 1640995200000"
-              class="font-mono" />
-            <div class="flex gap-2">
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="timestampUnit"
-                  value="seconds"
-                  type="radio"
-                  class="text-primary">
-                <span class="text-sm">秒</span>
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="timestampUnit"
-                  value="milliseconds"
-                  type="radio"
-                  class="text-primary">
-                <span class="text-sm">ミリ秒</span>
-              </label>
-            </div>
+        </template>
+        <!-- タイムスタンプ入力 -->
+        <div v-if="inputType === 'timestamp'" class="space-y-3">
+          <UInput
+            v-model="inputValue"
+            type="text"
+            placeholder="例: 1640995200000"
+            class="font-mono" />
+          <div class="flex gap-2">
+            <label class="flex items-center gap-2">
+              <input
+                v-model="timestampUnit"
+                value="seconds"
+                type="radio"
+                class="text-primary">
+              <span class="text-sm">秒</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="timestampUnit"
+                value="milliseconds"
+                type="radio"
+                class="text-primary">
+              <span class="text-sm">ミリ秒</span>
+            </label>
           </div>
+        </div>
 
-          <!-- 日時入力 -->
-          <div v-else-if="inputType === 'datetime'">
-            <input
-              v-model="inputValue"
-              type="datetime-local"
-              class="w-full h-9 px-3 rounded-md border border-input bg-background text-sm">
-          </div>
+        <!-- 日時入力 -->
+        <div v-else-if="inputType === 'datetime'">
+          <input
+            v-model="inputValue"
+            type="datetime-local"
+            class="w-full h-9 px-3 rounded-md border border-input bg-background text-sm">
+        </div>
 
-          <!-- ISO入力 -->
-          <div v-else-if="inputType === 'iso'">
-            <Input
-              v-model="inputValue"
-              type="text"
-              placeholder="例: 2024-01-01T00:00:00.000Z"
-              class="font-mono" />
-          </div>
+        <!-- ISO入力 -->
+        <div v-else-if="inputType === 'iso'">
+          <UInput
+            v-model="inputValue"
+            type="text"
+            placeholder="例: 2024-01-01T00:00:00.000Z"
+            class="font-mono" />
+        </div>
 
-          <div v-if="dateFromInput" class="mt-3 p-3 bg-muted rounded">
-            <div class="text-sm text-muted-foreground">
-              入力値の解釈:
-            </div>
-            <div class="font-medium">
-              {{ dateFromInput.toString() }}
-            </div>
+        <div v-if="dateFromInput" class="mt-3 p-3 bg-muted rounded">
+          <div class="text-sm text-muted-foreground">
+            入力値の解釈:
           </div>
-        </CardContent>
-      </Card>
+          <div class="font-medium">
+            {{ dateFromInput.toString() }}
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- 変換結果 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
           変換結果
           <span v-if="!inputValue" class="text-sm font-normal text-muted-foreground ml-2">
             (現在時刻を表示中)
           </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <div
-            v-for="format in formats"
-            :key="format.id"
-            class="group flex items-center justify-between p-3 bg-muted rounded hover:bg-muted/80 transition-colors">
-            <div>
-              <div class="text-sm text-muted-foreground">
-                {{ format.name }}
-              </div>
-              <div class="font-mono">
-                {{ format.value }}
-              </div>
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <div
+          v-for="format in formats"
+          :key="format.id"
+          class="group flex items-center justify-between p-3 bg-muted rounded hover:bg-muted/80 transition-colors">
+          <div>
+            <div class="text-sm text-muted-foreground">
+              {{ format.name }}
             </div>
-            <Button
-              v-if="format.copyValue"
-              size="sm"
-              variant="ghost"
-              class="opacity-0 group-hover:opacity-100 transition-opacity"
-              @click="copyToClipboard(format.copyValue, format.name)">
-              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            <div class="font-mono">
+              {{ format.value }}
+            </div>
           </div>
+          <UButton
+            v-if="format.copyValue"
+            size="sm"
+            variant="ghost"
+            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="copyToClipboard(format.copyValue, format.name)">
+            <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
+
     <!-- タイムスタンプについて -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>タイムスタンプについて</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
-        <div>
-          <h5 class="font-medium text-foreground mb-1">
-            Unix タイムスタンプとは
-          </h5>
-          <p>
-            1970年1月1日 00:00:00 UTC（Unix エポック）からの経過時間を表す数値です。
-            秒単位またはミリ秒単位で表現されます。
-          </p>
-        </div>
-        <div>
-          <h5 class="font-medium text-foreground mb-1">
-            使用例
-          </h5>
-          <ul class="list-disc list-inside space-y-1">
-            <li>データベースでの日時保存</li>
-            <li>APIでの日時データ交換</li>
-            <li>ログファイルのタイムスタンプ</li>
-            <li>異なるタイムゾーン間での時刻比較</li>
-          </ul>
-        </div>
-        <div>
-          <h5 class="font-medium text-foreground mb-1">
-            注意点
-          </h5>
-          <ul class="list-disc list-inside space-y-1">
-            <li>2038年問題: 32ビット整数では2038年1月19日までしか表現できません</li>
-            <li>JavaScriptではミリ秒単位、多くのシステムでは秒単位を使用</li>
-            <li>タイムゾーンの考慮が必要な場合があります</li>
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          タイムスタンプについて
+        </h3>
+      </template>
+      <div>
+        <h5 class="font-medium text-foreground mb-1">
+          Unix タイムスタンプとは
+        </h5>
+        <p>
+          1970年1月1日 00:00:00 UTC（Unix エポック）からの経過時間を表す数値です。
+          秒単位またはミリ秒単位で表現されます。
+        </p>
+      </div>
+      <div>
+        <h5 class="font-medium text-foreground mb-1">
+          使用例
+        </h5>
+        <ul class="list-disc list-inside space-y-1">
+          <li>データベースでの日時保存</li>
+          <li>APIでの日時データ交換</li>
+          <li>ログファイルのタイムスタンプ</li>
+          <li>異なるタイムゾーン間での時刻比較</li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-medium text-foreground mb-1">
+          注意点
+        </h5>
+        <ul class="list-disc list-inside space-y-1">
+          <li>2038年問題: 32ビット整数では2038年1月19日までしか表現できません</li>
+          <li>JavaScriptではミリ秒単位、多くのシステムでは秒単位を使用</li>
+          <li>タイムゾーンの考慮が必要な場合があります</li>
+        </ul>
+      </div>
+    </UCard>
   </div>
 </template>

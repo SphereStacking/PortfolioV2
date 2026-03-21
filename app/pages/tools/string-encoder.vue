@@ -347,19 +347,19 @@ const loadSample = (sample: typeof sampleTexts[0]) => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch {
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -388,274 +388,273 @@ useSeoMeta({
     </div>
 
     <!-- エンコーディングタイプ選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Encoding Type</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-          <Button
-            v-for="type in [
-              { value: 'url', label: 'URL', icon: 'heroicons:link' },
-              { value: 'html', label: 'HTML', icon: 'heroicons:code-bracket' },
-              { value: 'base64', label: 'Base64', icon: 'heroicons:key' },
-              { value: 'unicode', label: 'Unicode', icon: 'heroicons:language' },
-              { value: 'escape', label: 'Escape', icon: 'heroicons:command-line' },
-            ]"
-            :key="type.value"
-            :variant="encodingType === type.value ? 'default' : 'outline'"
-            size="sm"
-            @click="encodingType = type.value as 'url' | 'html' | 'base64' | 'unicode' | 'escape'">
-            <Icon :name="type.icon" class="w-4 h-4 mr-2" />
-            {{ type.label }}
-          </Button>
-        </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Encoding Type
+        </h3>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <UButton
+          v-for="type in [
+            { value: 'url', label: 'URL', icon: 'heroicons:link' },
+            { value: 'html', label: 'HTML', icon: 'heroicons:code-bracket' },
+            { value: 'base64', label: 'Base64', icon: 'heroicons:key' },
+            { value: 'unicode', label: 'Unicode', icon: 'heroicons:language' },
+            { value: 'escape', label: 'Escape', icon: 'heroicons:command-line' },
+          ]"
+          :key="type.value"
+          :variant="encodingType === type.value ? 'default' : 'outline'"
+          size="sm"
+          @click="encodingType = type.value as 'url' | 'html' | 'base64' | 'unicode' | 'escape'">
+          <Icon :name="type.icon" class="w-4 h-4 mr-2" />
+          {{ type.label }}
+        </UButton>
+      </div>
 
-        <!-- モード切り替え -->
-        <div class="mt-4 flex items-center gap-4">
-          <div class="flex items-center gap-2">
-            <Button
-              :variant="!decodeMode ? 'default' : 'outline'"
-              size="sm"
-              @click="decodeMode = false">
-              Encode
-            </Button>
-            <Icon name="heroicons:arrow-right" class="w-4 h-4 text-muted-foreground" />
-            <Button
-              :variant="decodeMode ? 'default' : 'outline'"
-              size="sm"
-              @click="decodeMode = true">
-              Decode
-            </Button>
-          </div>
+      <!-- モード切り替え -->
+      <div class="mt-4 flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <UButton
+            :variant="!decodeMode ? 'default' : 'outline'"
+            size="sm"
+            @click="decodeMode = false">
+            Encode
+          </UButton>
+          <Icon name="heroicons:arrow-right" class="w-4 h-4 text-muted-foreground" />
+          <UButton
+            :variant="decodeMode ? 'default' : 'outline'"
+            size="sm"
+            @click="decodeMode = true">
+            Decode
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- オプション設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Options</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <!-- URL Options -->
-        <div v-if="encodingType === 'url'" class="space-y-4">
-          <div class="flex items-center gap-2">
-            <input
-              id="urlComponent"
-              v-model="urlComponentMode"
-              type="checkbox"
-              class="rounded border-border">
-            <label for="urlComponent" class="text-sm">
-              Use encodeURIComponent (encode all characters including /, ?, &, =)
-            </label>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              <strong>encodeURI:</strong> For complete URLs (preserves URL structure)<br>
-              <strong>encodeURIComponent:</strong> For URL parameters and values
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Options
+        </h3>
+      </template>
+      <!-- URL Options -->
+      <div v-if="encodingType === 'url'" class="space-y-4">
+        <div class="flex items-center gap-2">
+          <input
+            id="urlComponent"
+            v-model="urlComponentMode"
+            type="checkbox"
+            class="rounded border-border">
+          <label for="urlComponent" class="text-sm">
+            Use encodeURIComponent (encode all characters including /, ?, &, =)
+          </label>
         </div>
+        <UAlert icon="heroicons:information-circle">
+          <template #description>
+            <strong>encodeURI:</strong> For complete URLs (preserves URL structure)<br>
+            <strong>encodeURIComponent:</strong> For URL parameters and values
+          </template>
+        </UAlert>
+      </div>
 
-        <!-- HTML Options -->
-        <div v-if="encodingType === 'html'" class="space-y-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">Entity Format</label>
-            <div class="flex gap-2">
-              <Button
-                v-for="mode in [
-                  { value: 'named', label: 'Named (&amp;)' },
-                  { value: 'numeric', label: 'Numeric (&#38;)' },
-                  { value: 'hex', label: 'Hex (&#x26;)' },
-                ]"
-                :key="mode.value"
-                :variant="htmlEntityMode === mode.value ? 'default' : 'outline'"
-                size="sm"
-                @click="htmlEntityMode = mode.value as 'named' | 'numeric' | 'hex'">
-                {{ mode.label }}
-              </Button>
-            </div>
+      <!-- HTML Options -->
+      <div v-if="encodingType === 'html'" class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">Entity Format</label>
+          <div class="flex gap-2">
+            <UButton
+              v-for="mode in [
+                { value: 'named', label: 'Named (&amp;)' },
+                { value: 'numeric', label: 'Numeric (&#38;)' },
+                { value: 'hex', label: 'Hex (&#x26;)' },
+              ]"
+              :key="mode.value"
+              :variant="htmlEntityMode === mode.value ? 'default' : 'outline'"
+              size="sm"
+              @click="htmlEntityMode = mode.value as 'named' | 'numeric' | 'hex'">
+              {{ mode.label }}
+            </UButton>
           </div>
         </div>
+      </div>
 
-        <!-- Unicode Options -->
-        <div v-if="encodingType === 'unicode'" class="space-y-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">Format</label>
-            <div class="grid grid-cols-2 gap-2">
-              <Button
-                v-for="format in [
-                  { value: 'codepoint', label: 'Code Point (U+0000)' },
-                  { value: 'jsEscape', label: 'JavaScript (\\u0000)' },
-                  { value: 'cssEscape', label: 'CSS (\\000000)' },
-                  { value: 'pythonEscape', label: 'Python (\\u0000)' },
-                ]"
-                :key="format.value"
-                :variant="unicodeFormat === format.value ? 'default' : 'outline'"
-                size="sm"
-                @click="unicodeFormat = format.value as 'codepoint' | 'jsEscape' | 'cssEscape' | 'pythonEscape'">
-                {{ format.label }}
-              </Button>
-            </div>
+      <!-- Unicode Options -->
+      <div v-if="encodingType === 'unicode'" class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">Format</label>
+          <div class="grid grid-cols-2 gap-2">
+            <UButton
+              v-for="format in [
+                { value: 'codepoint', label: 'Code Point (U+0000)' },
+                { value: 'jsEscape', label: 'JavaScript (\\u0000)' },
+                { value: 'cssEscape', label: 'CSS (\\000000)' },
+                { value: 'pythonEscape', label: 'Python (\\u0000)' },
+              ]"
+              :key="format.value"
+              :variant="unicodeFormat === format.value ? 'default' : 'outline'"
+              size="sm"
+              @click="unicodeFormat = format.value as 'codepoint' | 'jsEscape' | 'cssEscape' | 'pythonEscape'">
+              {{ format.label }}
+            </UButton>
           </div>
         </div>
+      </div>
 
-        <!-- Escape Options -->
-        <div v-if="encodingType === 'escape'" class="space-y-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">Quote Escaping</label>
-            <div class="flex gap-2">
-              <Button
-                v-for="quote in quoteOptions"
-                :key="quote.value"
-                :variant="escapeQuotes === quote.value ? 'default' : 'outline'"
-                size="sm"
-                @click="escapeQuotes = quote.value as 'single' | 'double' | 'both'">
-                {{ quote.label }}
-              </Button>
-            </div>
+      <!-- Escape Options -->
+      <div v-if="encodingType === 'escape'" class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">Quote Escaping</label>
+          <div class="flex gap-2">
+            <UButton
+              v-for="quote in quoteOptions"
+              :key="quote.value"
+              :variant="escapeQuotes === quote.value ? 'default' : 'outline'"
+              size="sm"
+              @click="escapeQuotes = quote.value as 'single' | 'double' | 'both'">
+              {{ quote.label }}
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 入出力エリア -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 入力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>{{ decodeMode ? 'Encoded' : 'Original' }} Text</CardTitle>
+            <h3 class="font-semibold">
+              {{ decodeMode ? 'Encoded' : 'Original' }} Text
+            </h3>
             <div class="flex items-center gap-2">
-              <Badge variant="outline">
+              <UBadge variant="outline">
                 {{ charInfo.characters }} chars
-              </Badge>
-              <Badge variant="outline">
+              </UBadge>
+              <UBadge variant="outline">
                 {{ byteCount }} bytes
-              </Badge>
+              </UBadge>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="inputText"
-            placeholder="Enter text to encode/decode..."
-            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
-          <div class="flex items-center justify-between mt-2">
-            <div class="text-xs text-muted-foreground">
-              Lines: {{ charInfo.lines }}, Words: {{ charInfo.words }}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              @click="reset">
-              Clear
-            </Button>
+        </template>
+        <textarea
+          v-model="inputText"
+          placeholder="Enter text to encode/decode..."
+          class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
+        <div class="flex items-center justify-between mt-2">
+          <div class="text-xs text-muted-foreground">
+            Lines: {{ charInfo.lines }}, Words: {{ charInfo.words }}
           </div>
-        </CardContent>
-      </Card>
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="reset">
+            Clear
+          </UButton>
+        </div>
+      </UCard>
 
       <!-- 出力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>{{ decodeMode ? 'Decoded' : 'Encoded' }} Result</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              {{ decodeMode ? 'Decoded' : 'Encoded' }} Result
+            </h3>
+            <UButton
               size="sm"
               variant="ghost"
               :disabled="!outputText"
               @click="copyToClipboard(outputText)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            :value="outputText"
-            readonly
-            placeholder="Result will appear here..."
-            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-            spellcheck="false"></textarea>
-          <div class="mt-2 text-xs text-muted-foreground">
-            Output: {{ outputText.length }} characters
-          </div>
-        </CardContent>
-      </Card>
+        </template>
+        <textarea
+          :value="outputText"
+          readonly
+          placeholder="Result will appear here..."
+          class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+          spellcheck="false"></textarea>
+        <div class="mt-2 text-xs text-muted-foreground">
+          Output: {{ outputText.length }} characters
+        </div>
+      </UCard>
     </div>
 
     <!-- サンプル -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Sample Inputs</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          <Button
-            v-for="sample in sampleTexts"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            class="justify-start"
-            @click="loadSample(sample)">
-            <Icon name="heroicons:document-text" class="w-4 h-4 mr-2" />
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Sample Inputs
+        </h3>
+      </template>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        <UButton
+          v-for="sample in sampleTexts"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          class="justify-start"
+          @click="loadSample(sample)">
+          <Icon name="heroicons:document-text" class="w-4 h-4 mr-2" />
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 使用ガイド -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Usage Guide</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              URL Encoding
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>encodeURI:</strong> For complete URLs, preserves :/?#[]@!$&'()*+,;=</li>
-              <li><strong>encodeURIComponent:</strong> For query parameters, encodes all special characters</li>
-              <li>Use for API calls, form submissions, and URL construction</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              HTML Entities
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Prevents XSS attacks by escaping special characters</li>
-              <li>Named entities are more readable (&amp;copy; vs &#169;)</li>
-              <li>Numeric entities have better compatibility</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Base64
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Binary-safe text encoding for data transmission</li>
-              <li>Common in APIs, data URIs, and authentication</li>
-              <li>Increases data size by ~33%</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Unicode Escapes
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>JavaScript: \u0000 format for JSON and JS strings</li>
-              <li>CSS: \000000 format for content and pseudo-elements</li>
-              <li>Python: Supports both \u and \U formats</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Usage Guide
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            URL Encoding
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>encodeURI:</strong> For complete URLs, preserves :/?#[]@!$&'()*+,;=</li>
+            <li><strong>encodeURIComponent:</strong> For query parameters, encodes all special characters</li>
+            <li>Use for API calls, form submissions, and URL construction</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            HTML Entities
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Prevents XSS attacks by escaping special characters</li>
+            <li>Named entities are more readable (&amp;copy; vs &#169;)</li>
+            <li>Numeric entities have better compatibility</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Base64
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Binary-safe text encoding for data transmission</li>
+            <li>Common in APIs, data URIs, and authentication</li>
+            <li>Increases data size by ~33%</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Unicode Escapes
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>JavaScript: \u0000 format for JSON and JS strings</li>
+            <li>CSS: \000000 format for content and pseudo-elements</li>
+            <li>Python: Supports both \u and \U formats</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

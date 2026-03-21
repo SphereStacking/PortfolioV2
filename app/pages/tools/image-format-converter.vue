@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Slider } from '~/components/ui/slider'
 
 definePageMeta({
   layout: 'tools',
 })
 
-const { toast } = useToast()
+const toast = useToast()
 
 // 画像データ
 const originalImage = ref<string>('')
@@ -20,7 +17,7 @@ const imageHeight = ref(0)
 
 // 変換設定
 const outputFormat = ref<'png' | 'jpeg' | 'webp' | 'avif'>('webp')
-const quality = ref([85])
+const quality = ref(85)
 const isConverting = ref(false)
 
 // リサイズ設定
@@ -41,40 +38,6 @@ const filters = ref({
   grayscale: 0,
   sepia: 0,
   invert: 0,
-})
-
-// Slider用の配列形式フィルター値
-const brightnessArray = computed({
-  get: () => [filters.value.brightness],
-  set: (val) => { filters.value.brightness = val[0] },
-})
-const contrastArray = computed({
-  get: () => [filters.value.contrast],
-  set: (val) => { filters.value.contrast = val[0] },
-})
-const saturationArray = computed({
-  get: () => [filters.value.saturation],
-  set: (val) => { filters.value.saturation = val[0] },
-})
-const hueArray = computed({
-  get: () => [filters.value.hue],
-  set: (val) => { filters.value.hue = val[0] },
-})
-const blurArray = computed({
-  get: () => [filters.value.blur],
-  set: (val) => { filters.value.blur = val[0] },
-})
-const grayscaleArray = computed({
-  get: () => [filters.value.grayscale],
-  set: (val) => { filters.value.grayscale = val[0] },
-})
-const sepiaArray = computed({
-  get: () => [filters.value.sepia],
-  set: (val) => { filters.value.sepia = val[0] },
-})
-const invertArray = computed({
-  get: () => [filters.value.invert],
-  set: (val) => { filters.value.invert = val[0] },
 })
 
 // ファイル選択
@@ -103,10 +66,10 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 // ファイル処理
 const handleFile = (file: File) => {
   if (!file.type.startsWith('image/')) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -168,7 +131,6 @@ const convertImage = async () => {
   try {
     const img = new Image()
     img.onload = () => {
-      // キャンバスサイズの決定
       let canvasWidth = img.width
       let canvasHeight = img.height
 
@@ -202,11 +164,9 @@ const convertImage = async () => {
       // リサイズモードに応じて描画
       if (enableResize.value) {
         if (resizeMode.value === 'fill') {
-          // フィル: アスペクト比を無視して引き伸ばし
           ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight)
         }
         else if (resizeMode.value === 'cover') {
-          // カバー: アスペクト比を保持して全体を覆う
           const scale = Math.max(canvasWidth / img.width, canvasHeight / img.height)
           const scaledWidth = img.width * scale
           const scaledHeight = img.height * scale
@@ -215,7 +175,6 @@ const convertImage = async () => {
           ctx.drawImage(img, x, y, scaledWidth, scaledHeight)
         }
         else {
-          // フィット: アスペクト比を保持して内接
           const scale = Math.min(canvasWidth / img.width, canvasHeight / img.height)
           const scaledWidth = img.width * scale
           const scaledHeight = img.height * scale
@@ -230,7 +189,7 @@ const convertImage = async () => {
 
       // 変換
       const mimeType = `image/${outputFormat.value}`
-      const qualityValue = outputFormat.value === 'png' ? 1 : quality.value[0] / 100
+      const qualityValue = outputFormat.value === 'png' ? 1 : quality.value / 100
 
       canvas.toBlob((blob) => {
         if (blob) {
@@ -246,10 +205,10 @@ const convertImage = async () => {
     img.src = originalImage.value
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像の変換に失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
     isConverting.value = false
   }
@@ -267,7 +226,7 @@ const downloadImage = () => {
   link.click()
   document.body.removeChild(link)
 
-  toast({
+  toast.add({
     title: 'ダウンロード完了',
     description: `画像を${outputFormat.value.toUpperCase()}形式でダウンロードしました`,
   })
@@ -316,10 +275,10 @@ const loadSampleImage = async (url: string) => {
     handleFile(file)
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'サンプル画像の読み込みに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -343,114 +302,121 @@ useSeoMeta({
     </div>
 
     <!-- サンプル画像 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプル画像</CardTitle>
-        <CardDescription>
-          動作確認用のサンプル画像を読み込めます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleImages"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSampleImage(sample.url)">
-            {{ sample.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            サンプル画像
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            動作確認用のサンプル画像を読み込めます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleImages"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSampleImage(sample.url)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 入力エリア -->
-    <Card>
-      <CardHeader>
-        <CardTitle>元画像</CardTitle>
-        <CardDescription>
-          変換したい画像をアップロード
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div
-          ref="dropZoneRef"
-          :class="[
-            'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-            isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
-          ]"
-          @click="openFileDialog">
-          <div v-if="!originalImage">
-            <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p class="text-sm text-muted-foreground mb-2">
-              クリックまたはドロップで画像を選択
-            </p>
-            <p class="text-xs text-muted-foreground">
-              PNG, JPEG, WebP, AVIF対応
-            </p>
-          </div>
-          <div v-else class="space-y-4">
-            <img
-              :src="originalImage"
-              alt="Original"
-              class="max-w-full max-h-[300px] mx-auto rounded">
-            <div class="text-sm text-muted-foreground">
-              <p>{{ fileName }}</p>
-              <p>{{ imageWidth }} × {{ imageHeight }}px</p>
-              <p>{{ (fileSize / 1024).toFixed(1) }}KB</p>
-            </div>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            元画像
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            変換したい画像をアップロード
+          </p>
+        </div>
+      </template>
+      <div
+        ref="dropZoneRef"
+        :class="[
+          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+          isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+        ]"
+        @click="openFileDialog">
+        <div v-if="!originalImage">
+          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p class="text-sm text-muted-foreground mb-2">
+            クリックまたはドロップで画像を選択
+          </p>
+          <p class="text-xs text-muted-foreground">
+            PNG, JPEG, WebP, AVIF対応
+          </p>
+        </div>
+        <div v-else class="space-y-4">
+          <img
+            :src="originalImage"
+            alt="Original"
+            class="max-w-full max-h-[300px] mx-auto rounded">
+          <div class="text-sm text-muted-foreground">
+            <p>{{ fileName }}</p>
+            <p>{{ imageWidth }} x {{ imageHeight }}px</p>
+            <p>{{ (fileSize / 1024).toFixed(1) }}KB</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 出力エリア -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>変換後</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              変換後
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               {{ outputFormat.toUpperCase() }}形式に変換
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             v-if="convertedImage"
             size="sm"
             @click="downloadImage">
             <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
             ダウンロード
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="isConverting" class="text-center py-12">
-          <Icon name="heroicons:arrow-path" class="w-8 h-8 mx-auto mb-4 animate-spin" />
-          <p class="text-sm text-muted-foreground">
-            変換中...
-          </p>
+      </template>
+      <div v-if="isConverting" class="text-center py-12">
+        <Icon name="heroicons:arrow-path" class="w-8 h-8 mx-auto mb-4 animate-spin" />
+        <p class="text-sm text-muted-foreground">
+          変換中...
+        </p>
+      </div>
+      <div v-else-if="convertedImage" class="space-y-4">
+        <img
+          :src="convertedImage"
+          alt="Converted"
+          class="max-w-full max-h-[400px] mx-auto rounded">
+        <div class="text-sm text-muted-foreground text-center">
+          <p>変換完了</p>
         </div>
-        <div v-else-if="convertedImage" class="space-y-4">
-          <img
-            :src="convertedImage"
-            alt="Converted"
-            class="max-w-full max-h-[400px] mx-auto rounded">
-          <div class="text-sm text-muted-foreground text-center">
-            <p>変換完了</p>
-          </div>
-        </div>
-        <div v-else class="text-center py-12 text-muted-foreground">
-          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p>画像を選択して変換ボタンを押してください</p>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div v-else class="text-center py-12 text-muted-foreground">
+        <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 opacity-20" />
+        <p>画像を選択して変換ボタンを押してください</p>
+      </div>
+    </UCard>
+
     <!-- 変換設定 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>変換設定</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-6">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          変換設定
+        </h3>
+      </template>
+      <div class="space-y-6">
         <!-- フォーマット選択 -->
         <div>
           <label class="text-sm font-medium mb-3 block">出力フォーマット</label>
@@ -478,13 +444,14 @@ useSeoMeta({
         <!-- 品質設定 -->
         <div v-if="outputFormat !== 'png'">
           <label class="text-sm font-medium mb-2 block">
-            品質: {{ quality[0] }}%
+            品質: {{ quality }}%
           </label>
-          <Slider
-            v-model="quality"
+          <USlider
+            :model-value="quality"
             :max="100"
             :min="1"
-            :step="1" />
+            :step="1"
+            @update:model-value="quality = $event" />
           <p class="text-xs text-muted-foreground mt-2">
             値が高いほど高品質・大容量
           </p>
@@ -509,14 +476,14 @@ useSeoMeta({
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="text-sm text-muted-foreground mb-1 block">幅</label>
-                <Input
+                <UInput
                   v-model="targetWidth"
                   type="number"
                   placeholder="800" />
               </div>
               <div>
                 <label class="text-sm text-muted-foreground mb-1 block">高さ</label>
-                <Input
+                <UInput
                   v-model="targetHeight"
                   type="number"
                   placeholder="600"
@@ -564,13 +531,13 @@ useSeoMeta({
               フィルター
             </h4>
             <div class="flex items-center gap-2">
-              <Button
+              <UButton
                 v-if="enableFilters"
                 size="sm"
                 variant="ghost"
                 @click="resetFilters">
                 リセット
-              </Button>
+              </UButton>
               <label class="flex items-center gap-2">
                 <input
                   v-model="enableFilters"
@@ -586,162 +553,170 @@ useSeoMeta({
               <label class="text-sm text-muted-foreground mb-1 block">
                 明るさ: {{ filters.brightness }}%
               </label>
-              <Slider
-                v-model="brightnessArray"
+              <USlider
+                :model-value="filters.brightness"
                 :max="200"
                 :min="0"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.brightness = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 コントラスト: {{ filters.contrast }}%
               </label>
-              <Slider
-                v-model="contrastArray"
+              <USlider
+                :model-value="filters.contrast"
                 :max="200"
                 :min="0"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.contrast = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 彩度: {{ filters.saturation }}%
               </label>
-              <Slider
-                v-model="saturationArray"
+              <USlider
+                :model-value="filters.saturation"
                 :max="200"
                 :min="0"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.saturation = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 色相: {{ filters.hue }}°
               </label>
-              <Slider
-                v-model="hueArray"
+              <USlider
+                :model-value="filters.hue"
                 :max="360"
                 :min="-180"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.hue = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 ブラー: {{ filters.blur }}px
               </label>
-              <Slider
-                v-model="blurArray"
+              <USlider
+                :model-value="filters.blur"
                 :max="20"
                 :min="0"
-                :step="0.1" />
+                :step="0.1"
+                @update:model-value="filters.blur = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 グレースケール: {{ filters.grayscale }}%
               </label>
-              <Slider
-                v-model="grayscaleArray"
+              <USlider
+                :model-value="filters.grayscale"
                 :max="100"
                 :min="0"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.grayscale = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 セピア: {{ filters.sepia }}%
               </label>
-              <Slider
-                v-model="sepiaArray"
+              <USlider
+                :model-value="filters.sepia"
                 :max="100"
                 :min="0"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.sepia = $event" />
             </div>
 
             <div>
               <label class="text-sm text-muted-foreground mb-1 block">
                 ネガポジ: {{ filters.invert }}%
               </label>
-              <Slider
-                v-model="invertArray"
+              <USlider
+                :model-value="filters.invert"
                 :max="100"
                 :min="0"
-                :step="1" />
+                :step="1"
+                @update:model-value="filters.invert = $event" />
             </div>
           </div>
         </div>
 
         <div class="flex gap-2">
-          <Button
+          <UButton
             :disabled="!originalImage || isConverting"
             @click="convertImage">
             <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-1" />
             変換
-          </Button>
-          <Button
+          </UButton>
+          <UButton
             variant="outline"
             :disabled="!originalImage"
             @click="clearAll">
             クリア
-          </Button>
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 使い方 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>フォーマットの特徴</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid md:grid-cols-2 gap-6 text-sm">
-          <div>
-            <h4 class="font-semibold mb-2">
-              PNG (Portable Network Graphics)
-            </h4>
-            <ul class="space-y-1 text-muted-foreground">
-              <li>• ロスレス圧縮で画質劣化なし</li>
-              <li>• 透明度（アルファチャンネル）対応</li>
-              <li>• イラスト、ロゴ、スクリーンショットに最適</li>
-              <li>• ファイルサイズが大きくなりがち</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-2">
-              JPEG (Joint Photographic Experts Group)
-            </h4>
-            <ul class="space-y-1 text-muted-foreground">
-              <li>• 非可逆圧縮で小さいファイルサイズ</li>
-              <li>• 写真や複雑な画像に最適</li>
-              <li>• 透明度非対応</li>
-              <li>• 繰り返し保存で画質劣化</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-2">
-              WebP
-            </h4>
-            <ul class="space-y-1 text-muted-foreground">
-              <li>• Googleが開発した次世代フォーマット</li>
-              <li>• JPEGより25-35%小さいファイルサイズ</li>
-              <li>• ロスレス・非可逆圧縮の両対応</li>
-              <li>• 透明度・アニメーション対応</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-2">
-              AVIF (AV1 Image File Format)
-            </h4>
-            <ul class="space-y-1 text-muted-foreground">
-              <li>• 最新の画像フォーマット</li>
-              <li>• WebPよりさらに高圧縮率</li>
-              <li>• HDR・広色域対応</li>
-              <li>• ブラウザサポートは発展途上</li>
-            </ul>
-          </div>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          フォーマットの特徴
+        </h3>
+      </template>
+      <div class="grid md:grid-cols-2 gap-6 text-sm">
+        <div>
+          <h4 class="font-semibold mb-2">
+            PNG (Portable Network Graphics)
+          </h4>
+          <ul class="space-y-1 text-muted-foreground">
+            <li>• ロスレス圧縮で画質劣化なし</li>
+            <li>• 透明度（アルファチャンネル）対応</li>
+            <li>• イラスト、ロゴ、スクリーンショットに最適</li>
+            <li>• ファイルサイズが大きくなりがち</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h4 class="font-semibold mb-2">
+            JPEG (Joint Photographic Experts Group)
+          </h4>
+          <ul class="space-y-1 text-muted-foreground">
+            <li>• 非可逆圧縮で小さいファイルサイズ</li>
+            <li>• 写真や複雑な画像に最適</li>
+            <li>• 透明度非対応</li>
+            <li>• 繰り返し保存で画質劣化</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">
+            WebP
+          </h4>
+          <ul class="space-y-1 text-muted-foreground">
+            <li>• Googleが開発した次世代フォーマット</li>
+            <li>• JPEGより25-35%小さいファイルサイズ</li>
+            <li>• ロスレス・非可逆圧縮の両対応</li>
+            <li>• 透明度・アニメーション対応</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">
+            AVIF (AV1 Image File Format)
+          </h4>
+          <ul class="space-y-1 text-muted-foreground">
+            <li>• 最新の画像フォーマット</li>
+            <li>• WebPよりさらに高圧縮率</li>
+            <li>• HDR・広色域対応</li>
+            <li>• ブラウザサポートは発展途上</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const markdownInput = ref('')
 const htmlOutput = ref('')
@@ -235,7 +233,7 @@ console.log(fibonacci(10)); // 55
 \`\`\`python
 def hello_world():
     print("Hello, World!")
-    
+
 hello_world()
 \`\`\``,
   },
@@ -286,7 +284,7 @@ const copyHtml = async () => {
   if (!htmlOutput.value) return
 
   await copy(htmlOutput.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'HTMLをクリップボードにコピーしました',
   })
@@ -306,7 +304,7 @@ const downloadHtml = () => {
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
 
-  toast({
+  toast.add({
     title: 'ダウンロード完了',
     description: 'HTMLファイルをダウンロードしました',
   })
@@ -336,51 +334,57 @@ useSeoMeta({
     </div>
 
     <!-- サンプル -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルMarkdown</CardTitle>
-        <CardDescription>
-          よく使われるMarkdownパターンを選択できます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleMarkdown"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            サンプルMarkdown
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使われるMarkdownパターンを選択できます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleMarkdown"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
     <!-- Markdown入力 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Markdown入力</CardTitle>
-        <CardDescription>
-          Markdown記法で記述してください
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="markdownInput"
-          class="w-full h-[500px] p-3 rounded-md border bg-background font-mono text-sm resize-y"
-          placeholder="# 見出し&#10;&#10;**太字**のテキスト"></textarea>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            Markdown入力
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            Markdown記法で記述してください
+          </p>
+        </div>
+      </template>
+      <textarea
+        v-model="markdownInput"
+        class="w-full h-[500px] p-3 rounded-md border bg-background font-mono text-sm resize-y"
+        placeholder="# 見出し&#10;&#10;**太字**のテキスト"></textarea>
+    </UCard>
 
     <!-- 出力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>出力</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              出力
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               {{ previewMode === 'html' ? 'HTMLコード' : 'プレビュー' }}
-            </CardDescription>
+            </p>
           </div>
           <div class="flex gap-2">
             <div class="flex rounded-md border">
@@ -401,20 +405,20 @@ useSeoMeta({
                 HTML
               </button>
             </div>
-            <Button
+            <UButton
               v-if="htmlOutput"
               size="sm"
               variant="outline"
               @click="copyHtml">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="htmlOutput"
               size="sm"
               variant="outline"
               @click="downloadHtml">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
         <div class="flex items-center gap-6">
@@ -435,78 +439,77 @@ useSeoMeta({
             <span class="text-sm text-muted-foreground">シンタックスハイライト (開発中)</span>
           </label>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="h-[500px] overflow-auto">
-          <!-- HTMLコード表示 -->
-          <div v-if="previewMode === 'html'" class="h-full">
-            <pre class="p-3 bg-muted rounded-md text-sm h-full overflow-auto"><code>{{ htmlOutput || 'Markdownを入力するとHTMLが表示されます' }}</code></pre>
-          </div>
+      </template>
+      <div class="h-[500px] overflow-auto">
+        <!-- HTMLコード表示 -->
+        <div v-if="previewMode === 'html'" class="h-full">
+          <pre class="p-3 bg-muted rounded-md text-sm h-full overflow-auto"><code>{{ htmlOutput || 'Markdownを入力するとHTMLが表示されます' }}</code></pre>
+        </div>
 
-          <!-- プレビュー表示 -->
-          <div v-else class="prose prose-sm max-w-none dark:prose-invert">
-            <div v-if="htmlOutput" v-html="htmlOutput"></div>
-            <div v-else class="text-muted-foreground text-center py-12">
-              Markdownを入力するとプレビューが表示されます
-            </div>
+        <!-- プレビュー表示 -->
+        <div v-else class="prose prose-sm max-w-none dark:prose-invert">
+          <div v-if="htmlOutput" v-html="htmlOutput"></div>
+          <div v-else class="text-muted-foreground text-center py-12">
+            Markdownを入力するとプレビューが表示されます
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- Markdownチートシート -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>Markdownチートシート</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
-          <div>
-            <h4 class="font-semibold mb-2">
-              見出し
-            </h4>
-            <pre class="bg-muted p-2 rounded text-xs">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          Markdownチートシート
+        </h3>
+      </template>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+        <div>
+          <h4 class="font-semibold mb-2">
+            見出し
+          </h4>
+          <pre class="bg-muted p-2 rounded text-xs">
 # 見出し1
 ## 見出し2
 ### 見出し3</pre>
-          </div>
+        </div>
 
-          <div>
-            <h4 class="font-semibold mb-2">
-              強調
-            </h4>
-            <pre class="bg-muted p-2 rounded text-xs">
+        <div>
+          <h4 class="font-semibold mb-2">
+            強調
+          </h4>
+          <pre class="bg-muted p-2 rounded text-xs">
 **太字**
 *斜体*
 ***太字の斜体***</pre>
-          </div>
+        </div>
 
-          <div>
-            <h4 class="font-semibold mb-2">
-              リンクと画像
-            </h4>
-            <pre class="bg-muted p-2 rounded text-xs">
+        <div>
+          <h4 class="font-semibold mb-2">
+            リンクと画像
+          </h4>
+          <pre class="bg-muted p-2 rounded text-xs">
 [リンクテキスト](URL)
 ![代替テキスト](画像URL)</pre>
-          </div>
+        </div>
 
-          <div>
-            <h4 class="font-semibold mb-2">
-              リスト
-            </h4>
-            <pre class="bg-muted p-2 rounded text-xs">
+        <div>
+          <h4 class="font-semibold mb-2">
+            リスト
+          </h4>
+          <pre class="bg-muted p-2 rounded text-xs">
 * 項目1
 * 項目2
 
 1. 番号付き
 2. リスト</pre>
-          </div>
+        </div>
 
-          <div>
-            <h4 class="font-semibold mb-2">
-              引用とコード
-            </h4>
-            <pre class="bg-muted p-2 rounded text-xs">
+        <div>
+          <h4 class="font-semibold mb-2">
+            引用とコード
+          </h4>
+          <pre class="bg-muted p-2 rounded text-xs">
 > 引用文
 
 `インラインコード`
@@ -514,18 +517,17 @@ useSeoMeta({
 ```
 コードブロック
 ```</pre>
-          </div>
+        </div>
 
-          <div>
-            <h4 class="font-semibold mb-2">
-              その他
-            </h4>
-            <pre class="bg-muted p-2 rounded text-xs">
+        <div>
+          <h4 class="font-semibold mb-2">
+            その他
+          </h4>
+          <pre class="bg-muted p-2 rounded text-xs">
 ---
 (水平線)</pre>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

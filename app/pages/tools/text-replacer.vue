@@ -144,7 +144,7 @@ const applyPreset = (preset: typeof presets[0]) => {
     global: true,
   }))
 
-  toast({
+  toast.add({
     title: 'プリセット適用',
     description: `「${preset.name}」のルールを適用しました`,
   })
@@ -219,7 +219,7 @@ const executeReplace = () => {
 
     outputText.value = result
 
-    toast({
+    toast.add({
       title: '置換完了',
       description: `${totalReplacements}箇所を置換しました`,
     })
@@ -227,10 +227,10 @@ const executeReplace = () => {
   catch (err) {
     error.value = '置換処理中にエラーが発生しました'
     console.error('Replace error:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: error.value,
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -344,17 +344,17 @@ const importRules = (event: Event) => {
           ...rule,
           id: Date.now().toString() + index,
         }))
-        toast({
+        toast.add({
           title: 'インポート完了',
           description: `${rules.length}個のルールをインポートしました`,
         })
       }
     }
     catch {
-      toast({
+      toast.add({
         title: 'エラー',
         description: 'ファイルの読み込みに失敗しました',
-        variant: 'destructive',
+        color: 'error',
       })
     }
   }
@@ -379,20 +379,20 @@ const sampleTexts = [
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async () => {
   try {
     await copy(outputText.value)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -426,29 +426,31 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card>
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            variant="outline"
-            size="sm"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          variant="outline"
+          size="sm"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 置換ルール -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>置換ルール</CardTitle>
+          <h3 class="font-semibold">
+            置換ルール
+          </h3>
           <div class="flex gap-2">
             <label>
               <input
@@ -456,285 +458,276 @@ useSeoMeta({
                 accept=".json"
                 class="hidden"
                 @change="importRules">
-              <Button variant="outline" size="sm" as="span">
+              <UButton variant="outline" size="sm" as="span">
                 <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
                 インポート
-              </Button>
+              </UButton>
             </label>
-            <Button
+            <UButton
               variant="outline"
               size="sm"
               @click="exportRules">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
               エクスポート
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               @click="addRule">
               <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
               ルール追加
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-3">
-          <div
-            v-for="(rule, index) in replaceRules"
-            :key="rule.id"
-            class="p-3 border rounded-md space-y-3">
-            <div class="flex items-center gap-2">
+      </template>
+      <div class="space-y-3">
+        <div
+          v-for="(rule, index) in replaceRules"
+          :key="rule.id"
+          class="p-3 border rounded-md space-y-3">
+          <div class="flex items-center gap-2">
+            <input
+              v-model="rule.enabled"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            <span class="text-sm font-medium">ルール {{ index + 1 }}</span>
+            <UButton
+              v-if="replaceRules.length > 1"
+              variant="ghost"
+              size="sm"
+              class="ml-auto"
+              @click="removeRule(rule.id)">
+              <Icon name="heroicons:trash" class="w-4 h-4" />
+            </UButton>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="text-sm font-medium mb-1 block">検索文字列</label>
+              <UInput
+                v-model="rule.find"
+                :disabled="!rule.enabled"
+                placeholder="置換したい文字列"
+                class="font-mono" />
+            </div>
+            <div>
+              <label class="text-sm font-medium mb-1 block">置換文字列</label>
+              <UInput
+                v-model="rule.replace"
+                :disabled="!rule.enabled"
+                placeholder="置換後の文字列"
+                class="font-mono" />
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-4 text-sm">
+            <label class="flex items-center gap-2">
               <input
-                v-model="rule.enabled"
+                v-model="rule.regex"
+                :disabled="!rule.enabled"
                 type="checkbox"
                 class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              <span class="text-sm font-medium">ルール {{ index + 1 }}</span>
-              <Button
-                v-if="replaceRules.length > 1"
-                variant="ghost"
-                size="sm"
-                class="ml-auto"
-                @click="removeRule(rule.id)">
-                <Icon name="heroicons:trash" class="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label class="text-sm font-medium mb-1 block">検索文字列</label>
-                <Input
-                  v-model="rule.find"
-                  :disabled="!rule.enabled"
-                  placeholder="置換したい文字列"
-                  class="font-mono" />
-              </div>
-              <div>
-                <label class="text-sm font-medium mb-1 block">置換文字列</label>
-                <Input
-                  v-model="rule.replace"
-                  :disabled="!rule.enabled"
-                  placeholder="置換後の文字列"
-                  class="font-mono" />
-              </div>
-            </div>
-
-            <div class="flex flex-wrap gap-4 text-sm">
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="rule.regex"
-                  :disabled="!rule.enabled"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                正規表現
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="rule.caseSensitive"
-                  :disabled="!rule.enabled"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                大文字小文字を区別
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="rule.global"
-                  :disabled="!rule.enabled"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                全て置換
-              </label>
-            </div>
+              正規表現
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="rule.caseSensitive"
+                :disabled="!rule.enabled"
+                type="checkbox"
+                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+              大文字小文字を区別
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="rule.global"
+                :disabled="!rule.enabled"
+                type="checkbox"
+                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+              全て置換
+            </label>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- サンプル -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルテキスト</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleTexts"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="inputText = sample.text">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルテキスト
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleTexts"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="inputText = sample.text">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 入力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>入力テキスト</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              入力テキスト
+            </h3>
+            <UButton
               v-if="inputText"
               size="sm"
               variant="ghost"
               @click="reset">
               <Icon name="heroicons:x-mark" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="inputText"
-            placeholder="置換したいテキストを入力してください"
-            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
+        </template>
+        <textarea
+          v-model="inputText"
+          placeholder="置換したいテキストを入力してください"
+          class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
 
-          <div class="mt-2 text-sm text-muted-foreground">
-            文字数: {{ statistics.inputLength }}
-          </div>
-        </CardContent>
-      </Card>
+        <div class="mt-2 text-sm text-muted-foreground">
+          文字数: {{ statistics.inputLength }}
+        </div>
+      </UCard>
 
       <!-- 出力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>置換結果</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              置換結果
+            </h3>
+            <UButton
               v-if="outputText"
               size="sm"
               variant="ghost"
               @click="copyToClipboard">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="outputText"
-            readonly
-            placeholder="置換結果がここに表示されます"
-            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-            spellcheck="false"></textarea>
+        </template>
+        <textarea
+          v-model="outputText"
+          readonly
+          placeholder="置換結果がここに表示されます"
+          class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+          spellcheck="false"></textarea>
 
-          <div class="mt-2 text-sm text-muted-foreground">
-            文字数: {{ statistics.outputLength }}
-            <span v-if="statistics.difference !== 0" class="ml-2">
-              ({{ statistics.difference > 0 ? '+' : '' }}{{ statistics.difference }})
-            </span>
-          </div>
+        <div class="mt-2 text-sm text-muted-foreground">
+          文字数: {{ statistics.outputLength }}
+          <span v-if="statistics.difference !== 0" class="ml-2">
+            ({{ statistics.difference > 0 ? '+' : '' }}{{ statistics.difference }})
+          </span>
+        </div>
 
-          <Alert v-if="error" variant="destructive" class="mt-2">
-            <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+        <UAlert
+          v-if="error" class="mt-2" color="error"
+          icon="heroicons:exclamation-circle" :description="error" />
+      </UCard>
     </div>
 
     <!-- プレビュー -->
-    <Card v-if="previewDiff && previewDiff.length > 0">
-      <CardHeader>
-        <CardTitle>変更プレビュー（最初の10件）</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <div
-            v-for="(change, index) in previewDiff"
-            :key="index"
-            class="flex items-center gap-2 text-sm">
-            <code class="px-2 py-1 bg-red-100 text-red-800 rounded">{{ change.before }}</code>
-            <Icon name="heroicons:arrow-right" class="w-4 h-4 text-muted-foreground" />
-            <code class="px-2 py-1 bg-green-100 text-green-800 rounded">{{ change.after }}</code>
-            <span class="text-xs text-muted-foreground ml-2">位置: {{ change.position }}</span>
-          </div>
+    <UCard v-if="previewDiff && previewDiff.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          変更プレビュー（最初の10件）
+        </h3>
+      </template>
+      <div class="space-y-2">
+        <div
+          v-for="(change, index) in previewDiff"
+          :key="index"
+          class="flex items-center gap-2 text-sm">
+          <code class="px-2 py-1 bg-red-100 text-red-800 rounded">{{ change.before }}</code>
+          <Icon name="heroicons:arrow-right" class="w-4 h-4 text-muted-foreground" />
+          <code class="px-2 py-1 bg-green-100 text-green-800 rounded">{{ change.after }}</code>
+          <span class="text-xs text-muted-foreground ml-2">位置: {{ change.position }}</span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 統計情報 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>統計情報</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div>
-            <p class="text-2xl font-bold">
-              {{ statistics.inputLength }}
-            </p>
-            <p class="text-sm text-muted-foreground">
-              入力文字数
-            </p>
-          </div>
-          <div>
-            <p class="text-2xl font-bold">
-              {{ statistics.outputLength }}
-            </p>
-            <p class="text-sm text-muted-foreground">
-              出力文字数
-            </p>
-          </div>
-          <div>
-            <p class="text-2xl font-bold">
-              {{ Math.abs(statistics.difference) }}
-            </p>
-            <p class="text-sm text-muted-foreground">
-              文字数{{ statistics.difference >= 0 ? '増加' : '減少' }}
-            </p>
-          </div>
-          <div>
-            <p class="text-2xl font-bold">
-              {{ statistics.activeRules }}
-            </p>
-            <p class="text-sm text-muted-foreground">
-              有効なルール
-            </p>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          統計情報
+        </h3>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div>
+          <p class="text-2xl font-bold">
+            {{ statistics.inputLength }}
+          </p>
+          <p class="text-sm text-muted-foreground">
+            入力文字数
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <p class="text-2xl font-bold">
+            {{ statistics.outputLength }}
+          </p>
+          <p class="text-sm text-muted-foreground">
+            出力文字数
+          </p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold">
+            {{ Math.abs(statistics.difference) }}
+          </p>
+          <p class="text-sm text-muted-foreground">
+            文字数{{ statistics.difference >= 0 ? '増加' : '減少' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold">
+            {{ statistics.activeRules }}
+          </p>
+          <p class="text-sm text-muted-foreground">
+            有効なルール
+          </p>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>使い方</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              基本的な使い方
-            </h3>
-            <ol class="list-decimal list-inside space-y-1">
-              <li>置換ルールを設定（検索文字列と置換文字列）</li>
-              <li>必要に応じてオプションを設定</li>
-              <li>テキストを入力すると自動的に置換</li>
-              <li>複数のルールを追加して一括処理も可能</li>
-            </ol>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              正規表現の例
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><code>\\d+</code> - 数字の連続</li>
-              <li><code>\\s+</code> - 空白文字の連続</li>
-              <li><code>^.*$</code> - 行全体</li>
-              <li><code>(\\w+)@(\\w+\\.\\w+)</code> - メールアドレス</li>
-              <li><code>\\$1, \\$2</code> - キャプチャグループの参照</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              正規表現を使用する場合は、エスケープが必要な文字に注意してください。
-              バックスラッシュは「\\」のように二重にする必要があります。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          使い方
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            基本的な使い方
+          </h3>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>置換ルールを設定（検索文字列と置換文字列）</li>
+            <li>必要に応じてオプションを設定</li>
+            <li>テキストを入力すると自動的に置換</li>
+            <li>複数のルールを追加して一括処理も可能</li>
+          </ol>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            正規表現の例
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><code>\\d+</code> - 数字の連続</li>
+            <li><code>\\s+</code> - 空白文字の連続</li>
+            <li><code>^.*$</code> - 行全体</li>
+            <li><code>(\\w+)@(\\w+\\.\\w+)</code> - メールアドレス</li>
+            <li><code>\\$1, \\$2</code> - キャプチャグループの参照</li>
+          </ul>
+        </div>
+        <UAlert icon="heroicons:information-circle" description="正規表現を使用する場合は、エスケープが必要な文字に注意してください。 バックスラッシュは「\\」のように二重にする必要があります。" />
+      </div>
+    </UCard>
   </div>
 </template>

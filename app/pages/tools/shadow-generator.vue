@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
-import { Slider } from '~/components/ui/slider'
 
 definePageMeta({
   layout: 'tools',
@@ -133,22 +129,22 @@ const tailwindCode = computed(() => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       title: 'コピーしました',
       description: '正常にコピーされました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -172,53 +168,55 @@ useSeoMeta({
     </div>
 
     <!-- プリセットセクション -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-6 gap-3">
-          <button
-            v-for="preset in shadowPresets"
-            :key="preset.label"
-            class="p-4 rounded-lg border hover:border-primary transition-colors text-center"
-            @click="selectPreset(preset.value)">
-            <div
-              class="w-12 h-12 mx-auto mb-2 bg-white rounded"
-              :style="{
-                boxShadow: preset.value
-                  .map(s => {
-                    const inset = s.inset ? 'inset ' : ''
-                    const color = `${s.color}${Math.round(s.opacity * 2.55).toString(16).padStart(2, '0')}`
-                    return `${inset}${s.x}px ${s.y}px ${s.blur}px ${s.spread}px ${color}`
-                  })
-                  .join(', '),
-              }">
-            </div>
-            <div class="text-xs font-medium">
-              {{ preset.label }}
-            </div>
-          </button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+      <div class="grid grid-cols-6 gap-3">
+        <button
+          v-for="preset in shadowPresets"
+          :key="preset.label"
+          class="p-4 rounded-lg border hover:border-primary transition-colors text-center"
+          @click="selectPreset(preset.value)">
+          <div
+            class="w-12 h-12 mx-auto mb-2 bg-white rounded"
+            :style="{
+              boxShadow: preset.value
+                .map(s => {
+                  const inset = s.inset ? 'inset ' : ''
+                  const color = `${s.color}${Math.round(s.opacity * 2.55).toString(16).padStart(2, '0')}`
+                  return `${inset}${s.x}px ${s.y}px ${s.blur}px ${s.spread}px ${color}`
+                })
+                .join(', '),
+            }">
+          </div>
+          <div class="text-xs font-medium">
+            {{ preset.label }}
+          </div>
+        </button>
+      </div>
+    </UCard>
     <!-- 左側：コントロールパネル -->
     <div class="space-y-6">
       <!-- ボックス設定 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>ボックス設定</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            ボックス設定
+          </h3>
+        </template>
+        <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="text-sm font-medium mb-2 block">ボックスカラー</label>
               <div class="flex gap-2">
-                <Input
+                <UInput
                   v-model="boxColor"
                   type="color"
                   class="w-12 h-10 p-1 cursor-pointer" />
-                <Input
+                <UInput
                   v-model="boxColor"
                   type="text"
                   class="flex-1" />
@@ -227,11 +225,11 @@ useSeoMeta({
             <div>
               <label class="text-sm font-medium mb-2 block">背景カラー</label>
               <div class="flex gap-2">
-                <Input
+                <UInput
                   v-model="boxBackground"
                   type="color"
                   class="w-12 h-10 p-1 cursor-pointer" />
-                <Input
+                <UInput
                   v-model="boxBackground"
                   type="text"
                   class="flex-1" />
@@ -242,41 +240,43 @@ useSeoMeta({
             <label class="text-sm font-medium mb-2 block">
               ボックスサイズ: {{ boxSize }}px
             </label>
-            <Slider
-              :model-value="[boxSize]"
+            <USlider
+              :model-value="boxSize"
               :min="50"
               :max="300"
               :step="1"
-              @update:model-value="(value) => { if (value) boxSize = value[0] }" />
+              @update:model-value="(value) => { if (value != null) boxSize = value }" />
           </div>
           <div>
             <label class="text-sm font-medium mb-2 block">
               角丸: {{ borderRadius }}px
             </label>
-            <Slider
-              :model-value="[borderRadius]"
+            <USlider
+              :model-value="borderRadius"
               :min="0"
               :max="50"
               :step="1"
-              @update:model-value="(value) => { if (value) borderRadius = value[0] }" />
+              @update:model-value="(value) => { if (value != null) borderRadius = value }" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- シャドウ設定 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>シャドウ設定</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              シャドウ設定
+            </h3>
+            <UButton
               size="sm"
               @click="addShadow">
               <Icon name="heroicons:plus" class="w-4 h-4 mr-1" />
               追加
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent class="space-y-4">
+        </template>
+        <div class="space-y-4">
           <div
             v-for="(shadow, index) in shadows"
             :key="index"
@@ -285,61 +285,61 @@ useSeoMeta({
               <h4 class="text-sm font-medium">
                 シャドウ {{ index + 1 }}
               </h4>
-              <Button
+              <UButton
                 v-if="shadows.length > 1"
                 size="sm"
                 variant="ghost"
                 @click="removeShadow(index)">
                 <Icon name="heroicons:x-mark" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="text-xs mb-1 block">X: {{ shadow.x }}px</label>
-                <Slider
-                  :model-value="[shadow.x]"
+                <USlider
+                  :model-value="shadow.x"
                   :min="-100"
                   :max="100"
                   :step="1"
-                  @update:model-value="(value) => { if (value) shadow.x = value[0] }" />
+                  @update:model-value="(value) => { if (value != null) shadow.x = value }" />
               </div>
               <div>
                 <label class="text-xs mb-1 block">Y: {{ shadow.y }}px</label>
-                <Slider
-                  :model-value="[shadow.y]"
+                <USlider
+                  :model-value="shadow.y"
                   :min="-100"
                   :max="100"
                   :step="1"
-                  @update:model-value="(value) => { if (value) shadow.y = value[0] }" />
+                  @update:model-value="(value) => { if (value != null) shadow.y = value }" />
               </div>
               <div>
                 <label class="text-xs mb-1 block">ぼかし: {{ shadow.blur }}px</label>
-                <Slider
-                  :model-value="[shadow.blur]"
+                <USlider
+                  :model-value="shadow.blur"
                   :min="0"
                   :max="100"
                   :step="1"
-                  @update:model-value="(value) => { if (value) shadow.blur = value[0] }" />
+                  @update:model-value="(value) => { if (value != null) shadow.blur = value }" />
               </div>
               <div>
                 <label class="text-xs mb-1 block">広がり: {{ shadow.spread }}px</label>
-                <Slider
-                  :model-value="[shadow.spread]"
+                <USlider
+                  :model-value="shadow.spread"
                   :min="-50"
                   :max="50"
                   :step="1"
-                  @update:model-value="(value) => { if (value) shadow.spread = value[0] }" />
+                  @update:model-value="(value) => { if (value != null) shadow.spread = value }" />
               </div>
             </div>
             <div class="flex items-center gap-3">
               <div class="flex-1">
                 <label class="text-xs mb-1 block">カラー</label>
                 <div class="flex gap-2">
-                  <Input
+                  <UInput
                     v-model="shadow.color"
                     type="color"
                     class="w-10 h-8 p-1 cursor-pointer" />
-                  <Input
+                  <UInput
                     v-model="shadow.color"
                     type="text"
                     class="flex-1 h-8" />
@@ -347,12 +347,12 @@ useSeoMeta({
               </div>
               <div class="w-24">
                 <label class="text-xs mb-1 block">不透明度 {{ shadow.opacity }}%</label>
-                <Slider
-                  :model-value="[shadow.opacity]"
+                <USlider
+                  :model-value="shadow.opacity"
                   :min="0"
                   :max="100"
                   :step="1"
-                  @update:model-value="(value) => { if (value) shadow.opacity = value[0] }" />
+                  @update:model-value="(value) => { if (value != null) shadow.opacity = value }" />
               </div>
               <div>
                 <label class="flex items-center gap-2 text-xs">
@@ -365,52 +365,54 @@ useSeoMeta({
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- 右側：プレビューと結果 -->
     <div class="space-y-6">
       <!-- プレビュー -->
-      <Card>
-        <CardHeader>
-          <CardTitle>プレビュー</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            プレビュー
+          </h3>
+        </template>
+        <div
+          class="flex items-center justify-center p-12 rounded-lg"
+          :style="{ backgroundColor: boxBackground }">
           <div
-            class="flex items-center justify-center p-12 rounded-lg"
-            :style="{ backgroundColor: boxBackground }">
-            <div
-              :style="{
-                width: `${boxSize}px`,
-                height: `${boxSize}px`,
-                backgroundColor: boxColor,
-                boxShadow: boxShadowCSS,
-                borderRadius: `${borderRadius}px`,
-              }">
-            </div>
+            :style="{
+              width: `${boxSize}px`,
+              height: `${boxSize}px`,
+              backgroundColor: boxColor,
+              boxShadow: boxShadowCSS,
+              borderRadius: `${borderRadius}px`,
+            }">
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- 生成されたコード -->
-      <Card>
-        <CardHeader>
-          <CardTitle>生成されたコード</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            生成されたコード
+          </h3>
+        </template>
+        <div class="space-y-4">
           <!-- CSS -->
           <div>
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-medium">
                 CSS
               </h4>
-              <Button
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(cssCode)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
             <div class="p-3 bg-muted rounded-md">
               <code class="text-sm whitespace-pre">{{ cssCode }}</code>
@@ -423,12 +425,12 @@ useSeoMeta({
               <h4 class="text-sm font-medium">
                 Tailwind CSS
               </h4>
-              <Button
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(tailwindCode)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
             <div class="p-3 bg-muted rounded-md">
               <code class="text-sm">{{ tailwindCode }}</code>
@@ -437,8 +439,8 @@ useSeoMeta({
               ※ 複雑なシャドウはstyle属性で指定: style="{{ boxShadowCSS }}"
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
   </div>
 </template>

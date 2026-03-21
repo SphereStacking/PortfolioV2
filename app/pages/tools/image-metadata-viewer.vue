@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog, useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 definePageMeta({
   layout: 'tools',
 })
 
-const { toast } = useToast()
+const toast = useToast()
 
 // 画像データ
 const imageUrl = ref<string>('')
@@ -46,10 +44,10 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 // ファイル処理
 const handleFile = async (file: File) => {
   if (!file.type.startsWith('image/')) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -193,7 +191,7 @@ const copyMetadata = async () => {
   const { copy } = useClipboard()
   await copy(text)
 
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'メタデータをクリップボードにコピーしました',
   })
@@ -227,7 +225,7 @@ const downloadWithoutMetadata = () => {
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      toast({
+      toast.add({
         title: 'ダウンロード完了',
         description: 'メタデータを削除した画像をダウンロードしました',
       })
@@ -269,100 +267,104 @@ useSeoMeta({
       </p>
     </div>
     <!-- 入力エリア -->
-    <Card>
-      <CardHeader>
-        <CardTitle>画像選択</CardTitle>
-        <CardDescription>
-          メタデータを確認したい画像をアップロード
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div
-          ref="dropZoneRef"
-          :class="[
-            'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-            isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
-          ]"
-          @click="openFileDialog">
-          <div v-if="!imageUrl">
-            <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p class="text-sm text-muted-foreground mb-2">
-              クリックまたはドロップで画像を選択
-            </p>
-            <p class="text-xs text-muted-foreground">
-              JPEG, PNG, GIF, WebP, AVIF対応
-            </p>
-          </div>
-          <div v-else class="space-y-4">
-            <img
-              :src="imageUrl"
-              alt="Selected"
-              class="max-w-full max-h-[300px] mx-auto rounded">
-            <Button
-              variant="outline"
-              size="sm"
-              @click.stop="clearAll">
-              別の画像を選択
-            </Button>
-          </div>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            画像選択
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            メタデータを確認したい画像をアップロード
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div
+        ref="dropZoneRef"
+        :class="[
+          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+          isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+        ]"
+        @click="openFileDialog">
+        <div v-if="!imageUrl">
+          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p class="text-sm text-muted-foreground mb-2">
+            クリックまたはドロップで画像を選択
+          </p>
+          <p class="text-xs text-muted-foreground">
+            JPEG, PNG, GIF, WebP, AVIF対応
+          </p>
+        </div>
+        <div v-else class="space-y-4">
+          <img
+            :src="imageUrl"
+            alt="Selected"
+            class="max-w-full max-h-[300px] mx-auto rounded">
+          <UButton
+            variant="outline"
+            size="sm"
+            @click.stop="clearAll">
+            別の画像を選択
+          </UButton>
+        </div>
+      </div>
+    </UCard>
     <!-- メタデータ表示 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>メタデータ</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              メタデータ
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               画像に含まれる情報
-            </CardDescription>
+            </p>
           </div>
           <div class="flex gap-2">
-            <Button
+            <UButton
               v-if="Object.keys(metadata).length > 0"
               size="sm"
               variant="outline"
               @click="copyMetadata">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="imageUrl"
               size="sm"
               variant="outline"
               @click="downloadWithoutMetadata">
               <Icon name="heroicons:shield-check" class="w-4 h-4 mr-1" />
               メタデータ削除
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="Object.keys(metadata).length > 0" class="space-y-2">
-          <div
-            v-for="(value, key) in metadata"
-            :key="key"
-            class="grid grid-cols-2 gap-2 py-2 border-b last:border-0">
-            <div class="text-sm font-medium">
-              {{ key }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              {{ value }}
-            </div>
+      </template>
+      <div v-if="Object.keys(metadata).length > 0" class="space-y-2">
+        <div
+          v-for="(value, key) in metadata"
+          :key="key"
+          class="grid grid-cols-2 gap-2 py-2 border-b last:border-0">
+          <div class="text-sm font-medium">
+            {{ key }}
+          </div>
+          <div class="text-sm text-muted-foreground">
+            {{ value }}
           </div>
         </div>
-        <div v-else class="text-center py-12 text-muted-foreground">
-          <Icon name="heroicons:information-circle" class="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p>画像を選択するとメタデータが表示されます</p>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div v-else class="text-center py-12 text-muted-foreground">
+        <Icon name="heroicons:information-circle" class="w-12 h-12 mx-auto mb-4 opacity-20" />
+        <p>画像を選択するとメタデータが表示されます</p>
+      </div>
+    </UCard>
     <!-- 説明 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>メタデータについて</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4 text-sm text-muted-foreground">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          メタデータについて
+        </h3>
+      </template>
+      <div class="space-y-4 text-sm text-muted-foreground">
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <h4 class="font-semibold mb-2 text-foreground">
@@ -394,7 +396,7 @@ useSeoMeta({
             完全なExif情報の表示には対応していない場合があります。
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

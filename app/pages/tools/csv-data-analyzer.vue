@@ -81,7 +81,7 @@ const analyzeData = () => {
     // 統計計算
     calculateStatistics()
 
-    toast({
+    toast.add({
       description: `${parsedData.value.length}行のデータを解析しました`,
     })
   }
@@ -257,9 +257,9 @@ const handleFileUpload = (event: Event) => {
 // エクスポート
 const exportFiltered = (format: 'csv' | 'json') => {
   if (parsedData.value.length === 0) {
-    toast({
+    toast.add({
       description: 'エクスポートするデータがありません',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -405,20 +405,20 @@ watch([chartData, chartType, showChart], () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -442,266 +442,271 @@ useSeoMeta({
     </div>
 
     <!-- データ入力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>データ入力</CardTitle>
+          <h3 class="font-semibold">
+            データ入力
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               variant="outline"
               size="sm"
               @click="loadSample">
               サンプル読み込み
-            </Button>
+            </UButton>
             <label>
               <input
                 type="file"
                 accept=".csv"
                 class="hidden"
                 @change="handleFileUpload">
-              <Button variant="outline" size="sm" as="span">
+              <UButton variant="outline" size="sm" as="span">
                 <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
                 CSVファイル
-              </Button>
+              </UButton>
             </label>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <textarea
-            v-model="csvData"
-            placeholder="CSVデータを貼り付けるか、ファイルを選択してください&#10;例：&#10;名前,年齢,職業&#10;田中太郎,28,エンジニア&#10;佐藤花子,32,デザイナー"
-            class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
+      </template>
 
-          <Alert v-if="error" variant="destructive">
-            <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
+      <div class="space-y-4">
+        <textarea
+          v-model="csvData"
+          placeholder="CSVデータを貼り付けるか、ファイルを選択してください&#10;例：&#10;名前,年齢,職業&#10;田中太郎,28,エンジニア&#10;佐藤花子,32,デザイナー"
+          class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
 
-          <Button
-            class="w-full"
-            :disabled="!csvData.trim()"
-            @click="analyzeData">
-            <Icon name="heroicons:chart-bar" class="w-4 h-4 mr-2" />
-            データを分析
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        <UAlert
+          v-if="error" color="error" icon="heroicons:exclamation-circle"
+          :description="error" />
+
+        <UButton
+          class="w-full"
+          :disabled="!csvData.trim()"
+          @click="analyzeData">
+          <Icon name="heroicons:chart-bar" class="w-4 h-4 mr-2" />
+          データを分析
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- データプレビューと統計 -->
     <div v-if="parsedData.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- データプレビュー -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>データプレビュー</CardTitle>
+            <h3 class="font-semibold">
+              データプレビュー
+            </h3>
             <div class="text-sm text-muted-foreground">
               {{ parsedData.length }}行 × {{ headers.length }}列
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead v-for="header in headers.slice(0, 6)" :key="header">
-                    {{ header }}
-                  </TableHead>
-                  <TableHead v-if="headers.length > 6">
-                    ...
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-for="(row, index) in parsedData.slice(0, 10)" :key="index">
-                  <TableCell v-for="(cell, cellIndex) in row.slice(0, 6)" :key="cellIndex" class="max-w-32 truncate">
-                    {{ cell }}
-                  </TableCell>
-                  <TableCell v-if="row.length > 6">
-                    ...
-                  </TableCell>
-                </TableRow>
-                <TableRow v-if="parsedData.length > 10">
-                  <TableCell :colspan="Math.min(headers.length, 7)" class="text-center text-muted-foreground">
-                    ...他 {{ parsedData.length - 10 }}行
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+        </template>
+
+        <div class="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead v-for="header in headers.slice(0, 6)" :key="header">
+                  {{ header }}
+                </TableHead>
+                <TableHead v-if="headers.length > 6">
+                  ...
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="(row, index) in parsedData.slice(0, 10)" :key="index">
+                <TableCell v-for="(cell, cellIndex) in row.slice(0, 6)" :key="cellIndex" class="max-w-32 truncate">
+                  {{ cell }}
+                </TableCell>
+                <TableCell v-if="row.length > 6">
+                  ...
+                </TableCell>
+              </TableRow>
+              <TableRow v-if="parsedData.length > 10">
+                <TableCell :colspan="Math.min(headers.length, 7)" class="text-center text-muted-foreground">
+                  ...他 {{ parsedData.length - 10 }}行
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </UCard>
 
       <!-- 基本統計 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>基本統計</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4 max-h-96 overflow-y-auto">
-            <div v-for="(stat, column) in statistics" :key="column" class="p-3 border rounded-md">
-              <h3 class="font-medium mb-2">
-                {{ column }}
-              </h3>
-              <div class="grid grid-cols-2 gap-2 text-sm">
-                <div>件数: {{ stat.count }}</div>
-                <div>ユニーク: {{ stat.unique }}</div>
-                <div v-if="stat.missing > 0" class="col-span-2 text-destructive">
-                  欠損値: {{ stat.missing }}
-                </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            基本統計
+          </h3>
+        </template>
 
-                <template v-if="stat.isNumeric">
-                  <div>最小値: {{ stat.min }}</div>
-                  <div>最大値: {{ stat.max }}</div>
-                  <div>平均: {{ stat.mean }}</div>
-                  <div>中央値: {{ stat.median }}</div>
-                  <div>合計: {{ stat.sum }}</div>
-                  <div>標準偏差: {{ stat.std }}</div>
-                </template>
-
-                <template v-else>
-                  <div class="col-span-2">
-                    <div class="text-xs text-muted-foreground mb-1">
-                      上位値:
-                    </div>
-                    <div v-for="item in stat.topValues.slice(0, 3)" :key="item.value" class="text-xs">
-                      {{ item.value }}: {{ item.count }}件 ({{ item.percentage }}%)
-                    </div>
-                  </div>
-                </template>
+        <div class="space-y-4 max-h-96 overflow-y-auto">
+          <div v-for="(stat, column) in statistics" :key="column" class="p-3 border rounded-md">
+            <h3 class="font-medium mb-2">
+              {{ column }}
+            </h3>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div>件数: {{ stat.count }}</div>
+              <div>ユニーク: {{ stat.unique }}</div>
+              <div v-if="stat.missing > 0" class="col-span-2 text-destructive">
+                欠損値: {{ stat.missing }}
               </div>
+
+              <template v-if="stat.isNumeric">
+                <div>最小値: {{ stat.min }}</div>
+                <div>最大値: {{ stat.max }}</div>
+                <div>平均: {{ stat.mean }}</div>
+                <div>中央値: {{ stat.median }}</div>
+                <div>合計: {{ stat.sum }}</div>
+                <div>標準偏差: {{ stat.std }}</div>
+              </template>
+
+              <template v-else>
+                <div class="col-span-2">
+                  <div class="text-xs text-muted-foreground mb-1">
+                    上位値:
+                  </div>
+                  <div v-for="item in stat.topValues.slice(0, 3)" :key="item.value" class="text-xs">
+                    {{ item.value }}: {{ item.count }}件 ({{ item.percentage }}%)
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- グラフ機能 -->
-    <Card v-if="parsedData.length > 0">
-      <CardHeader>
-        <CardTitle>データ可視化</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <!-- 列選択 -->
-          <div>
-            <label class="text-sm font-medium mb-2 block">グラフ化する列を選択</label>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-              <label v-for="header in headers" :key="header" class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="selectedColumns"
-                  type="checkbox"
-                  :value="header"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                {{ header }}
-              </label>
-            </div>
-          </div>
+    <UCard v-if="parsedData.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          データ可視化
+        </h3>
+      </template>
 
-          <!-- チャートタイプ選択 -->
-          <div v-if="selectedColumns.length > 0">
-            <label class="text-sm font-medium mb-2 block">グラフの種類</label>
-            <div class="flex gap-2">
-              <Button
-                v-for="type in ['bar', 'line', 'pie']"
-                :key="type"
-                :variant="chartType === type ? 'default' : 'outline'"
-                size="sm"
-                @click="chartType = type">
-                {{ type === 'bar' ? '棒グラフ' : type === 'line' ? '線グラフ' : '円グラフ' }}
-              </Button>
-            </div>
-          </div>
-
-          <div class="flex gap-2">
-            <Button
-              :disabled="selectedColumns.length === 0"
-              @click="showChart = !showChart">
-              <Icon name="heroicons:chart-bar" class="w-4 h-4 mr-2" />
-              {{ showChart ? 'グラフを非表示' : 'グラフを表示' }}
-            </Button>
-          </div>
-
-          <!-- グラフ表示 -->
-          <div v-if="showChart && chartData" class="border rounded-md p-4">
-            <canvas
-              id="chart-canvas"
-              width="600"
-              height="400"
-              class="max-w-full h-auto"></canvas>
+      <div class="space-y-4">
+        <!-- 列選択 -->
+        <div>
+          <label class="text-sm font-medium mb-2 block">グラフ化する列を選択</label>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <label v-for="header in headers" :key="header" class="flex items-center gap-2 text-sm">
+              <input
+                v-model="selectedColumns"
+                type="checkbox"
+                :value="header"
+                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+              {{ header }}
+            </label>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- チャートタイプ選択 -->
+        <div v-if="selectedColumns.length > 0">
+          <label class="text-sm font-medium mb-2 block">グラフの種類</label>
+          <div class="flex gap-2">
+            <UButton
+              v-for="type in ['bar', 'line', 'pie']"
+              :key="type"
+              :variant="chartType === type ? 'default' : 'outline'"
+              size="sm"
+              @click="chartType = type">
+              {{ type === 'bar' ? '棒グラフ' : type === 'line' ? '線グラフ' : '円グラフ' }}
+            </UButton>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <UButton
+            :disabled="selectedColumns.length === 0"
+            @click="showChart = !showChart">
+            <Icon name="heroicons:chart-bar" class="w-4 h-4 mr-2" />
+            {{ showChart ? 'グラフを非表示' : 'グラフを表示' }}
+          </UButton>
+        </div>
+
+        <!-- グラフ表示 -->
+        <div v-if="showChart && chartData" class="border rounded-md p-4">
+          <canvas
+            id="chart-canvas"
+            width="600"
+            height="400"
+            class="max-w-full h-auto"></canvas>
+        </div>
+      </div>
+    </UCard>
 
     <!-- エクスポート -->
-    <Card v-if="parsedData.length > 0">
-      <CardHeader>
-        <CardTitle>データエクスポート</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <p class="text-sm text-muted-foreground">
-            選択した列のデータをエクスポートできます
-            {{ selectedColumns.length > 0 ? `（${selectedColumns.length}列選択中）` : '（全列）' }}
-          </p>
-          <div class="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              @click="exportFiltered('csv')">
-              <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
-              CSV形式でダウンロード
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              @click="exportFiltered('json')">
-              <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
-              JSON形式でダウンロード
-            </Button>
-          </div>
+    <UCard v-if="parsedData.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          データエクスポート
+        </h3>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-sm text-muted-foreground">
+          選択した列のデータをエクスポートできます
+          {{ selectedColumns.length > 0 ? `（${selectedColumns.length}列選択中）` : '（全列）' }}
+        </p>
+        <div class="flex gap-2">
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="exportFiltered('csv')">
+            <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
+            CSV形式でダウンロード
+          </UButton>
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="exportFiltered('json')">
+            <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
+            JSON形式でダウンロード
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>機能説明</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              対応機能
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>CSVファイルの読み込みと解析</li>
-              <li>基本統計量の計算（平均、中央値、標準偏差など）</li>
-              <li>カテゴリデータの度数分析</li>
-              <li>簡易グラフ生成（棒・線・円グラフ）</li>
-              <li>データのフィルタリングとエクスポート</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              使用方法
-            </h3>
-            <ol class="list-decimal list-inside space-y-1">
-              <li>CSVファイルをアップロードまたは直接入力</li>
-              <li>「データを分析」ボタンをクリック</li>
-              <li>統計結果を確認</li>
-              <li>必要に応じてグラフを生成</li>
-              <li>結果をエクスポート</li>
-            </ol>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          機能説明
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            対応機能
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>CSVファイルの読み込みと解析</li>
+            <li>基本統計量の計算（平均、中央値、標準偏差など）</li>
+            <li>カテゴリデータの度数分析</li>
+            <li>簡易グラフ生成（棒・線・円グラフ）</li>
+            <li>データのフィルタリングとエクスポート</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            使用方法
+          </h3>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>CSVファイルをアップロードまたは直接入力</li>
+            <li>「データを分析」ボタンをクリック</li>
+            <li>統計結果を確認</li>
+            <li>必要に応じてグラフを生成</li>
+            <li>結果をエクスポート</li>
+          </ol>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

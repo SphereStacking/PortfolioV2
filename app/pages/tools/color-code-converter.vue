@@ -370,20 +370,20 @@ const cssVariables = computed(() => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -414,461 +414,466 @@ useSeoMeta({
     </div>
 
     <!-- カラーピッカーとプレビュー -->
-    <Card>
-      <CardHeader>
-        <CardTitle>色の選択</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">カラーピッカー</label>
-              <div class="flex gap-4 items-center">
-                <input
-                  v-model="colorPicker"
-                  type="color"
-                  class="w-20 h-20 rounded cursor-pointer"
-                  :style="{ backgroundColor: computedHex }">
-                <div class="flex-1">
-                  <p class="font-mono text-lg">
-                    {{ computedHex }}
-                  </p>
-                  <p class="text-sm text-muted-foreground">
-                    近似色: {{ getClosestColorName(computedHex) }}
-                  </p>
-                </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          色の選択
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">カラーピッカー</label>
+            <div class="flex gap-4 items-center">
+              <input
+                v-model="colorPicker"
+                type="color"
+                class="w-20 h-20 rounded cursor-pointer"
+                :style="{ backgroundColor: computedHex }">
+              <div class="flex-1">
+                <p class="font-mono text-lg">
+                  {{ computedHex }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  近似色: {{ getClosestColorName(computedHex) }}
+                </p>
               </div>
             </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                透明度: {{ alpha[0] }}%
-              </label>
-              <Slider
-                :model-value="alpha"
-                :min="0"
-                :max="100"
-                :step="1"
-                class="w-full"
-                @update:model-value="alpha = $event" />
-            </div>
           </div>
 
-          <div
-            class="h-40 rounded-lg border-2"
-            :style="{ backgroundColor: formatRgba }">
-            <div class="h-full w-full flex items-center justify-center">
-              <span class="text-sm font-mono px-3 py-1 rounded bg-background/80">
-                {{ formatRgba }}
-              </span>
-            </div>
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              透明度: {{ alpha[0] }}%
+            </label>
+            <Slider
+              :model-value="alpha"
+              :min="0"
+              :max="100"
+              :step="1"
+              class="w-full"
+              @update:model-value="alpha = $event" />
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div
+          class="h-40 rounded-lg border-2"
+          :style="{ backgroundColor: formatRgba }">
+          <div class="h-full w-full flex items-center justify-center">
+            <span class="text-sm font-mono px-3 py-1 rounded bg-background/80">
+              {{ formatRgba }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 色形式変換 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>色形式変換</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <!-- HEX -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-medium">
-                HEX
-              </h3>
-              <Button
-                size="sm"
-                variant="ghost"
-                @click="copyToClipboard(computedHex)">
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-            </div>
-            <div class="flex gap-2">
-              <Input
-                v-model="hexInput"
-                placeholder="#FF0000"
-                class="font-mono"
-                @focus="activeFormat = 'hex'" />
-              <Badge variant="outline" class="px-3">
-                {{ computedHex }}
-              </Badge>
-            </div>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          色形式変換
+        </h3>
+      </template>
 
-          <!-- RGB -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-medium">
-                RGB / RGBA
-              </h3>
-              <div class="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="copyToClipboard(formatRgb)">
-                  RGB
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="copyToClipboard(formatRgba)">
-                  RGBA
-                </Button>
-              </div>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="text-xs text-muted-foreground">R</label>
-                <Input
-                  v-model.number="rgbInput.r"
-                  type="number"
-                  min="0"
-                  max="255"
-                  class="font-mono"
-                  @focus="activeFormat = 'rgb'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">G</label>
-                <Input
-                  v-model.number="rgbInput.g"
-                  type="number"
-                  min="0"
-                  max="255"
-                  class="font-mono"
-                  @focus="activeFormat = 'rgb'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">B</label>
-                <Input
-                  v-model.number="rgbInput.b"
-                  type="number"
-                  min="0"
-                  max="255"
-                  class="font-mono"
-                  @focus="activeFormat = 'rgb'" />
-              </div>
-            </div>
-            <div class="text-sm text-muted-foreground font-mono">
-              {{ formatRgb }} / {{ formatRgba }}
-            </div>
+      <div class="space-y-4">
+        <!-- HEX -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-medium">
+              HEX
+            </h3>
+            <UButton
+              size="sm"
+              variant="ghost"
+              @click="copyToClipboard(computedHex)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
           </div>
-
-          <!-- HSL -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-medium">
-                HSL / HSLA
-              </h3>
-              <div class="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="copyToClipboard(formatHsl)">
-                  HSL
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="copyToClipboard(formatHsla)">
-                  HSLA
-                </Button>
-              </div>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="text-xs text-muted-foreground">H (°)</label>
-                <Input
-                  v-model.number="hslInput.h"
-                  type="number"
-                  min="0"
-                  max="360"
-                  class="font-mono"
-                  @focus="activeFormat = 'hsl'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">S (%)</label>
-                <Input
-                  v-model.number="hslInput.s"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'hsl'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">L (%)</label>
-                <Input
-                  v-model.number="hslInput.l"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'hsl'" />
-              </div>
-            </div>
-            <div class="text-sm text-muted-foreground font-mono">
-              {{ formatHsl }} / {{ formatHsla }}
-            </div>
-          </div>
-
-          <!-- HSV -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-medium">
-                HSV / HSB
-              </h3>
-              <Button
-                size="sm"
-                variant="ghost"
-                @click="copyToClipboard(`hsv(${computedHsv.h}, ${computedHsv.s}%, ${computedHsv.v}%)`)">
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="text-xs text-muted-foreground">H (°)</label>
-                <Input
-                  v-model.number="hsvInput.h"
-                  type="number"
-                  min="0"
-                  max="360"
-                  class="font-mono"
-                  @focus="activeFormat = 'hsv'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">S (%)</label>
-                <Input
-                  v-model.number="hsvInput.s"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'hsv'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">V (%)</label>
-                <Input
-                  v-model.number="hsvInput.v"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'hsv'" />
-              </div>
-            </div>
-            <div class="text-sm text-muted-foreground font-mono">
-              hsv({{ computedHsv.h }}, {{ computedHsv.s }}%, {{ computedHsv.v }}%)
-            </div>
-          </div>
-
-          <!-- CMYK -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <h3 class="font-medium">
-                CMYK
-              </h3>
-              <Button
-                size="sm"
-                variant="ghost"
-                @click="copyToClipboard(formatCmyk)">
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-            </div>
-            <div class="grid grid-cols-4 gap-2">
-              <div>
-                <label class="text-xs text-muted-foreground">C (%)</label>
-                <Input
-                  v-model.number="cmykInput.c"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'cmyk'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">M (%)</label>
-                <Input
-                  v-model.number="cmykInput.m"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'cmyk'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">Y (%)</label>
-                <Input
-                  v-model.number="cmykInput.y"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'cmyk'" />
-              </div>
-              <div>
-                <label class="text-xs text-muted-foreground">K (%)</label>
-                <Input
-                  v-model.number="cmykInput.k"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="font-mono"
-                  @focus="activeFormat = 'cmyk'" />
-              </div>
-            </div>
-            <div class="text-sm text-muted-foreground font-mono">
-              {{ formatCmyk }}
-            </div>
+          <div class="flex gap-2">
+            <UInput
+              v-model="hexInput"
+              placeholder="#FF0000"
+              class="font-mono"
+              @focus="activeFormat = 'hex'" />
+            <UBadge variant="outline" class="px-3">
+              {{ computedHex }}
+            </UBadge>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- RGB -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-medium">
+              RGB / RGBA
+            </h3>
+            <div class="flex gap-2">
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="copyToClipboard(formatRgb)">
+                RGB
+              </UButton>
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="copyToClipboard(formatRgba)">
+                RGBA
+              </UButton>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-xs text-muted-foreground">R</label>
+              <UInput
+                v-model.number="rgbInput.r"
+                type="number"
+                min="0"
+                max="255"
+                class="font-mono"
+                @focus="activeFormat = 'rgb'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">G</label>
+              <UInput
+                v-model.number="rgbInput.g"
+                type="number"
+                min="0"
+                max="255"
+                class="font-mono"
+                @focus="activeFormat = 'rgb'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">B</label>
+              <UInput
+                v-model.number="rgbInput.b"
+                type="number"
+                min="0"
+                max="255"
+                class="font-mono"
+                @focus="activeFormat = 'rgb'" />
+            </div>
+          </div>
+          <div class="text-sm text-muted-foreground font-mono">
+            {{ formatRgb }} / {{ formatRgba }}
+          </div>
+        </div>
+
+        <!-- HSL -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-medium">
+              HSL / HSLA
+            </h3>
+            <div class="flex gap-2">
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="copyToClipboard(formatHsl)">
+                HSL
+              </UButton>
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="copyToClipboard(formatHsla)">
+                HSLA
+              </UButton>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-xs text-muted-foreground">H (°)</label>
+              <UInput
+                v-model.number="hslInput.h"
+                type="number"
+                min="0"
+                max="360"
+                class="font-mono"
+                @focus="activeFormat = 'hsl'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">S (%)</label>
+              <UInput
+                v-model.number="hslInput.s"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'hsl'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">L (%)</label>
+              <UInput
+                v-model.number="hslInput.l"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'hsl'" />
+            </div>
+          </div>
+          <div class="text-sm text-muted-foreground font-mono">
+            {{ formatHsl }} / {{ formatHsla }}
+          </div>
+        </div>
+
+        <!-- HSV -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-medium">
+              HSV / HSB
+            </h3>
+            <UButton
+              size="sm"
+              variant="ghost"
+              @click="copyToClipboard(`hsv(${computedHsv.h}, ${computedHsv.s}%, ${computedHsv.v}%)`)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-xs text-muted-foreground">H (°)</label>
+              <UInput
+                v-model.number="hsvInput.h"
+                type="number"
+                min="0"
+                max="360"
+                class="font-mono"
+                @focus="activeFormat = 'hsv'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">S (%)</label>
+              <UInput
+                v-model.number="hsvInput.s"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'hsv'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">V (%)</label>
+              <UInput
+                v-model.number="hsvInput.v"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'hsv'" />
+            </div>
+          </div>
+          <div class="text-sm text-muted-foreground font-mono">
+            hsv({{ computedHsv.h }}, {{ computedHsv.s }}%, {{ computedHsv.v }}%)
+          </div>
+        </div>
+
+        <!-- CMYK -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-medium">
+              CMYK
+            </h3>
+            <UButton
+              size="sm"
+              variant="ghost"
+              @click="copyToClipboard(formatCmyk)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <div>
+              <label class="text-xs text-muted-foreground">C (%)</label>
+              <UInput
+                v-model.number="cmykInput.c"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'cmyk'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">M (%)</label>
+              <UInput
+                v-model.number="cmykInput.m"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'cmyk'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">Y (%)</label>
+              <UInput
+                v-model.number="cmykInput.y"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'cmyk'" />
+            </div>
+            <div>
+              <label class="text-xs text-muted-foreground">K (%)</label>
+              <UInput
+                v-model.number="cmykInput.k"
+                type="number"
+                min="0"
+                max="100"
+                class="font-mono"
+                @focus="activeFormat = 'cmyk'" />
+            </div>
+          </div>
+          <div class="text-sm text-muted-foreground font-mono">
+            {{ formatCmyk }}
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- カラーパレット -->
-    <Card>
-      <CardHeader>
-        <CardTitle>カラーパレット生成</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <h3 class="font-medium mb-2">
-              補色（Complementary）
-            </h3>
-            <div class="flex gap-2">
-              <div
-                v-for="color in generatePalette('complementary')"
-                :key="color"
-                class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
-                :style="{ backgroundColor: color }"
-                @click="copyToClipboard(color)">
-                <div class="h-full flex items-end justify-center pb-2">
-                  <span class="text-xs font-mono bg-background/80 px-1 rounded">
-                    {{ color }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          カラーパレット生成
+        </h3>
+      </template>
 
-          <div>
-            <h3 class="font-medium mb-2">
-              類似色（Analogous）
-            </h3>
-            <div class="flex gap-2">
-              <div
-                v-for="color in generatePalette('analogous')"
-                :key="color"
-                class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
-                :style="{ backgroundColor: color }"
-                @click="copyToClipboard(color)">
-                <div class="h-full flex items-end justify-center pb-2">
-                  <span class="text-xs font-mono bg-background/80 px-1 rounded">
-                    {{ color }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="font-medium mb-2">
-              三色配色（Triadic）
-            </h3>
-            <div class="flex gap-2">
-              <div
-                v-for="color in generatePalette('triadic')"
-                :key="color"
-                class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
-                :style="{ backgroundColor: color }"
-                @click="copyToClipboard(color)">
-                <div class="h-full flex items-end justify-center pb-2">
-                  <span class="text-xs font-mono bg-background/80 px-1 rounded">
-                    {{ color }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="font-medium mb-2">
-              四色配色（Tetradic）
-            </h3>
-            <div class="flex gap-2">
-              <div
-                v-for="color in generatePalette('tetradic')"
-                :key="color"
-                class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
-                :style="{ backgroundColor: color }"
-                @click="copyToClipboard(color)">
-                <div class="h-full flex items-end justify-center pb-2">
-                  <span class="text-xs font-mono bg-background/80 px-1 rounded">
-                    {{ color }}
-                  </span>
-                </div>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-medium mb-2">
+            補色（Complementary）
+          </h3>
+          <div class="flex gap-2">
+            <div
+              v-for="color in generatePalette('complementary')"
+              :key="color"
+              class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
+              :style="{ backgroundColor: color }"
+              @click="copyToClipboard(color)">
+              <div class="h-full flex items-end justify-center pb-2">
+                <span class="text-xs font-mono bg-background/80 px-1 rounded">
+                  {{ color }}
+                </span>
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <h3 class="font-medium mb-2">
+            類似色（Analogous）
+          </h3>
+          <div class="flex gap-2">
+            <div
+              v-for="color in generatePalette('analogous')"
+              :key="color"
+              class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
+              :style="{ backgroundColor: color }"
+              @click="copyToClipboard(color)">
+              <div class="h-full flex items-end justify-center pb-2">
+                <span class="text-xs font-mono bg-background/80 px-1 rounded">
+                  {{ color }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-medium mb-2">
+            三色配色（Triadic）
+          </h3>
+          <div class="flex gap-2">
+            <div
+              v-for="color in generatePalette('triadic')"
+              :key="color"
+              class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
+              :style="{ backgroundColor: color }"
+              @click="copyToClipboard(color)">
+              <div class="h-full flex items-end justify-center pb-2">
+                <span class="text-xs font-mono bg-background/80 px-1 rounded">
+                  {{ color }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-medium mb-2">
+            四色配色（Tetradic）
+          </h3>
+          <div class="flex gap-2">
+            <div
+              v-for="color in generatePalette('tetradic')"
+              :key="color"
+              class="flex-1 h-20 rounded cursor-pointer transition-transform hover:scale-105"
+              :style="{ backgroundColor: color }"
+              @click="copyToClipboard(color)">
+              <div class="h-full flex items-end justify-center pb-2">
+                <span class="text-xs font-mono bg-background/80 px-1 rounded">
+                  {{ color }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- CSS変数生成 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>CSS変数</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            CSS変数
+          </h3>
+          <UButton
             size="sm"
             variant="outline"
             @click="copyToClipboard(cssVariables)">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
             コピー
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssVariables }}</code></pre>
-      </CardContent>
-    </Card>
+      </template>
+
+      <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssVariables }}</code></pre>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>色形式について</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              各形式の特徴
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>HEX:</strong> Web開発で最も一般的。#RRGGBBの16進数表記</li>
-              <li><strong>RGB:</strong> 赤・緑・青の光の三原色。0-255の値で指定</li>
-              <li><strong>HSL:</strong> 色相・彩度・明度。人間の色認識に近い</li>
-              <li><strong>HSV:</strong> 色相・彩度・明度（値）。グラフィックソフトで使用</li>
-              <li><strong>CMYK:</strong> 印刷用の色空間。シアン・マゼンタ・イエロー・ブラック</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              配色理論
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>補色:</strong> 色相環の反対側にある色</li>
-              <li><strong>類似色:</strong> 色相環で隣接する色</li>
-              <li><strong>三色配色:</strong> 色相環を3等分した位置の色</li>
-              <li><strong>四色配色:</strong> 色相環を4等分した位置の色</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          色形式について
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            各形式の特徴
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>HEX:</strong> Web開発で最も一般的。#RRGGBBの16進数表記</li>
+            <li><strong>RGB:</strong> 赤・緑・青の光の三原色。0-255の値で指定</li>
+            <li><strong>HSL:</strong> 色相・彩度・明度。人間の色認識に近い</li>
+            <li><strong>HSV:</strong> 色相・彩度・明度（値）。グラフィックソフトで使用</li>
+            <li><strong>CMYK:</strong> 印刷用の色空間。シアン・マゼンタ・イエロー・ブラック</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            配色理論
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>補色:</strong> 色相環の反対側にある色</li>
+            <li><strong>類似色:</strong> 色相環で隣接する色</li>
+            <li><strong>三色配色:</strong> 色相環を3等分した位置の色</li>
+            <li><strong>四色配色:</strong> 色相環を4等分した位置の色</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

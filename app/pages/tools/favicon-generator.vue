@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog, useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 // 画像データ
 const originalImage = ref<string>('')
@@ -53,10 +51,10 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 // ファイル処理
 const handleFile = (file: File) => {
   if (!file.type.startsWith('image/')) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -119,10 +117,10 @@ const generateFavicons = async () => {
   }
   catch (error) {
     console.error(error)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'ファビコンの生成に失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
     isGenerating.value = false
   }
@@ -153,7 +151,7 @@ const downloadAll = async () => {
     }
   }
 
-  toast({
+  toast.add({
     title: 'ダウンロード完了',
     description: 'すべてのファビコンをダウンロードしました',
   })
@@ -207,7 +205,7 @@ const manifestCode = computed(() => {
 // コードコピー
 const copyCode = async (code: string) => {
   await copy(code)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'コードをクリップボードにコピーしました',
   })
@@ -239,61 +237,66 @@ useSeoMeta({
       </p>
     </div>
     <!-- 入力エリア -->
-    <Card class="row-start-2 row-end-5">
-      <CardHeader>
-        <CardTitle>元画像</CardTitle>
-        <CardDescription>
-          正方形の画像を推奨（最小512×512px）
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div
-          ref="dropZoneRef"
-          :class="[
-            'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-            isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
-          ]"
-          @click="openFileDialog">
-          <div v-if="!originalImage">
-            <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p class="text-sm text-muted-foreground mb-2">
-              クリックまたはドロップで画像を選択
-            </p>
-            <p class="text-xs text-muted-foreground">
-              PNG, JPEG, SVG対応
-            </p>
-          </div>
-          <div v-else class="space-y-4">
-            <img
-              :src="originalImage"
-              alt="Original"
-              class="max-w-full max-h-[200px] mx-auto rounded">
-            <p class="text-sm text-muted-foreground">
-              {{ fileName }}
-            </p>
-          </div>
+    <UCard class="row-start-2 row-end-5">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            元画像
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            正方形の画像を推奨（最小512×512px）
+          </p>
         </div>
+      </template>
+      <div
+        ref="dropZoneRef"
+        :class="[
+          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+          isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+        ]"
+        @click="openFileDialog">
+        <div v-if="!originalImage">
+          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p class="text-sm text-muted-foreground mb-2">
+            クリックまたはドロップで画像を選択
+          </p>
+          <p class="text-xs text-muted-foreground">
+            PNG, JPEG, SVG対応
+          </p>
+        </div>
+        <div v-else class="space-y-4">
+          <img
+            :src="originalImage"
+            alt="Original"
+            class="max-w-full max-h-[200px] mx-auto rounded">
+          <p class="text-sm text-muted-foreground">
+            {{ fileName }}
+          </p>
+        </div>
+      </div>
 
-        <div class="flex gap-2 mt-4">
-          <Button
-            :disabled="!originalImage || isGenerating"
-            class="flex-1"
-            @click="generateFavicons">
-            <Icon name="heroicons:sparkles" class="w-4 h-4 mr-1" />
-            ファビコン生成
-          </Button>
-          <Button
-            variant="outline"
-            :disabled="!originalImage"
-            @click="clearAll">
-            クリア
-          </Button>
-        </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>推奨事項</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
+      <div class="flex gap-2 mt-4">
+        <UButton
+          :disabled="!originalImage || isGenerating"
+          class="flex-1"
+          @click="generateFavicons">
+          <Icon name="heroicons:sparkles" class="w-4 h-4 mr-1" />
+          ファビコン生成
+        </UButton>
+        <UButton
+          variant="outline"
+          :disabled="!originalImage"
+          @click="clearAll">
+          クリア
+        </UButton>
+      </div>
+
+      <div class="mt-6">
+        <h3 class="font-semibold mb-2">
+          推奨事項
+        </h3>
+      </div>
+      <div class="space-y-3 text-sm text-muted-foreground">
         <div>
           <h4 class="font-semibold mb-1 text-foreground">
             元画像について
@@ -314,125 +317,125 @@ useSeoMeta({
             <li>• site.webmanifest → ルートディレクトリ</li>
           </ul>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 生成されたファビコン -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>生成されたファビコン</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              生成されたファビコン
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               クリックで個別ダウンロード
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             v-if="favicons.length > 0"
             size="sm"
             @click="downloadAll">
             <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
             すべてダウンロード
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="isGenerating" class="text-center py-12">
-          <Icon name="heroicons:arrow-path" class="w-8 h-8 mx-auto mb-4 animate-spin" />
-          <p class="text-sm text-muted-foreground">
-            生成中...
+      </template>
+      <div v-if="isGenerating" class="text-center py-12">
+        <Icon name="heroicons:arrow-path" class="w-8 h-8 mx-auto mb-4 animate-spin" />
+        <p class="text-sm text-muted-foreground">
+          生成中...
+        </p>
+      </div>
+      <div v-else-if="favicons.length > 0" class="grid grid-cols-4 gap-4">
+        <button
+          v-for="{ size } in faviconSizes"
+          :key="size"
+          class="group relative"
+          @click="downloadFavicon(size)">
+          <div class="aspect-square rounded-lg p-2 border hover:border-primary transition-colors bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+            <img
+              :src="favicons.find(f => f.size === size)?.url"
+              :alt="`${size}x${size}`"
+              class="w-full h-full object-contain">
+          </div>
+          <p class="text-xs mt-1">
+            {{ size }}×{{ size }}
           </p>
-        </div>
-        <div v-else-if="favicons.length > 0" class="grid grid-cols-4 gap-4">
-          <button
-            v-for="{ size } in faviconSizes"
-            :key="size"
-            class="group relative"
-            @click="downloadFavicon(size)">
-            <div class="aspect-square rounded-lg p-2 border hover:border-primary transition-colors bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-              <img
-                :src="favicons.find(f => f.size === size)?.url"
-                :alt="`${size}x${size}`"
-                class="w-full h-full object-contain">
-            </div>
-            <p class="text-xs mt-1">
-              {{ size }}×{{ size }}
-            </p>
-            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-              <Icon name="heroicons:arrow-down-tray" class="w-6 h-6 text-white" />
-            </div>
-          </button>
-        </div>
-        <div v-else class="text-center py-12 text-muted-foreground">
-          <Icon name="heroicons:star" class="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p>画像を選択して生成ボタンを押してください</p>
-        </div>
-      </CardContent>
-    </Card>
+          <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+            <Icon name="heroicons:arrow-down-tray" class="w-6 h-6 text-white" />
+          </div>
+        </button>
+      </div>
+      <div v-else class="text-center py-12 text-muted-foreground">
+        <Icon name="heroicons:star" class="w-12 h-12 mx-auto mb-4 opacity-20" />
+        <p>画像を選択して生成ボタンを押してください</p>
+      </div>
+    </UCard>
 
     <!-- HTMLコード -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>HTMLコード</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              HTMLコード
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               &lt;head&gt;タグ内に貼り付け
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             size="sm"
             variant="outline"
             @click="copyCode(htmlCode)">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <pre class="p-4 bg-muted rounded-md text-sm overflow-x-auto"><code>{{ htmlCode }}</code></pre>
-      </CardContent>
-    </Card>
+      </template>
+      <pre class="p-4 bg-muted rounded-md text-sm overflow-x-auto"><code>{{ htmlCode }}</code></pre>
+    </UCard>
 
     <!-- マニフェストコード -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>site.webmanifest</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              site.webmanifest
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               PWA対応用マニフェストファイル
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             size="sm"
             variant="outline"
             @click="copyCode(manifestCode)">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <pre class="p-4 bg-muted rounded-md text-sm overflow-x-auto"><code>{{ manifestCode }}</code></pre>
-      </CardContent>
-    </Card>
+      </template>
+      <pre class="p-4 bg-muted rounded-md text-sm overflow-x-auto"><code>{{ manifestCode }}</code></pre>
+    </UCard>
     <!-- サイズ一覧 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>ファビコンサイズの用途</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid md:grid-cols-2 gap-4 text-sm">
-          <div v-for="sizeInfo in faviconSizes" :key="sizeInfo.size">
-            <div class="flex items-center gap-2">
-              <code class="bg-muted px-2 py-1 rounded">{{ sizeInfo.size }}×{{ sizeInfo.size }}</code>
-              <span class="font-medium">{{ sizeInfo.name }}</span>
-            </div>
-            <p class="text-muted-foreground mt-1">
-              {{ sizeInfo.description }}
-            </p>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          ファビコンサイズの用途
+        </h3>
+      </template>
+      <div class="grid md:grid-cols-2 gap-4 text-sm">
+        <div v-for="sizeInfo in faviconSizes" :key="sizeInfo.size">
+          <div class="flex items-center gap-2">
+            <code class="bg-muted px-2 py-1 rounded">{{ sizeInfo.size }}×{{ sizeInfo.size }}</code>
+            <span class="font-medium">{{ sizeInfo.name }}</span>
           </div>
+          <p class="text-muted-foreground mt-1">
+            {{ sizeInfo.description }}
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

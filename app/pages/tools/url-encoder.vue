@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
 
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const input = ref('')
 const encoded = ref('')
@@ -23,10 +20,10 @@ const encodeUrl = () => {
       : encodeURI(input.value)
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'エンコードに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -38,10 +35,10 @@ const decodeUrl = () => {
       : decodeURI(input.value)
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'デコードに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -50,7 +47,7 @@ const copyToClipboard = async (text: string) => {
   if (!text) return
 
   await copy(text)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'クリップボードにコピーしました',
   })
@@ -124,35 +121,41 @@ useSeoMeta({
     </div>
 
     <!-- サンプルURL -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルURL</CardTitle>
-        <CardDescription>
-          よく使用されるURLパターンを選択できます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-          <Button
-            v-for="sample in sampleUrls"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSampleUrl(sample)">
-            {{ sample.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            サンプルURL
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使用されるURLパターンを選択できます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <UButton
+          v-for="sample in sampleUrls"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSampleUrl(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>入力</CardTitle>
-        <CardDescription>
-          エンコード・デコードしたいテキストまたはURLを入力してください
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            入力
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            エンコード・デコードしたいテキストまたはURLを入力してください
+          </p>
+        </div>
+      </template>
+      <div class="space-y-4">
         <div>
           <textarea
             v-model="input"
@@ -169,65 +172,71 @@ useSeoMeta({
             <span class="text-sm">encodeURIComponent を使用（推奨）</span>
           </label>
 
-          <Button
+          <UButton
             variant="outline"
             size="sm"
             @click="clearAll">
             クリア
-          </Button>
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>エンコード結果</CardTitle>
-        <CardDescription>
-          特殊文字がURLセーフな形式に変換されます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="relative">
-          <pre class="p-3 rounded-md bg-muted overflow-x-auto min-h-[100px] text-sm">{{ encoded || '入力待ち...' }}</pre>
-          <Button
-            v-if="encoded"
-            size="sm"
-            variant="ghost"
-            class="absolute top-2 right-2"
-            @click="copyToClipboard(encoded)">
-            <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            エンコード結果
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            特殊文字がURLセーフな形式に変換されます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="relative">
+        <pre class="p-3 rounded-md bg-muted overflow-x-auto min-h-[100px] text-sm">{{ encoded || '入力待ち...' }}</pre>
+        <UButton
+          v-if="encoded"
+          size="sm"
+          variant="ghost"
+          class="absolute top-2 right-2"
+          @click="copyToClipboard(encoded)">
+          <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>デコード結果</CardTitle>
-        <CardDescription>
-          エンコードされた文字列を元に戻します
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="relative">
-          <pre class="p-3 rounded-md bg-muted overflow-x-auto min-h-[100px] text-sm">{{ decoded || '入力待ち...' }}</pre>
-          <Button
-            v-if="decoded"
-            size="sm"
-            variant="ghost"
-            class="absolute top-2 right-2"
-            @click="copyToClipboard(decoded)">
-            <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            デコード結果
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            エンコードされた文字列を元に戻します
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="relative">
+        <pre class="p-3 rounded-md bg-muted overflow-x-auto min-h-[100px] text-sm">{{ decoded || '入力待ち...' }}</pre>
+        <UButton
+          v-if="decoded"
+          size="sm"
+          variant="ghost"
+          class="absolute top-2 right-2"
+          @click="copyToClipboard(decoded)">
+          <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>使い方のヒント</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          使い方のヒント
+        </h3>
+      </template>
+      <div class="space-y-3 text-sm text-muted-foreground">
         <p>
           <strong>encodeURI</strong>: URL全体をエンコード（プロトコルやドメインは変換しない）
         </p>
@@ -245,7 +254,7 @@ useSeoMeta({
             <li>エンコードされたURLの解読・デバッグ</li>
           </ul>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

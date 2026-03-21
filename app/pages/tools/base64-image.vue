@@ -164,22 +164,22 @@ const handleDrop = (e: DragEvent) => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async () => {
   try {
     await copy(base64Output.value)
-    toast({
+    toast.add({
       title: 'コピーしました',
       description: 'Base64データをクリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -244,219 +244,210 @@ useSeoMeta({
     </div>
 
     <!-- 画像入力 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>画像を選択</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <!-- ドラッグ&ドロップエリア -->
-        <div
-          :class="[
-            'relative border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-            isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25',
-          ]"
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave"
-          @drop="handleDrop">
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          画像を選択
+        </h3>
+      </template>
+      <!-- ドラッグ&ドロップエリア -->
+      <div
+        :class="[
+          'relative border-2 border-dashed rounded-lg p-8 text-center transition-colors',
+          isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25',
+        ]"
+        @dragover="handleDragOver"
+        @dragleave="handleDragLeave"
+        @drop="handleDrop">
+        <input
+          type="file"
+          accept="image/*"
+          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          @change="handleFileSelect">
+
+        <Icon name="heroicons:arrow-up-tray" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <p class="text-sm font-medium">
+          画像をドラッグ&ドロップ
+        </p>
+        <p class="text-xs text-muted-foreground mt-1">
+          またはクリックして選択
+        </p>
+      </div>
+
+      <!-- URL入力 -->
+      <div class="space-y-2">
+        <label class="text-sm font-medium">URLから読み込み</label>
+        <div class="flex gap-2">
+          <UInput
+            v-model="imageUrl"
+            placeholder="https://example.com/image.png"
+            @keydown.enter="loadFromUrl" />
+          <UButton
+            :disabled="!imageUrl || loading"
+            @click="loadFromUrl">
+            読み込み
+          </UButton>
+        </div>
+        <p class="text-xs text-muted-foreground">
+          ※ CORSの制限により一部の画像は読み込めません
+        </p>
+      </div>
+      <h3 class="font-semibold mt-4 mb-2">
+        出力設定
+      </h3>
+      <div class="space-y-3">
+        <label class="flex items-center gap-3">
           <input
-            type="file"
-            accept="image/*"
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            @change="handleFileSelect">
-
-          <Icon name="heroicons:arrow-up-tray" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p class="text-sm font-medium">
-            画像をドラッグ&ドロップ
-          </p>
-          <p class="text-xs text-muted-foreground mt-1">
-            またはクリックして選択
-          </p>
-        </div>
-
-        <!-- URL入力 -->
-        <div class="space-y-2">
-          <label class="text-sm font-medium">URLから読み込み</label>
-          <div class="flex gap-2">
-            <Input
-              v-model="imageUrl"
-              placeholder="https://example.com/image.png"
-              @keydown.enter="loadFromUrl" />
-            <Button
-              :disabled="!imageUrl || loading"
-              @click="loadFromUrl">
-              読み込み
-            </Button>
+            v-model="imageFormat"
+            value="dataurl"
+            type="radio"
+            class="text-primary">
+          <div>
+            <div class="font-medium">Data URL形式</div>
+            <div class="text-sm text-muted-foreground">data:image/png;base64,...</div>
           </div>
-          <p class="text-xs text-muted-foreground">
-            ※ CORSの制限により一部の画像は読み込めません
-          </p>
-        </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>出力設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-3">
-          <label class="flex items-center gap-3">
-            <input
-              v-model="imageFormat"
-              value="dataurl"
-              type="radio"
-              class="text-primary">
-            <div>
-              <div class="font-medium">Data URL形式</div>
-              <div class="text-sm text-muted-foreground">data:image/png;base64,...</div>
-            </div>
-          </label>
-          <label class="flex items-center gap-3">
-            <input
-              v-model="imageFormat"
-              value="base64"
-              type="radio"
-              class="text-primary">
-            <div>
-              <div class="font-medium">Base64のみ</div>
-              <div class="text-sm text-muted-foreground">プレフィックスなしの文字列</div>
-            </div>
-          </label>
-        </div>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader>
+        </label>
+        <label class="flex items-center gap-3">
+          <input
+            v-model="imageFormat"
+            value="base64"
+            type="radio"
+            class="text-primary">
+          <div>
+            <div class="font-medium">Base64のみ</div>
+            <div class="text-sm text-muted-foreground">プレフィックスなしの文字列</div>
+          </div>
+        </label>
+      </div>
+    </UCard>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>Base64出力</CardTitle>
+          <h3 class="font-semibold">
+            Base64出力
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               @click="copyToClipboard">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
               コピー
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               @click="downloadBase64">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
               保存
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="base64Output"
-          readonly
-          class="w-full h-64 p-3 font-mono text-xs border rounded-md bg-muted resize-none"
-          spellcheck="false">
+      </template>
+      <textarea
+        v-model="base64Output"
+        readonly
+        class="w-full h-64 p-3 font-mono text-xs border rounded-md bg-muted resize-none"
+        spellcheck="false">
             </textarea>
-      </CardContent>
-      <CardHeader>
-        <div class="flex items-center justify-between">
-          <CardTitle>プレビュー</CardTitle>
-          <Button
-            size="sm"
-            variant="ghost"
-            @click="clearAll">
-            <Icon name="heroicons:x-mark" class="w-4 h-4" />
-          </Button>
+      <div class="flex items-center justify-between mt-4 mb-2">
+        <h3 class="font-semibold">
+          プレビュー
+        </h3>
+        <UButton
+          size="sm"
+          variant="ghost"
+          @click="clearAll">
+          <Icon name="heroicons:x-mark" class="w-4 h-4" />
+        </UButton>
+      </div>
+      <div class="rounded-lg p-4 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+        <img
+          :src="previewUrl"
+          alt="Preview"
+          class="max-w-full h-auto mx-auto rounded shadow-lg">
+      </div>
+      <h3 class="font-semibold mt-4 mb-2">
+        画像情報
+      </h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-muted-foreground">
+            ファイル名:
+          </dt>
+          <dd class="font-medium">
+            {{ imageInfo.name }}
+          </dd>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="rounded-lg p-4 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-          <img
-            :src="previewUrl"
-            alt="Preview"
-            class="max-w-full h-auto mx-auto rounded shadow-lg">
+        <div class="flex justify-between">
+          <dt class="text-muted-foreground">
+            形式:
+          </dt>
+          <dd class="font-medium">
+            {{ imageInfo.type }}
+          </dd>
         </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>画像情報</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <dl class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <dt class="text-muted-foreground">
-              ファイル名:
-            </dt>
-            <dd class="font-medium">
-              {{ imageInfo.name }}
-            </dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-muted-foreground">
-              形式:
-            </dt>
-            <dd class="font-medium">
-              {{ imageInfo.type }}
-            </dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-muted-foreground">
-              サイズ:
-            </dt>
-            <dd class="font-medium">
-              {{ formatFileSize(imageInfo.size) }}
-            </dd>
-          </div>
-          <div v-if="imageInfo.width" class="flex justify-between">
-            <dt class="text-muted-foreground">
-              寸法:
-            </dt>
-            <dd class="font-medium">
-              {{ imageInfo.width }} × {{ imageInfo.height }}px
-            </dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-muted-foreground">
-              Base64サイズ:
-            </dt>
-            <dd class="font-medium">
-              {{ formatFileSize(base64Size) }}
-            </dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-muted-foreground">
-              増加率:
-            </dt>
-            <dd class="font-medium">
-              {{ imageInfo.size ? ((base64Size / imageInfo.size) * 100).toFixed(1) : 0 }}%
-            </dd>
-          </div>
-        </dl>
-      </CardContent>
-    </Card>
+        <div class="flex justify-between">
+          <dt class="text-muted-foreground">
+            サイズ:
+          </dt>
+          <dd class="font-medium">
+            {{ formatFileSize(imageInfo.size) }}
+          </dd>
+        </div>
+        <div v-if="imageInfo.width" class="flex justify-between">
+          <dt class="text-muted-foreground">
+            寸法:
+          </dt>
+          <dd class="font-medium">
+            {{ imageInfo.width }} × {{ imageInfo.height }}px
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-muted-foreground">
+            Base64サイズ:
+          </dt>
+          <dd class="font-medium">
+            {{ formatFileSize(base64Size) }}
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-muted-foreground">
+            増加率:
+          </dt>
+          <dd class="font-medium">
+            {{ imageInfo.size ? ((base64Size / imageInfo.size) * 100).toFixed(1) : 0 }}%
+          </dd>
+        </div>
+      </dl>
+    </UCard>
 
     <!-- エラー表示 -->
-    <Alert v-if="error" variant="destructive" class="col-span-full">
-      <Icon name="heroicons:exclamation-circle" class="h-4 w-4" />
-      <AlertDescription>
-        {{ error }}
-      </AlertDescription>
-    </Alert>
+    <UAlert
+      v-if="error" class="col-span-full" color="error"
+      icon="heroicons:exclamation-circle" :description="error" />
 
     <!-- 使い方 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>使い方</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
-        <p>
-          画像をBase64形式にエンコードすることで、HTMLやCSSに直接埋め込むことができます。
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          使い方
+        </h3>
+      </template>
+      <p>
+        画像をBase64形式にエンコードすることで、HTMLやCSSに直接埋め込むことができます。
+      </p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>小さなアイコンやロゴの埋め込みに最適</li>
+        <li>HTTPリクエストを削減できる</li>
+        <li>Data URL形式はimg要素のsrc属性やCSSのbackground-imageで使用可能</li>
+        <li>ファイルサイズは約33%増加するため、大きな画像には不向き</li>
+      </ul>
+      <div class="mt-4 p-3 bg-muted rounded-md">
+        <p class="text-xs font-mono">
+          &lt;img src="data:image/png;base64,iVBORw0..." /&gt;
         </p>
-        <ul class="list-disc list-inside space-y-1">
-          <li>小さなアイコンやロゴの埋め込みに最適</li>
-          <li>HTTPリクエストを削減できる</li>
-          <li>Data URL形式はimg要素のsrc属性やCSSのbackground-imageで使用可能</li>
-          <li>ファイルサイズは約33%増加するため、大きな画像には不向き</li>
-        </ul>
-        <div class="mt-4 p-3 bg-muted rounded-md">
-          <p class="text-xs font-mono">
-            &lt;img src="data:image/png;base64,iVBORw0..." /&gt;
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

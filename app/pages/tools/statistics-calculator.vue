@@ -237,20 +237,20 @@ const exportResults = () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -274,388 +274,387 @@ useSeoMeta({
     </div>
 
     <!-- データ入力 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>データ入力</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          データ入力
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-sm font-medium">データ</label>
+            <div class="flex gap-2">
+              <UButton
+                v-for="(data, key) in { normal: '正規分布', exam: '試験点数', height: '身長データ' }"
+                :key="key"
+                variant="outline"
+                size="sm"
+                @click="loadSample(key)">
+                {{ data }}
+              </UButton>
+            </div>
+          </div>
+          <textarea
+            v-model="inputData"
+            placeholder="数値を入力（例: 23 45 67 89 または 23,45,67,89）"
+            class="w-full h-32 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+            spellcheck="false"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <label class="text-sm font-medium">データ</label>
-              <div class="flex gap-2">
-                <Button
-                  v-for="(data, key) in { normal: '正規分布', exam: '試験点数', height: '身長データ' }"
-                  :key="key"
-                  variant="outline"
-                  size="sm"
-                  @click="loadSample(key)">
-                  {{ data }}
-                </Button>
-              </div>
-            </div>
-            <textarea
-              v-model="inputData"
-              placeholder="数値を入力（例: 23 45 67 89 または 23,45,67,89）"
-              class="w-full h-32 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-              spellcheck="false"></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">区切り文字</label>
-              <div class="flex gap-2">
-                <Button
-                  v-for="(label, value) in { space: 'スペース', comma: 'カンマ', newline: '改行' }"
-                  :key="value"
-                  :variant="delimiter === value ? 'default' : 'outline'"
-                  size="sm"
-                  @click="delimiter = value">
-                  {{ label }}
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                小数点以下桁数: {{ precision }}
-              </label>
-              <Slider
-                :model-value="[precision]"
-                :min="0"
-                :max="10"
-                :step="1"
-                class="w-full"
-                @update:model-value="precision = $event[0]" />
+            <label class="text-sm font-medium mb-2 block">区切り文字</label>
+            <div class="flex gap-2">
+              <UButton
+                v-for="(label, value) in { space: 'スペース', comma: 'カンマ', newline: '改行' }"
+                :key="value"
+                :variant="delimiter === value ? 'default' : 'outline'"
+                size="sm"
+                @click="delimiter = value">
+                {{ label }}
+              </UButton>
             </div>
           </div>
 
-          <div class="text-sm text-muted-foreground">
-            データ数: {{ parsedData.length }}個
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              小数点以下桁数: {{ precision }}
+            </label>
+            <Slider
+              :model-value="[precision]"
+              :min="0"
+              :max="10"
+              :step="1"
+              class="w-full"
+              @update:model-value="precision = $event[0]" />
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div class="text-sm text-muted-foreground">
+          データ数: {{ parsedData.length }}個
+        </div>
+      </div>
+    </UCard>
 
     <!-- 統計量 -->
     <div v-if="statistics" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 基本統計量 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>基本統計量</CardTitle>
-            <Button size="sm" variant="outline" @click="exportResults">
+            <h3 class="font-semibold">
+              基本統計量
+            </h3>
+            <UButton size="sm" variant="outline" @click="exportResults">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
               エクスポート
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <div class="text-sm text-muted-foreground">
-                  データ数
-                </div>
-                <div class="text-xl font-medium">
-                  {{ statistics.count }}
-                </div>
+        </template>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-sm text-muted-foreground">
+                データ数
               </div>
-              <div>
-                <div class="text-sm text-muted-foreground">
-                  合計
-                </div>
-                <div class="text-xl font-medium">
-                  {{ formatNumber(statistics.sum) }}
-                </div>
+              <div class="text-xl font-medium">
+                {{ statistics.count }}
               </div>
             </div>
-
-            <Separator />
-
-            <div class="space-y-3">
-              <div class="flex justify-between">
-                <span class="text-sm">平均（Mean）</span>
-                <span class="font-mono">{{ formatNumber(statistics.mean) }}</span>
+            <div>
+              <div class="text-sm text-muted-foreground">
+                合計
               </div>
-              <div class="flex justify-between">
-                <span class="text-sm">中央値（Median）</span>
-                <span class="font-mono">{{ formatNumber(statistics.median) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">最頻値（Mode）</span>
-                <span class="font-mono">{{ statistics.modes.map(m => formatNumber(m)).join(', ') }}</span>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div class="space-y-3">
-              <div class="flex justify-between">
-                <span class="text-sm">最小値</span>
-                <span class="font-mono">{{ formatNumber(statistics.min) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">最大値</span>
-                <span class="font-mono">{{ formatNumber(statistics.max) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">範囲</span>
-                <span class="font-mono">{{ formatNumber(statistics.range) }}</span>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div class="space-y-3">
-              <div class="flex justify-between">
-                <span class="text-sm">分散</span>
-                <span class="font-mono">{{ formatNumber(statistics.variance) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">標準偏差（σ）</span>
-                <span class="font-mono">{{ formatNumber(statistics.stdDev) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">標本標準偏差（s）</span>
-                <span class="font-mono">{{ formatNumber(statistics.sampleStdDev) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">変動係数（CV）</span>
-                <span class="font-mono">{{ formatNumber(statistics.cv) }}%</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm">標準誤差</span>
-                <span class="font-mono">{{ formatNumber(statistics.standardError) }}</span>
+              <div class="text-xl font-medium">
+                {{ formatNumber(statistics.sum) }}
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <USeparator />
+
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm">平均（Mean）</span>
+              <span class="font-mono">{{ formatNumber(statistics.mean) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">中央値（Median）</span>
+              <span class="font-mono">{{ formatNumber(statistics.median) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">最頻値（Mode）</span>
+              <span class="font-mono">{{ statistics.modes.map(m => formatNumber(m)).join(', ') }}</span>
+            </div>
+          </div>
+
+          <USeparator />
+
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm">最小値</span>
+              <span class="font-mono">{{ formatNumber(statistics.min) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">最大値</span>
+              <span class="font-mono">{{ formatNumber(statistics.max) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">範囲</span>
+              <span class="font-mono">{{ formatNumber(statistics.range) }}</span>
+            </div>
+          </div>
+
+          <USeparator />
+
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm">分散</span>
+              <span class="font-mono">{{ formatNumber(statistics.variance) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">標準偏差（σ）</span>
+              <span class="font-mono">{{ formatNumber(statistics.stdDev) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">標本標準偏差（s）</span>
+              <span class="font-mono">{{ formatNumber(statistics.sampleStdDev) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">変動係数（CV）</span>
+              <span class="font-mono">{{ formatNumber(statistics.cv) }}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm">標準誤差</span>
+              <span class="font-mono">{{ formatNumber(statistics.standardError) }}</span>
+            </div>
+          </div>
+        </div>
+      </UCard>
 
       <!-- 四分位数と形状 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>分布の特性</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div>
-              <h4 class="font-medium mb-3">
-                四分位数
-              </h4>
-              <div class="space-y-3">
-                <div class="flex justify-between">
-                  <span class="text-sm">第1四分位数（Q1）</span>
-                  <span class="font-mono">{{ formatNumber(statistics.q1) }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm">第3四分位数（Q3）</span>
-                  <span class="font-mono">{{ formatNumber(statistics.q3) }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm">四分位範囲（IQR）</span>
-                  <span class="font-mono">{{ formatNumber(statistics.iqr) }}</span>
-                </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            分布の特性
+          </h3>
+        </template>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-medium mb-3">
+              四分位数
+            </h4>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-sm">第1四分位数（Q1）</span>
+                <span class="font-mono">{{ formatNumber(statistics.q1) }}</span>
               </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 class="font-medium mb-3">
-                分布の形状
-              </h4>
-              <div class="space-y-3">
-                <div class="flex justify-between">
-                  <span class="text-sm">歪度（Skewness）</span>
-                  <span class="font-mono">{{ formatNumber(statistics.skewness) }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-sm">尖度（Kurtosis）</span>
-                  <span class="font-mono">{{ formatNumber(statistics.kurtosis) }}</span>
-                </div>
+              <div class="flex justify-between">
+                <span class="text-sm">第3四分位数（Q3）</span>
+                <span class="font-mono">{{ formatNumber(statistics.q3) }}</span>
               </div>
-              <Alert class="mt-4">
-                <Icon name="heroicons:information-circle" class="w-4 h-4" />
-                <AlertDescription>
-                  <div class="text-xs">
-                    歪度: {{ statistics.skewness > 0.5 ? '右に歪んだ分布' : statistics.skewness < -0.5 ? '左に歪んだ分布' : '対称的な分布' }}<br>
-                    尖度: {{ statistics.kurtosis > 0.5 ? '尖った分布' : statistics.kurtosis < -0.5 ? '平たい分布' : '正規分布に近い' }}
-                  </div>
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h4 class="font-medium mb-3">
-                信頼区間
-              </h4>
-              <div class="p-3 bg-muted rounded-md">
-                <div class="text-sm text-center">
-                  95% 信頼区間
-                </div>
-                <div class="font-mono text-center mt-1">
-                  [{{ formatNumber(statistics.confidenceInterval.lower) }}, {{ formatNumber(statistics.confidenceInterval.upper) }}]
-                </div>
+              <div class="flex justify-between">
+                <span class="text-sm">四分位範囲（IQR）</span>
+                <span class="font-mono">{{ formatNumber(statistics.iqr) }}</span>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <USeparator />
+
+          <div>
+            <h4 class="font-medium mb-3">
+              分布の形状
+            </h4>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-sm">歪度（Skewness）</span>
+                <span class="font-mono">{{ formatNumber(statistics.skewness) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm">尖度（Kurtosis）</span>
+                <span class="font-mono">{{ formatNumber(statistics.kurtosis) }}</span>
+              </div>
+            </div>
+            <UAlert class="mt-4" icon="heroicons:information-circle">
+              <template #description>
+                <div class="text-xs">
+                  歪度: {{ statistics.skewness > 0.5 ? '右に歪んだ分布' : statistics.skewness < -0.5 ? '左に歪んだ分布' : '対称的な分布' }}<br>
+                  尖度: {{ statistics.kurtosis > 0.5 ? '尖った分布' : statistics.kurtosis < -0.5 ? '平たい分布' : '正規分布に近い' }}
+                </div>
+              </template>
+            </UAlert>
+          </div>
+
+          <USeparator />
+
+          <div>
+            <h4 class="font-medium mb-3">
+              信頼区間
+            </h4>
+            <div class="p-3 bg-muted rounded-md">
+              <div class="text-sm text-center">
+                95% 信頼区間
+              </div>
+              <div class="font-mono text-center mt-1">
+                [{{ formatNumber(statistics.confidenceInterval.lower) }}, {{ formatNumber(statistics.confidenceInterval.upper) }}]
+              </div>
+            </div>
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- 度数分布表 -->
-    <Card v-if="statistics && showFrequencyTable">
-      <CardHeader>
+    <UCard v-if="statistics && showFrequencyTable">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>度数分布表</CardTitle>
+          <h3 class="font-semibold">
+            度数分布表
+          </h3>
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
               <label class="text-sm">階級数:</label>
-              <Input
+              <UInput
                 v-model.number="binCount"
                 type="number"
                 min="3"
                 max="30"
                 class="w-20" />
             </div>
-            <Button
+            <UButton
               size="sm"
               variant="ghost"
               @click="showFrequencyTable = false">
               <Icon name="heroicons:x-mark" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>階級</TableHead>
-                <TableHead class="text-right">
-                  度数
-                </TableHead>
-                <TableHead class="text-right">
-                  相対度数
-                </TableHead>
-                <TableHead class="text-right">
-                  累積度数
-                </TableHead>
-                <TableHead class="text-right">
-                  累積相対度数
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="(bin, index) in frequencyDistribution" :key="index">
-                <TableCell class="font-mono text-sm">
-                  {{ bin.range }}
-                </TableCell>
-                <TableCell class="text-right">
-                  {{ bin.frequency }}
-                </TableCell>
-                <TableCell class="text-right">
-                  {{ (bin.relativeFrequency * 100).toFixed(2) }}%
-                </TableCell>
-                <TableCell class="text-right">
-                  {{ bin.cumulativeFrequency }}
-                </TableCell>
-                <TableCell class="text-right">
-                  {{ (bin.cumulativeRelative * 100).toFixed(2) }}%
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>階級</TableHead>
+              <TableHead class="text-right">
+                度数
+              </TableHead>
+              <TableHead class="text-right">
+                相対度数
+              </TableHead>
+              <TableHead class="text-right">
+                累積度数
+              </TableHead>
+              <TableHead class="text-right">
+                累積相対度数
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="(bin, index) in frequencyDistribution" :key="index">
+              <TableCell class="font-mono text-sm">
+                {{ bin.range }}
+              </TableCell>
+              <TableCell class="text-right">
+                {{ bin.frequency }}
+              </TableCell>
+              <TableCell class="text-right">
+                {{ (bin.relativeFrequency * 100).toFixed(2) }}%
+              </TableCell>
+              <TableCell class="text-right">
+                {{ bin.cumulativeFrequency }}
+              </TableCell>
+              <TableCell class="text-right">
+                {{ (bin.cumulativeRelative * 100).toFixed(2) }}%
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    </UCard>
 
     <!-- ヒストグラム -->
-    <Card v-if="statistics && histogramData && showHistogram">
-      <CardHeader>
+    <UCard v-if="statistics && histogramData && showHistogram">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>ヒストグラム</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            ヒストグラム
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="showHistogram = false">
             <Icon name="heroicons:x-mark" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <div
-            v-for="(bin, index) in histogramData.bins"
-            :key="index"
-            class="flex items-center gap-2">
-            <div class="w-32 text-xs text-right">
-              {{ bin.range }}
+      </template>
+      <div class="space-y-2">
+        <div
+          v-for="(bin, index) in histogramData.bins"
+          :key="index"
+          class="flex items-center gap-2">
+          <div class="w-32 text-xs text-right">
+            {{ bin.range }}
+          </div>
+          <div class="flex-1 flex items-center gap-2">
+            <div
+              class="h-6 bg-primary"
+              :style="{ width: `${(bin.frequency / histogramData.maxFrequency) * 100}%` }">
             </div>
-            <div class="flex-1 flex items-center gap-2">
-              <div
-                class="h-6 bg-primary"
-                :style="{ width: `${(bin.frequency / histogramData.maxFrequency) * 100}%` }">
-              </div>
-              <span class="text-sm">{{ bin.frequency }}</span>
-            </div>
+            <span class="text-sm">{{ bin.frequency }}</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>統計用語の説明</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-muted-foreground">
-          <div>
-            <h4 class="font-medium text-foreground mb-2">
-              中心傾向の指標
-            </h4>
-            <ul class="space-y-1">
-              <li><strong>平均:</strong> データの総和を個数で割った値</li>
-              <li><strong>中央値:</strong> データを順に並べた時の中央の値</li>
-              <li><strong>最頻値:</strong> 最も頻繁に現れる値</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-medium text-foreground mb-2">
-              ばらつきの指標
-            </h4>
-            <ul class="space-y-1">
-              <li><strong>分散:</strong> 平均からの偏差の2乗の平均</li>
-              <li><strong>標準偏差:</strong> 分散の平方根</li>
-              <li><strong>変動係数:</strong> 標準偏差を平均で割った値（%）</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-medium text-foreground mb-2">
-              分布の形状
-            </h4>
-            <ul class="space-y-1">
-              <li><strong>歪度:</strong> 分布の左右対称性（0で対称）</li>
-              <li><strong>尖度:</strong> 分布の尖り具合（0で正規分布）</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-medium text-foreground mb-2">
-              その他
-            </h4>
-            <ul class="space-y-1">
-              <li><strong>四分位数:</strong> データを4等分する値</li>
-              <li><strong>信頼区間:</strong> 母平均が含まれる可能性が高い範囲</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          統計用語の説明
+        </h3>
+      </template>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-muted-foreground">
+        <div>
+          <h4 class="font-medium text-foreground mb-2">
+            中心傾向の指標
+          </h4>
+          <ul class="space-y-1">
+            <li><strong>平均:</strong> データの総和を個数で割った値</li>
+            <li><strong>中央値:</strong> データを順に並べた時の中央の値</li>
+            <li><strong>最頻値:</strong> 最も頻繁に現れる値</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h4 class="font-medium text-foreground mb-2">
+            ばらつきの指標
+          </h4>
+          <ul class="space-y-1">
+            <li><strong>分散:</strong> 平均からの偏差の2乗の平均</li>
+            <li><strong>標準偏差:</strong> 分散の平方根</li>
+            <li><strong>変動係数:</strong> 標準偏差を平均で割った値（%）</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium text-foreground mb-2">
+            分布の形状
+          </h4>
+          <ul class="space-y-1">
+            <li><strong>歪度:</strong> 分布の左右対称性（0で対称）</li>
+            <li><strong>尖度:</strong> 分布の尖り具合（0で正規分布）</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-medium text-foreground mb-2">
+            その他
+          </h4>
+          <ul class="space-y-1">
+            <li><strong>四分位数:</strong> データを4等分する値</li>
+            <li><strong>信頼区間:</strong> 母平均が含まれる可能性が高い範囲</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

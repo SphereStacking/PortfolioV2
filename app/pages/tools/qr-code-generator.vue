@@ -1,33 +1,29 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
-import { Slider } from '~/components/ui/slider'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const inputText = ref('')
-const qrSize = ref([300])
+const qrSize = ref(300)
 const errorCorrectionLevel = ref<'L' | 'M' | 'Q' | 'H'>('M')
 const qrColor = ref('#000000')
 const qrBackground = ref('#ffffff')
-const margin = ref([4])
+const margin = ref(4)
 const qrDataUrl = ref('')
 const downloading = ref(false)
 
 // QRコード生成APIのURL構築
 const generateQrCode = () => {
   if (!inputText.value.trim()) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'テキストを入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -36,11 +32,11 @@ const generateQrCode = () => {
   const baseUrl = 'https://api.qrserver.com/v1/create-qr-code/'
   const params = new URLSearchParams({
     data: inputText.value,
-    size: `${qrSize.value[0]}x${qrSize.value[0]}`,
+    size: `${qrSize.value}x${qrSize.value}`,
     ecc: errorCorrectionLevel.value,
     color: qrColor.value.substring(1), // #を除去
     bgcolor: qrBackground.value.substring(1), // #を除去
-    margin: margin.value[0].toString(),
+    margin: margin.value.toString(),
     format: 'png',
   })
 
@@ -108,16 +104,16 @@ const downloadQrCode = async () => {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
 
-    toast({
+    toast.add({
       title: 'ダウンロード完了',
       description: 'QRコードをダウンロードしました',
     })
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'ダウンロードに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -130,7 +126,7 @@ const copyQrCode = async () => {
   if (!qrDataUrl.value) return
 
   await copy(qrDataUrl.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'QRコードのURLをクリップボードにコピーしました',
   })
@@ -170,179 +166,188 @@ useSeoMeta({
     </div>
 
     <!-- サンプルデータ -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルデータ</CardTitle>
-        <CardDescription>
-          よく使われるQRコードのパターンを選択できます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-          <Button
-            v-for="sample in sampleData"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            class="flex flex-col h-auto py-3"
-            @click="loadSample(sample)">
-            <Icon :name="sample.icon" class="w-5 h-5 mb-1" />
-            <span class="text-xs">{{ sample.name }}</span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader>
-        <CardTitle>データ入力</CardTitle>
-        <CardDescription>
-          QRコードに変換するデータを入力してください
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="inputText"
-          class="w-full h-32 p-3 rounded-md border bg-background text-sm resize-y"
-          placeholder="URL、テキスト、電話番号など"></textarea>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>カスタマイズ</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-6">
-        <!-- サイズ -->
+    <UCard class="col-span-full">
+      <template #header>
         <div>
-          <label class="text-sm font-medium mb-2 block">
-            サイズ: {{ qrSize[0] }}px
-          </label>
-          <Slider
-            v-model="qrSize"
-            :max="600"
-            :min="100"
-            :step="10"
-            class="mb-4" />
+          <h3 class="font-semibold">
+            サンプルデータ
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使われるQRコードのパターンを選択できます
+          </p>
         </div>
-
-        <!-- エラー訂正レベル -->
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+        <UButton
+          v-for="sample in sampleData"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          class="flex flex-col h-auto py-3"
+          @click="loadSample(sample)">
+          <Icon :name="sample.icon" class="w-5 h-5 mb-1" />
+          <span class="text-xs">{{ sample.name }}</span>
+        </UButton>
+      </div>
+    </UCard>
+    <UCard>
+      <template #header>
         <div>
-          <label class="text-sm font-medium mb-2 block">エラー訂正レベル</label>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              v-for="level in errorCorrectionLevels"
-              :key="level.value"
-              :class="[
-                'p-3 rounded-md border text-sm transition-colors',
-                errorCorrectionLevel === level.value
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'hover:bg-muted',
-              ]"
-              @click="errorCorrectionLevel = level.value as 'L' | 'M' | 'Q' | 'H'">
-              <div class="font-medium">
-                {{ level.label }}
-              </div>
-              <div class="text-xs opacity-80 mt-0.5">
-                {{ level.description }}
-              </div>
-            </button>
-          </div>
+          <h3 class="font-semibold">
+            データ入力
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            QRコードに変換するデータを入力してください
+          </p>
         </div>
+      </template>
+      <textarea
+        v-model="inputText"
+        class="w-full h-32 p-3 rounded-md border bg-background text-sm resize-y"
+        placeholder="URL、テキスト、電話番号など"></textarea>
 
-        <!-- 色設定 -->
-        <div class="grid grid-cols-2 gap-4">
+      <div class="mt-6">
+        <h3 class="font-semibold mb-4">
+          カスタマイズ
+        </h3>
+        <div class="space-y-6">
+          <!-- サイズ -->
           <div>
-            <label class="text-sm font-medium mb-2 block">前景色</label>
-            <div class="flex gap-2">
-              <input
-                v-model="qrColor"
-                type="color"
-                class="h-10 w-16 rounded border cursor-pointer">
-              <Input
-                v-model="qrColor"
-                class="flex-1"
-                placeholder="#000000" />
+            <label class="text-sm font-medium mb-2 block">
+              サイズ: {{ qrSize }}px
+            </label>
+            <USlider
+              v-model="qrSize"
+              :max="600"
+              :min="100"
+              :step="10"
+              class="mb-4" />
+          </div>
+
+          <!-- エラー訂正レベル -->
+          <div>
+            <label class="text-sm font-medium mb-2 block">エラー訂正レベル</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                v-for="level in errorCorrectionLevels"
+                :key="level.value"
+                :class="[
+                  'p-3 rounded-md border text-sm transition-colors',
+                  errorCorrectionLevel === level.value
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'hover:bg-muted',
+                ]"
+                @click="errorCorrectionLevel = level.value as 'L' | 'M' | 'Q' | 'H'">
+                <div class="font-medium">
+                  {{ level.label }}
+                </div>
+                <div class="text-xs opacity-80 mt-0.5">
+                  {{ level.description }}
+                </div>
+              </button>
             </div>
           </div>
-          <div>
-            <label class="text-sm font-medium mb-2 block">背景色</label>
-            <div class="flex gap-2">
-              <input
-                v-model="qrBackground"
-                type="color"
-                class="h-10 w-16 rounded border cursor-pointer">
-              <Input
-                v-model="qrBackground"
-                class="flex-1"
-                placeholder="#ffffff" />
+
+          <!-- 色設定 -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium mb-2 block">前景色</label>
+              <div class="flex gap-2">
+                <input
+                  v-model="qrColor"
+                  type="color"
+                  class="h-10 w-16 rounded border cursor-pointer">
+                <UInput
+                  v-model="qrColor"
+                  class="flex-1"
+                  placeholder="#000000" />
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium mb-2 block">背景色</label>
+              <div class="flex gap-2">
+                <input
+                  v-model="qrBackground"
+                  type="color"
+                  class="h-10 w-16 rounded border cursor-pointer">
+                <UInput
+                  v-model="qrBackground"
+                  class="flex-1"
+                  placeholder="#ffffff" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- マージン -->
-        <div>
-          <label class="text-sm font-medium mb-2 block">
-            余白: {{ margin[0] }}モジュール
-          </label>
-          <Slider
-            v-model="margin"
-            :max="10"
-            :min="0"
-            :step="1" />
+          <!-- マージン -->
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              余白: {{ margin }}モジュール
+            </label>
+            <USlider
+              v-model="margin"
+              :max="10"
+              :min="0"
+              :step="1" />
+          </div>
         </div>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader>
+      </div>
+    </UCard>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>プレビュー</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              プレビュー
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               生成されたQRコード
-            </CardDescription>
+            </p>
           </div>
           <div class="flex gap-2">
-            <Button
+            <UButton
               v-if="qrDataUrl"
               size="sm"
               variant="outline"
               @click="copyQrCode">
               <Icon name="heroicons:link" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="qrDataUrl"
               size="sm"
               :disabled="downloading"
               @click="downloadQrCode">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
               ダウンロード
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="flex items-center justify-center min-h-[400px]">
-          <div v-if="qrDataUrl" class="text-center">
-            <img
-              :src="qrDataUrl"
-              alt="QR Code"
-              class="max-w-full shadow-lg rounded-lg"
-              :style="{ backgroundColor: qrBackground }">
-            <p class="text-sm text-muted-foreground mt-4">
-              {{ qrSize[0] }} × {{ qrSize[0] }}px
-            </p>
-          </div>
-          <div v-else class="text-center text-muted-foreground">
-            <Icon name="heroicons:qr-code" class="w-24 h-24 mx-auto mb-4 opacity-20" />
-            <p>データを入力するとQRコードが生成されます</p>
-          </div>
+      </template>
+      <div class="flex items-center justify-center min-h-[400px]">
+        <div v-if="qrDataUrl" class="text-center">
+          <img
+            :src="qrDataUrl"
+            alt="QR Code"
+            class="max-w-full shadow-lg rounded-lg"
+            :style="{ backgroundColor: qrBackground }">
+          <p class="text-sm text-muted-foreground mt-4">
+            {{ qrSize }} × {{ qrSize }}px
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <div v-else class="text-center text-muted-foreground">
+          <Icon name="heroicons:qr-code" class="w-24 h-24 mx-auto mb-4 opacity-20" />
+          <p>データを入力するとQRコードが生成されます</p>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 使い方 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>使い方のヒント</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4 text-sm text-muted-foreground">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          使い方のヒント
+        </h3>
+      </template>
+      <div class="space-y-4 text-sm text-muted-foreground">
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <h4 class="font-semibold mb-2 text-foreground">
@@ -370,7 +375,7 @@ useSeoMeta({
             </ul>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

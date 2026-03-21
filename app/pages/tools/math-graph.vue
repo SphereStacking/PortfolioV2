@@ -332,20 +332,20 @@ onMounted(() => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -372,222 +372,221 @@ useSeoMeta({
       <!-- 設定パネル -->
       <div class="space-y-6">
         <!-- 関数入力 -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>関数</CardTitle>
-              <Button size="sm" @click="addFunction">
+              <h3 class="font-semibold">
+                関数
+              </h3>
+              <UButton size="sm" @click="addFunction">
                 <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
                 追加
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-3">
-              <div
-                v-for="func in functions"
-                :key="func.id"
-                class="flex items-center gap-2">
-                <input
-                  v-model="func.color"
-                  type="color"
-                  class="w-8 h-8 rounded cursor-pointer">
-                <Input
-                  v-model="func.expression"
-                  placeholder="例: sin(x), x^2, ln(x)"
-                  class="flex-1"
-                  :disabled="!func.visible" />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="toggleFunction(func.id)">
-                  <Icon
-                    :name="func.visible ? 'heroicons:eye' : 'heroicons:eye-slash'"
-                    class="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="removeFunction(func.id)">
-                  <Icon name="heroicons:trash" class="w-4 h-4" />
-                </Button>
-              </div>
+          </template>
+          <div class="space-y-3">
+            <div
+              v-for="func in functions"
+              :key="func.id"
+              class="flex items-center gap-2">
+              <input
+                v-model="func.color"
+                type="color"
+                class="w-8 h-8 rounded cursor-pointer">
+              <UInput
+                v-model="func.expression"
+                placeholder="例: sin(x), x^2, ln(x)"
+                class="flex-1"
+                :disabled="!func.visible" />
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="toggleFunction(func.id)">
+                <Icon
+                  :name="func.visible ? 'heroicons:eye' : 'heroicons:eye-slash'"
+                  class="w-4 h-4" />
+              </UButton>
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="removeFunction(func.id)">
+                <Icon name="heroicons:trash" class="w-4 h-4" />
+              </UButton>
             </div>
+          </div>
 
-            <div class="mt-4">
-              <label class="text-sm font-medium mb-2 block">プリセット</label>
-              <div class="grid grid-cols-2 gap-2">
-                <Button
-                  v-for="preset in presets"
-                  :key="preset.name"
-                  variant="outline"
-                  size="sm"
-                  @click="loadPreset(preset)">
-                  {{ preset.name }}
-                </Button>
-              </div>
+          <div class="mt-4">
+            <label class="text-sm font-medium mb-2 block">プリセット</label>
+            <div class="grid grid-cols-2 gap-2">
+              <UButton
+                v-for="preset in presets"
+                :key="preset.name"
+                variant="outline"
+                size="sm"
+                @click="loadPreset(preset)">
+                {{ preset.name }}
+              </UButton>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </UCard>
 
         <!-- 表示範囲 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>表示範囲</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="text-sm font-medium">X最小</label>
-                  <Input v-model.number="xMin" type="number" />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">X最大</label>
-                  <Input v-model.number="xMax" type="number" />
-                </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              表示範囲
+            </h3>
+          </template>
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-sm font-medium">X最小</label>
+                <UInput v-model.number="xMin" type="number" />
               </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="text-sm font-medium">Y最小</label>
-                  <Input v-model.number="yMin" type="number" />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Y最大</label>
-                  <Input v-model.number="yMax" type="number" />
-                </div>
+              <div>
+                <label class="text-sm font-medium">X最大</label>
+                <UInput v-model.number="xMax" type="number" />
               </div>
-
-              <div class="flex items-center gap-2">
-                <Button size="sm" variant="outline" @click="zoomIn">
-                  <Icon name="heroicons:magnifying-glass-plus" class="w-4 h-4 mr-2" />
-                  拡大
-                </Button>
-                <Button size="sm" variant="outline" @click="zoomOut">
-                  <Icon name="heroicons:magnifying-glass-minus" class="w-4 h-4 mr-2" />
-                  縮小
-                </Button>
-                <Button size="sm" variant="outline" @click="resetView">
-                  <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
-                  リセット
-                </Button>
-              </div>
-
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="gridEnabled"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary">
-                グリッドを表示
-              </label>
             </div>
-          </CardContent>
-        </Card>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-sm font-medium">Y最小</label>
+                <UInput v-model.number="yMin" type="number" />
+              </div>
+              <div>
+                <label class="text-sm font-medium">Y最大</label>
+                <UInput v-model.number="yMax" type="number" />
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <UButton size="sm" variant="outline" @click="zoomIn">
+                <Icon name="heroicons:magnifying-glass-plus" class="w-4 h-4 mr-2" />
+                拡大
+              </UButton>
+              <UButton size="sm" variant="outline" @click="zoomOut">
+                <Icon name="heroicons:magnifying-glass-minus" class="w-4 h-4 mr-2" />
+                縮小
+              </UButton>
+              <UButton size="sm" variant="outline" @click="resetView">
+                <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
+                リセット
+              </UButton>
+            </div>
+
+            <label class="flex items-center gap-2">
+              <input
+                v-model="gridEnabled"
+                type="checkbox"
+                class="w-4 h-4 rounded border-zinc-300 text-primary">
+              グリッドを表示
+            </label>
+          </div>
+        </UCard>
 
         <!-- 交点 -->
-        <Card v-if="findIntersections.length > 0">
-          <CardHeader>
-            <CardTitle>交点</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-2 text-sm">
-              <div
-                v-for="(point, index) in findIntersections.slice(0, 10)"
-                :key="index"
-                class="p-2 bg-muted rounded">
-                <div class="font-medium">
-                  ({{ point.x }}, {{ point.y }})
-                </div>
-                <div class="text-xs text-muted-foreground">
-                  {{ point.f1 }} ∩ {{ point.f2 }}
-                </div>
+        <UCard v-if="findIntersections.length > 0">
+          <template #header>
+            <h3 class="font-semibold">
+              交点
+            </h3>
+          </template>
+          <div class="space-y-2 text-sm">
+            <div
+              v-for="(point, index) in findIntersections.slice(0, 10)"
+              :key="index"
+              class="p-2 bg-muted rounded">
+              <div class="font-medium">
+                ({{ point.x }}, {{ point.y }})
               </div>
-              <div v-if="findIntersections.length > 10" class="text-xs text-muted-foreground text-center">
-                他 {{ findIntersections.length - 10 }} 個の交点
+              <div class="text-xs text-muted-foreground">
+                {{ point.f1 }} ∩ {{ point.f2 }}
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div v-if="findIntersections.length > 10" class="text-xs text-muted-foreground text-center">
+              他 {{ findIntersections.length - 10 }} 個の交点
+            </div>
+          </div>
+        </UCard>
       </div>
 
       <!-- グラフ表示 -->
       <div class="lg:col-span-2">
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>グラフ</CardTitle>
-              <Button size="sm" variant="outline" @click="exportGraph">
+              <h3 class="font-semibold">
+                グラフ
+              </h3>
+              <UButton size="sm" variant="outline" @click="exportGraph">
                 <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
                 画像保存
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="border rounded-md bg-white p-4">
-              <canvas
-                ref="canvasRef"
-                :width="canvasWidth"
-                :height="canvasHeight"
-                class="w-full"
-                style="max-width: 100%; height: auto;">
-              </canvas>
-            </div>
+          </template>
+          <div class="border rounded-md bg-white p-4">
+            <canvas
+              ref="canvasRef"
+              :width="canvasWidth"
+              :height="canvasHeight"
+              class="w-full"
+              style="max-width: 100%; height: auto;">
+            </canvas>
+          </div>
 
-            <Alert v-if="error" variant="destructive" class="mt-4">
-              <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-              <AlertDescription>{{ error }}</AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
+          <UAlert
+            v-if="error" class="mt-4" color="error"
+            icon="heroicons:exclamation-circle" :description="error" />
+        </UCard>
 
         <!-- 使い方 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>使用可能な関数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <h4 class="font-medium mb-1">
-                  基本演算
-                </h4>
-                <ul class="space-y-1 text-muted-foreground">
-                  <li><code>x + 2</code> 加算</li>
-                  <li><code>x - 3</code> 減算</li>
-                  <li><code>x * 2</code> 乗算</li>
-                  <li><code>x / 2</code> 除算</li>
-                  <li><code>x^2</code> べき乗</li>
-                </ul>
-              </div>
-              <div>
-                <h4 class="font-medium mb-1">
-                  三角関数
-                </h4>
-                <ul class="space-y-1 text-muted-foreground">
-                  <li><code>sin(x)</code> 正弦</li>
-                  <li><code>cos(x)</code> 余弦</li>
-                  <li><code>tan(x)</code> 正接</li>
-                </ul>
-              </div>
-              <div>
-                <h4 class="font-medium mb-1">
-                  その他の関数
-                </h4>
-                <ul class="space-y-1 text-muted-foreground">
-                  <li><code>sqrt(x)</code> 平方根</li>
-                  <li><code>abs(x)</code> 絶対値</li>
-                  <li><code>exp(x)</code> 指数関数</li>
-                  <li><code>ln(x)</code> 自然対数</li>
-                  <li><code>log(x)</code> 常用対数</li>
-                </ul>
-              </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              使用可能な関数
+            </h3>
+          </template>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <h4 class="font-medium mb-1">
+                基本演算
+              </h4>
+              <ul class="space-y-1 text-muted-foreground">
+                <li><code>x + 2</code> 加算</li>
+                <li><code>x - 3</code> 減算</li>
+                <li><code>x * 2</code> 乗算</li>
+                <li><code>x / 2</code> 除算</li>
+                <li><code>x^2</code> べき乗</li>
+              </ul>
             </div>
-            <div class="mt-4 text-sm text-muted-foreground">
-              <p>定数: <code>pi</code> (円周率), <code>e</code> (自然対数の底)</p>
+            <div>
+              <h4 class="font-medium mb-1">
+                三角関数
+              </h4>
+              <ul class="space-y-1 text-muted-foreground">
+                <li><code>sin(x)</code> 正弦</li>
+                <li><code>cos(x)</code> 余弦</li>
+                <li><code>tan(x)</code> 正接</li>
+              </ul>
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h4 class="font-medium mb-1">
+                その他の関数
+              </h4>
+              <ul class="space-y-1 text-muted-foreground">
+                <li><code>sqrt(x)</code> 平方根</li>
+                <li><code>abs(x)</code> 絶対値</li>
+                <li><code>exp(x)</code> 指数関数</li>
+                <li><code>ln(x)</code> 自然対数</li>
+                <li><code>log(x)</code> 常用対数</li>
+              </ul>
+            </div>
+          </div>
+          <div class="mt-4 text-sm text-muted-foreground">
+            <p>定数: <code>pi</code> (円周率), <code>e</code> (自然対数の底)</p>
+          </div>
+        </UCard>
       </div>
     </div>
   </div>

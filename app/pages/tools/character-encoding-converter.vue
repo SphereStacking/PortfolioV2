@@ -201,17 +201,17 @@ const convert = () => {
       outputText.value = bytesToString(reencoded, outputEncoding.value)
     }
 
-    toast({
+    toast.add({
       title: '変換完了',
       description: `${inputEncoding.value} → ${outputEncoding.value} への変換が完了しました`,
     })
   }
   catch {
     error.value = e instanceof Error ? e.message : '変換に失敗しました'
-    toast({
+    toast.add({
       title: 'エラー',
       description: error.value,
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -334,36 +334,36 @@ const loadFile = async (event: Event) => {
     // テキストに変換
     inputText.value = bytesToString(bytes, inputEncoding.value)
 
-    toast({
+    toast.add({
       title: 'ファイル読み込み完了',
       description: `${file.name} を読み込みました`,
     })
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'ファイルの読み込みに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -387,216 +387,214 @@ useSeoMeta({
     </div>
 
     <!-- 設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>変換設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                入力エンコーディング
-              </label>
-              <select
-                v-model="inputEncoding"
-                class="w-full px-3 py-2 border rounded-md bg-background">
-                <option v-for="enc in encodings" :key="enc.value" :value="enc.value">
-                  {{ enc.label }}
-                </option>
-              </select>
-            </div>
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                出力エンコーディング
-              </label>
-              <select
-                v-model="outputEncoding"
-                class="w-full px-3 py-2 border rounded-md bg-background">
-                <option v-for="enc in encodings" :key="enc.value" :value="enc.value">
-                  {{ enc.label }}
-                </option>
-              </select>
-            </div>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          変換設定
+        </h3>
+      </template>
 
-          <div class="flex items-center gap-4">
-            <label class="flex items-center gap-2 text-sm">
-              <input
-                v-model="autoDetect"
-                type="checkbox"
-                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              エンコーディング自動検出
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              入力エンコーディング
             </label>
-
-            <label class="flex items-center gap-2 text-sm">
-              <input
-                v-model="showHexView"
-                type="checkbox"
-                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              16進数表示
-            </label>
+            <select
+              v-model="inputEncoding"
+              class="w-full px-3 py-2 border rounded-md bg-background">
+              <option v-for="enc in encodings" :key="enc.value" :value="enc.value">
+                {{ enc.label }}
+              </option>
+            </select>
           </div>
-
-          <div v-if="detectedEncoding" class="text-sm">
-            <span class="text-muted-foreground">検出されたエンコーディング:</span>
-            <Badge variant="outline" class="ml-2">
-              {{ detectedEncoding }}
-            </Badge>
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              出力エンコーディング
+            </label>
+            <select
+              v-model="outputEncoding"
+              class="w-full px-3 py-2 border rounded-md bg-background">
+              <option v-for="enc in encodings" :key="enc.value" :value="enc.value">
+                {{ enc.label }}
+              </option>
+            </select>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              v-model="autoDetect"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            エンコーディング自動検出
+          </label>
+
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              v-model="showHexView"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            16進数表示
+          </label>
+        </div>
+
+        <div v-if="detectedEncoding" class="text-sm">
+          <span class="text-muted-foreground">検出されたエンコーディング:</span>
+          <UBadge variant="outline" class="ml-2">
+            {{ detectedEncoding }}
+          </UBadge>
+        </div>
+      </div>
+    </UCard>
 
     <!-- サンプル -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルテキスト</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleTexts"
-            :key="sample.label"
-            variant="outline"
-            size="sm"
-            @click="inputText = sample.text">
-            {{ sample.label }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルテキスト
+        </h3>
+      </template>
+
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleTexts"
+          :key="sample.label"
+          variant="outline"
+          size="sm"
+          @click="inputText = sample.text">
+          {{ sample.label }}
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 入力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>入力テキスト</CardTitle>
+            <h3 class="font-semibold">
+              入力テキスト
+            </h3>
             <label>
               <input
                 type="file"
                 accept=".txt,.log,.csv"
                 class="hidden"
                 @change="loadFile">
-              <Button size="sm" variant="outline" as="span">
+              <UButton size="sm" variant="outline" as="span">
                 <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
                 ファイル読込
-              </Button>
+              </UButton>
             </label>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="inputText"
-            placeholder="変換したいテキストを入力してください"
-            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
+        </template>
 
-          <div v-if="showHexView && hexView" class="mt-4">
-            <p class="text-sm font-medium mb-2">
-              16進数ダンプ:
-            </p>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-xs font-mono">{{ hexView }}</pre>
-          </div>
-        </CardContent>
-      </Card>
+        <textarea
+          v-model="inputText"
+          placeholder="変換したいテキストを入力してください"
+          class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
+
+        <div v-if="showHexView && hexView" class="mt-4">
+          <p class="text-sm font-medium mb-2">
+            16進数ダンプ:
+          </p>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-xs font-mono">{{ hexView }}</pre>
+        </div>
+      </UCard>
 
       <!-- 出力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>変換結果</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              変換結果
+            </h3>
+            <UButton
               v-if="outputText"
               size="sm"
               variant="ghost"
               @click="copyToClipboard(outputText)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="outputText"
-            readonly
-            placeholder="変換結果がここに表示されます"
-            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-            spellcheck="false"></textarea>
+        </template>
 
-          <Alert v-if="error" variant="destructive" class="mt-4">
-            <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
+        <textarea
+          v-model="outputText"
+          readonly
+          placeholder="変換結果がここに表示されます"
+          class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+          spellcheck="false"></textarea>
 
-          <Alert v-if="detectMojibake" class="mt-4">
-            <Icon name="heroicons:exclamation-triangle" class="w-4 h-4" />
-            <AlertTitle>文字化けの可能性</AlertTitle>
-            <AlertDescription>
-              <p>{{ detectMojibake.hint }}</p>
-              <Button
-                v-if="detectMojibake.fix"
-                size="sm"
-                variant="outline"
-                class="mt-2"
-                @click="inputEncoding = detectMojibake.fix.from; outputEncoding = detectMojibake.fix.to; convert()">
-                {{ detectMojibake.fix.from }} → {{ detectMojibake.fix.to }} で再変換
-              </Button>
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+        <UAlert
+          v-if="error" class="mt-4" color="error"
+          icon="heroicons:exclamation-circle" :description="error" />
+
+        <UAlert
+          v-if="detectMojibake" class="mt-4" icon="heroicons:exclamation-triangle"
+          title="文字化けの可能性">
+          <template #description>
+            <p>{{ detectMojibake.hint }}</p>
+            <UButton
+              v-if="detectMojibake.fix"
+              size="sm"
+              variant="outline"
+              class="mt-2"
+              @click="inputEncoding = detectMojibake.fix.from; outputEncoding = detectMojibake.fix.to; convert()">
+              {{ detectMojibake.fix.from }} → {{ detectMojibake.fix.to }} で再変換
+            </UButton>
+          </template>
+        </UAlert>
+      </UCard>
     </div>
 
     <!-- 変換ボタン -->
     <div class="flex justify-center">
-      <Button
+      <UButton
         size="lg"
         :disabled="!inputText"
         @click="convert">
         <Icon name="heroicons:arrows-right-left" class="w-5 h-5 mr-2" />
         変換実行
-      </Button>
+      </UButton>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>文字エンコーディングについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              主要なエンコーディング
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>UTF-8:</strong> 現在の標準。全世界の文字を表現可能</li>
-              <li><strong>Shift_JIS:</strong> Windows日本語環境の標準</li>
-              <li><strong>EUC-JP:</strong> Unix/Linux日本語環境で使用</li>
-              <li><strong>ISO-2022-JP:</strong> メールで使用される7ビットエンコーディング</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              文字化けの原因
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>保存時と読み込み時のエンコーディングの不一致</li>
-              <li>エンコーディングがサポートしていない文字の使用</li>
-              <li>BOM（Byte Order Mark）の有無</li>
-              <li>自動検出の誤判定</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              このツールは基本的なエンコーディング変換のみサポートしています。
-              より高度な変換が必要な場合は、専用のテキストエディタの使用を推奨します。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          文字エンコーディングについて
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            主要なエンコーディング
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>UTF-8:</strong> 現在の標準。全世界の文字を表現可能</li>
+            <li><strong>Shift_JIS:</strong> Windows日本語環境の標準</li>
+            <li><strong>EUC-JP:</strong> Unix/Linux日本語環境で使用</li>
+            <li><strong>ISO-2022-JP:</strong> メールで使用される7ビットエンコーディング</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            文字化けの原因
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>保存時と読み込み時のエンコーディングの不一致</li>
+            <li>エンコーディングがサポートしていない文字の使用</li>
+            <li>BOM（Byte Order Mark）の有無</li>
+            <li>自動検出の誤判定</li>
+          </ul>
+        </div>
+        <UAlert icon="heroicons:information-circle" description="このツールは基本的なエンコーディング変換のみサポートしています。 より高度な変換が必要な場合は、専用のテキストエディタの使用を推奨します。" />
+      </div>
+    </UCard>
   </div>
 </template>

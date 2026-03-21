@@ -139,20 +139,20 @@ const bitInfo = computed(() => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string, label: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: `${label}をクリップボードにコピーしました`,
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -187,250 +187,245 @@ useSeoMeta({
     </div>
 
     <!-- サンプル -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプル値</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in samples"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="setPresetValue(sample.value, sample.base)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプル値
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in samples"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="setPresetValue(sample.value, sample.base)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 入力 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>入力</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">値</label>
-            <input
-              v-model="inputValue"
-              type="text"
-              class="w-full px-3 py-2 font-mono text-lg border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="42">
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          入力
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">値</label>
+          <input
+            v-model="inputValue"
+            type="text"
+            class="w-full px-3 py-2 font-mono text-lg border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="42">
+        </div>
 
-          <div>
-            <label class="text-sm font-medium mb-2 block">入力の基数</label>
-            <div class="grid grid-cols-4 gap-2">
-              <Button
-                v-for="base in bases"
-                :key="base.value"
-                :variant="inputBase === base.value ? 'default' : 'outline'"
-                @click="inputBase = base.value">
-                {{ base.name }}
-              </Button>
-            </div>
-          </div>
-
-          <div v-if="error">
-            <Alert variant="destructive">
-              <Icon name="heroicons:exclamation-circle" class="h-4 w-4" />
-              <AlertDescription>
-                {{ error }}
-              </AlertDescription>
-            </Alert>
+        <div>
+          <label class="text-sm font-medium mb-2 block">入力の基数</label>
+          <div class="grid grid-cols-4 gap-2">
+            <UButton
+              v-for="base in bases"
+              :key="base.value"
+              :variant="inputBase === base.value ? 'default' : 'outline'"
+              @click="inputBase = base.value">
+              {{ base.name }}
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div v-if="error">
+          <UAlert color="error" icon="heroicons:exclamation-circle" :description="error" />
+        </div>
+      </div>
+    </UCard>
 
     <!-- 変換結果 -->
-    <Card v-if="!error && results.decimal !== undefined">
-      <CardHeader>
-        <CardTitle>変換結果</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div v-for="base in bases" :key="base.value" class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-medium">{{ base.name }}</span>
-              <Button
-                size="sm"
-                variant="ghost"
-                @click="copyToClipboard(base.prefix + results[base.value], base.name)">
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-            </div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-sm text-muted-foreground">{{ base.prefix }}</span>
-              <span class="font-mono text-lg">{{ results[base.value] }}</span>
-            </div>
-            <Separator />
+    <UCard v-if="!error && results.decimal !== undefined">
+      <template #header>
+        <h3 class="font-semibold">
+          変換結果
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div v-for="base in bases" :key="base.value" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-medium">{{ base.name }}</span>
+            <UButton
+              size="sm"
+              variant="ghost"
+              @click="copyToClipboard(base.prefix + results[base.value], base.name)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
           </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-sm text-muted-foreground">{{ base.prefix }}</span>
+            <span class="font-mono text-lg">{{ results[base.value] }}</span>
+          </div>
+          <USeparator />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- ビット情報 -->
-    <Card v-if="bitInfo">
-      <CardHeader>
-        <CardTitle>ビット情報</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div class="text-2xl font-bold">
-              {{ bitInfo.totalBits }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              総ビット数
-            </div>
+    <UCard v-if="bitInfo">
+      <template #header>
+        <h3 class="font-semibold">
+          ビット情報
+        </h3>
+      </template>
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-bold">
+            {{ bitInfo.totalBits }}
           </div>
-          <div>
-            <div class="text-2xl font-bold">
-              {{ bitInfo.setBits }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              1のビット数
-            </div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold">
-              {{ bitInfo.totalBits - bitInfo.setBits }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              0のビット数
-            </div>
+          <div class="text-sm text-muted-foreground">
+            総ビット数
           </div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <div class="text-2xl font-bold">
+            {{ bitInfo.setBits }}
+          </div>
+          <div class="text-sm text-muted-foreground">
+            1のビット数
+          </div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold">
+            {{ bitInfo.totalBits - bitInfo.setBits }}
+          </div>
+          <div class="text-sm text-muted-foreground">
+            0のビット数
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- ビット演算の例 -->
-    <Card v-if="bitOperations">
-      <CardHeader>
-        <CardTitle>ビット演算の例</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-3">
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span class="font-medium">{{ bitOpLabels.not }}</span>
-              <div class="font-mono text-muted-foreground">
-                {{ bitOperations.not }}
-              </div>
+    <UCard v-if="bitOperations">
+      <template #header>
+        <h3 class="font-semibold">
+          ビット演算の例
+        </h3>
+      </template>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span class="font-medium">{{ bitOpLabels.not }}</span>
+            <div class="font-mono text-muted-foreground">
+              {{ bitOperations.not }}
             </div>
-            <div>
-              <span class="font-medium">{{ bitOpLabels.leftShift }}</span>
-              <div class="font-mono text-muted-foreground">
-                {{ bitOperations.leftShift1 }}
-              </div>
+          </div>
+          <div>
+            <span class="font-medium">{{ bitOpLabels.leftShift }}</span>
+            <div class="font-mono text-muted-foreground">
+              {{ bitOperations.leftShift1 }}
             </div>
-            <div>
-              <span class="font-medium">{{ bitOpLabels.rightShift }}</span>
-              <div class="font-mono text-muted-foreground">
-                {{ bitOperations.rightShift1 }}
-              </div>
+          </div>
+          <div>
+            <span class="font-medium">{{ bitOpLabels.rightShift }}</span>
+            <div class="font-mono text-muted-foreground">
+              {{ bitOperations.rightShift1 }}
             </div>
-            <div>
-              <span class="font-medium">{{ bitOpLabels.and15 }}</span>
-              <div class="font-mono text-muted-foreground">
-                {{ bitOperations.and15 }}
-              </div>
+          </div>
+          <div>
+            <span class="font-medium">{{ bitOpLabels.and15 }}</span>
+            <div class="font-mono text-muted-foreground">
+              {{ bitOperations.and15 }}
             </div>
-            <div>
-              <span class="font-medium">{{ bitOpLabels.or8 }}</span>
-              <div class="font-mono text-muted-foreground">
-                {{ bitOperations.or8 }}
-              </div>
+          </div>
+          <div>
+            <span class="font-medium">{{ bitOpLabels.or8 }}</span>
+            <div class="font-mono text-muted-foreground">
+              {{ bitOperations.or8 }}
             </div>
-            <div>
-              <span class="font-medium">{{ bitOpLabels.xor255 }}</span>
-              <div class="font-mono text-muted-foreground">
-                {{ bitOperations.xor255 }}
-              </div>
+          </div>
+          <div>
+            <span class="font-medium">{{ bitOpLabels.xor255 }}</span>
+            <div class="font-mono text-muted-foreground">
+              {{ bitOperations.xor255 }}
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>進数システムについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              各進数の用途
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>2進数（Binary）</strong>: コンピュータの基本、ビット演算、フラグ管理</li>
-              <li><strong>8進数（Octal）</strong>: Unixファイルパーミッション（例: 755）</li>
-              <li><strong>10進数（Decimal）</strong>: 一般的な数値表現</li>
-              <li><strong>16進数（Hexadecimal）</strong>: カラーコード、メモリアドレス、バイトデータ</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              プログラミングでの表記
-            </h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>進数</TableHead>
-                  <TableHead>JavaScript/TypeScript</TableHead>
-                  <TableHead>Python</TableHead>
-                  <TableHead>C/C++</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>2進数</TableCell>
-                  <TableCell class="font-mono">
-                    0b1010
-                  </TableCell>
-                  <TableCell class="font-mono">
-                    0b1010
-                  </TableCell>
-                  <TableCell class="font-mono">
-                    0b1010
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>8進数</TableCell>
-                  <TableCell class="font-mono">
-                    0o12
-                  </TableCell>
-                  <TableCell class="font-mono">
-                    0o12
-                  </TableCell>
-                  <TableCell class="font-mono">
-                    012
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>16進数</TableCell>
-                  <TableCell class="font-mono">
-                    0xA
-                  </TableCell>
-                  <TableCell class="font-mono">
-                    0xA
-                  </TableCell>
-                  <TableCell class="font-mono">
-                    0xA
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          進数システムについて
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            各進数の用途
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>2進数（Binary）</strong>: コンピュータの基本、ビット演算、フラグ管理</li>
+            <li><strong>8進数（Octal）</strong>: Unixファイルパーミッション（例: 755）</li>
+            <li><strong>10進数（Decimal）</strong>: 一般的な数値表現</li>
+            <li><strong>16進数（Hexadecimal）</strong>: カラーコード、メモリアドレス、バイトデータ</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            プログラミングでの表記
+          </h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>進数</TableHead>
+                <TableHead>JavaScript/TypeScript</TableHead>
+                <TableHead>Python</TableHead>
+                <TableHead>C/C++</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>2進数</TableCell>
+                <TableCell class="font-mono">
+                  0b1010
+                </TableCell>
+                <TableCell class="font-mono">
+                  0b1010
+                </TableCell>
+                <TableCell class="font-mono">
+                  0b1010
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>8進数</TableCell>
+                <TableCell class="font-mono">
+                  0o12
+                </TableCell>
+                <TableCell class="font-mono">
+                  0o12
+                </TableCell>
+                <TableCell class="font-mono">
+                  012
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>16進数</TableCell>
+                <TableCell class="font-mono">
+                  0xA
+                </TableCell>
+                <TableCell class="font-mono">
+                  0xA
+                </TableCell>
+                <TableCell class="font-mono">
+                  0xA
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

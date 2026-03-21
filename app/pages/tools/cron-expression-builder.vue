@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 // Cron式のパーツ
 const minute = ref('*')
@@ -113,7 +110,7 @@ const specialCharacters = [
 // Cron式をコピー
 const copyCron = async () => {
   await copy(cronExpression.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'Cron式をクリップボードにコピーしました',
   })
@@ -138,43 +135,49 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-        <CardDescription>
-          よく使われるCron式のパターン
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <button
-            v-for="preset in presets"
-            :key="preset.value"
-            class="p-3 rounded-md border hover:bg-muted transition-colors text-left"
-            @click="applyPreset(preset)">
-            <div class="font-medium text-sm">
-              {{ preset.label }}
-            </div>
-            <div class="text-xs text-muted-foreground">
-              {{ preset.value }}
-            </div>
-          </button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            プリセット
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使われるCron式のパターン
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <button
+          v-for="preset in presets"
+          :key="preset.value"
+          class="p-3 rounded-md border hover:bg-muted transition-colors text-left"
+          @click="applyPreset(preset)">
+          <div class="font-medium text-sm">
+            {{ preset.label }}
+          </div>
+          <div class="text-xs text-muted-foreground">
+            {{ preset.value }}
+          </div>
+        </button>
+      </div>
+    </UCard>
 
     <!-- モード切り替え -->
-    <Card class="row-start-3 row-end-5 ">
-      <CardHeader>
-        <CardTitle>詳細設定</CardTitle>
-        <CardDescription>
-          各フィールドを個別に設定するか、直接Cron式を入力
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard class="row-start-3 row-end-5 ">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            詳細設定
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            各フィールドを個別に設定するか、直接Cron式を入力
+          </p>
+        </div>
+      </template>
+      <div class="space-y-4">
         <div>
           <label class="text-sm font-medium mb-2 block">直接入力</label>
-          <Input
+          <UInput
             v-model="customExpression"
             placeholder="* * * * *"
             class="font-mono" />
@@ -192,7 +195,7 @@ useSeoMeta({
         <div class="grid grid-cols-5 gap-2">
           <div>
             <label class="text-xs font-medium mb-1 block">分</label>
-            <Input
+            <UInput
               v-model="minute"
               :disabled="!!customExpression"
               placeholder="*"
@@ -200,7 +203,7 @@ useSeoMeta({
           </div>
           <div>
             <label class="text-xs font-medium mb-1 block">時</label>
-            <Input
+            <UInput
               v-model="hour"
               :disabled="!!customExpression"
               placeholder="*"
@@ -208,7 +211,7 @@ useSeoMeta({
           </div>
           <div>
             <label class="text-xs font-medium mb-1 block">日</label>
-            <Input
+            <UInput
               v-model="dayOfMonth"
               :disabled="!!customExpression"
               placeholder="*"
@@ -216,7 +219,7 @@ useSeoMeta({
           </div>
           <div>
             <label class="text-xs font-medium mb-1 block">月</label>
-            <Input
+            <UInput
               v-model="month"
               :disabled="!!customExpression"
               placeholder="*"
@@ -224,67 +227,69 @@ useSeoMeta({
           </div>
           <div>
             <label class="text-xs font-medium mb-1 block">曜日</label>
-            <Input
+            <UInput
               v-model="dayOfWeek"
               :disabled="!!customExpression"
               placeholder="*"
               class="font-mono text-center" />
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
     <!-- Cron式 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>生成されたCron式</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              生成されたCron式
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               このCron式をスケジューラーに設定してください
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             size="sm"
             variant="outline"
             @click="copyCron">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="p-4 bg-muted rounded-md font-mono text-lg text-center">
-          {{ cronExpression }}
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="p-4 bg-muted rounded-md font-mono text-lg text-center">
+        {{ cronExpression }}
+      </div>
+    </UCard>
     <!-- 次回実行時刻 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>次回実行予定</CardTitle>
-        <CardDescription>
-          次の5回の実行予定時刻
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <div
-            v-for="(execution, index) in nextExecutions"
-            :key="index"
-            class="flex items-center gap-2 p-2 rounded-md hover:bg-muted">
-            <Icon name="heroicons:clock" class="w-4 h-4 text-muted-foreground" />
-            <span class="text-sm">{{ execution }}</span>
-          </div>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            次回実行予定
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            次の5回の実行予定時刻
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="space-y-2">
+        <div
+          v-for="(execution, index) in nextExecutions"
+          :key="index"
+          class="flex items-center gap-2 p-2 rounded-md hover:bg-muted">
+          <Icon name="heroicons:clock" class="w-4 h-4 text-muted-foreground" />
+          <span class="text-sm">{{ execution }}</span>
+        </div>
+      </div>
+    </UCard>
 
-    <Card class="col-span-full grid grid-cols-2 gap-6">
+    <UCard class="col-span-full grid grid-cols-2 gap-6">
       <!-- フィールドの説明 -->
       <div class="col-span-full">
-        <CardHeader>
-          <CardTitle>フィールドの説明</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div class="p-4">
+          <h3 class="font-semibold mb-4">
+            フィールドの説明
+          </h3>
           <div class="space-y-2 text-sm">
             <div v-for="field in fieldDescriptions" :key="field.field" class="grid grid-cols-4 gap-2 py-1 border-b last:border-0">
               <div class="font-medium">
@@ -301,14 +306,14 @@ useSeoMeta({
               </div>
             </div>
           </div>
-        </CardContent>
+        </div>
       </div>
       <!-- 使用例 -->
       <div>
-        <CardHeader>
-          <CardTitle>Cron式の例</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div class="p-4">
+          <h3 class="font-semibold mb-4">
+            Cron式の例
+          </h3>
           <div class="grid grid-cols-2 gap-2">
             <code class="bg-muted px-2 py-1 rounded">0 0 * * *</code>
             <p class="text-muted-foreground mt-1">
@@ -327,22 +332,22 @@ useSeoMeta({
               毎月最終日の午前0時に実行
             </p>
           </div>
-        </CardContent>
+        </div>
       </div>
       <!-- 特殊文字の説明 -->
       <div>
-        <CardHeader>
-          <CardTitle>特殊文字</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div class="p-4">
+          <h3 class="font-semibold mb-4">
+            特殊文字
+          </h3>
           <div class="space-y-2">
             <div v-for="char in specialCharacters" :key="char.char" class="flex gap-3">
               <code class="w-8 text-center bg-muted px-1 py-0.5 rounded text-sm">{{ char.char }}</code>
               <span class="text-sm text-muted-foreground">{{ char.description }}</span>
             </div>
           </div>
-        </CardContent>
+        </div>
       </div>
-    </Card>
+    </UCard>
   </div>
 </template>

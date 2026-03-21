@@ -426,20 +426,20 @@ const downloadOutput = () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -550,262 +550,246 @@ useSeoMeta({
     </div>
 
     <!-- サンプル -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプル</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in samples"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          サンプル
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in samples"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 入力エリア -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>
+          <h3 class="font-semibold">
             {{ mode === 'yaml-to-json' ? 'YAML' : 'JSON' }}
-          </CardTitle>
-          <Button
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="inputText = ''; outputText = ''; errorLine = null">
             <Icon name="heroicons:x-mark" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="relative">
-          <div v-if="errorLine" class="absolute left-0 top-0 h-full w-full pointer-events-none">
-            <div
-              class="absolute left-0 right-0 bg-red-500/20 dark:bg-red-400/20"
-              :style="{
-                top: `${(errorLine - 1) * 1.5}em`,
-                height: '1.5em',
-              }">
-            </div>
+      </template>
+      <div class="relative">
+        <div v-if="errorLine" class="absolute left-0 top-0 h-full w-full pointer-events-none">
+          <div
+            class="absolute left-0 right-0 bg-red-500/20 dark:bg-red-400/20"
+            :style="{
+              top: `${(errorLine - 1) * 1.5}em`,
+              height: '1.5em',
+            }">
           </div>
-          <textarea
-            v-model="inputText"
-            :placeholder="mode === 'yaml-to-json' ? 'YAMLを入力...' : 'JSONを入力...'"
-            class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary leading-6"
-            :class="{ 'border-red-500': errorLine }"
-            spellcheck="false"
-            @input="convert"></textarea>
         </div>
-        <div class="mt-2 flex items-center justify-between text-sm text-muted-foreground">
-          <span>{{ stats.inputLines }} 行 / {{ (stats.inputSize / 1024).toFixed(2) }} KB</span>
-          <span v-if="errorLine" class="text-red-500">エラー: 行 {{ errorLine }}</span>
-        </div>
-      </CardContent>
-    </Card>
+        <textarea
+          v-model="inputText"
+          :placeholder="mode === 'yaml-to-json' ? 'YAMLを入力...' : 'JSONを入力...'"
+          class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary leading-6"
+          :class="{ 'border-red-500': errorLine }"
+          spellcheck="false"
+          @input="convert"></textarea>
+      </div>
+      <div class="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+        <span>{{ stats.inputLines }} 行 / {{ (stats.inputSize / 1024).toFixed(2) }} KB</span>
+        <span v-if="errorLine" class="text-red-500">エラー: 行 {{ errorLine }}</span>
+      </div>
+    </UCard>
 
     <!-- 出力エリア -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>
+          <h3 class="font-semibold">
             {{ mode === 'yaml-to-json' ? 'JSON' : 'YAML' }}
-          </CardTitle>
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="ghost"
               :disabled="!outputText"
               @click="downloadOutput">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="ghost"
               :disabled="!outputText"
               @click="copyToClipboard(outputText)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="error" class="mb-4">
-          <Alert variant="destructive">
-            <Icon name="heroicons:exclamation-circle" class="h-4 w-4" />
-            <AlertDescription>
-              {{ error }}
-            </AlertDescription>
-          </Alert>
-        </div>
-        <textarea
-          v-model="outputText"
-          readonly
-          :placeholder="mode === 'yaml-to-json' ? 'JSON出力がここに表示されます...' : 'YAML出力がここに表示されます...'"
-          class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-          spellcheck="false"></textarea>
-        <div class="mt-2 text-sm text-muted-foreground">
-          {{ stats.outputLines }} 行 / {{ (stats.outputSize / 1024).toFixed(2) }} KB
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div v-if="error" class="mb-4">
+        <UAlert color="error" icon="heroicons:exclamation-circle" :description="error" />
+      </div>
+      <textarea
+        v-model="outputText"
+        readonly
+        :placeholder="mode === 'yaml-to-json' ? 'JSON出力がここに表示されます...' : 'YAML出力がここに表示されます...'"
+        class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+        spellcheck="false"></textarea>
+      <div class="mt-2 text-sm text-muted-foreground">
+        {{ stats.outputLines }} 行 / {{ (stats.outputSize / 1024).toFixed(2) }} KB
+      </div>
+    </UCard>
 
     <!-- コントロール -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div class="flex flex-wrap items-center gap-4">
-            <!-- 変換モード -->
-            <div class="flex gap-2">
-              <Button
-                :variant="mode === 'yaml-to-json' ? 'default' : 'outline'"
-                @click="mode = 'yaml-to-json'; convert()">
-                YAML → JSON
-              </Button>
-              <Button
-                :variant="mode === 'json-to-yaml' ? 'default' : 'outline'"
-                @click="mode = 'json-to-yaml'; convert()">
-                JSON → YAML
-              </Button>
-            </div>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          設定
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div class="flex flex-wrap items-center gap-4">
+          <!-- 変換モード -->
+          <div class="flex gap-2">
+            <UButton
+              :variant="mode === 'yaml-to-json' ? 'default' : 'outline'"
+              @click="mode = 'yaml-to-json'; convert()">
+              YAML → JSON
+            </UButton>
+            <UButton
+              :variant="mode === 'json-to-yaml' ? 'default' : 'outline'"
+              @click="mode = 'json-to-yaml'; convert()">
+              JSON → YAML
+            </UButton>
+          </div>
 
-            <!-- インデントサイズ -->
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium">インデント:</label>
-              <div class="flex gap-1">
-                <Button
-                  v-for="size in [2, 4]"
-                  :key="size"
-                  size="sm"
-                  :variant="indentSize === size ? 'default' : 'outline'"
-                  @click="indentSize = size; convert()">
-                  {{ size }}
-                </Button>
-              </div>
-            </div>
-
-            <!-- アクション -->
-            <div class="flex gap-2 ml-auto">
-              <Button
-                variant="outline"
-                @click="swapInputOutput">
-                <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
-                入れ替え
-              </Button>
-              <label>
-                <input
-                  type="file"
-                  accept=".yaml,.yml,.json"
-                  class="hidden"
-                  @change="loadFile">
-                <Button variant="outline" as="span">
-                  <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
-                  ファイル
-                </Button>
-              </label>
+          <!-- インデントサイズ -->
+          <div class="flex items-center gap-2">
+            <label class="text-sm font-medium">インデント:</label>
+            <div class="flex gap-1">
+              <UButton
+                v-for="size in [2, 4]"
+                :key="size"
+                size="sm"
+                :variant="indentSize === size ? 'default' : 'outline'"
+                @click="indentSize = size; convert()">
+                {{ size }}
+              </UButton>
             </div>
           </div>
 
-          <!-- 詳細オプション -->
-          <div class="space-y-2">
-            <div class="flex items-center gap-4">
-              <label class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="sortKeys"
-                  type="checkbox"
-                  class="rounded"
-                  @change="convert">
-                キーをソート
-              </label>
-              <label v-if="mode === 'yaml-to-json'" class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="preserveComments"
-                  type="checkbox"
-                  class="rounded"
-                  @change="convert">
-                コメントを保持（開発中）
-              </label>
-              <label class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="validateSchema"
-                  type="checkbox"
-                  class="rounded">
-                JSON Schema検証
-              </label>
-            </div>
+          <!-- アクション -->
+          <div class="flex gap-2 ml-auto">
+            <UButton
+              variant="outline"
+              @click="swapInputOutput">
+              <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
+              入れ替え
+            </UButton>
+            <label>
+              <input
+                type="file"
+                accept=".yaml,.yml,.json"
+                class="hidden"
+                @change="loadFile">
+              <UButton variant="outline" as="span">
+                <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
+                ファイル
+              </UButton>
+            </label>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- 詳細オプション -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                v-model="sortKeys"
+                type="checkbox"
+                class="rounded"
+                @change="convert">
+              キーをソート
+            </label>
+            <label v-if="mode === 'yaml-to-json'" class="flex items-center gap-2 text-sm">
+              <input
+                v-model="preserveComments"
+                type="checkbox"
+                class="rounded"
+                @change="convert">
+              コメントを保持（開発中）
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                v-model="validateSchema"
+                type="checkbox"
+                class="rounded">
+              JSON Schema検証
+            </label>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- JSON Schema入力 -->
-    <Card v-if="validateSchema" class="col-span-full">
-      <CardHeader>
-        <CardTitle>JSON Schema</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="jsonSchema"
-          placeholder="JSON Schemaを入力..."
-          class="w-full h-[200px] p-3 font-mono text-sm border rounded-md bg-background resize-none"
-          spellcheck="false"
-          @input="convert"></textarea>
-        <div class="mt-2">
-          <Button
-            size="sm"
-            variant="outline"
-            @click="jsonSchema = JSON.stringify({
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                age: { type: 'number' },
-              },
-              required: ['name'],
-            }, null, 2); convert()">
-            サンプルスキーマ
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard v-if="validateSchema" class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          JSON Schema
+        </h3>
+      </template>
+      <textarea
+        v-model="jsonSchema"
+        placeholder="JSON Schemaを入力..."
+        class="w-full h-[200px] p-3 font-mono text-sm border rounded-md bg-background resize-none"
+        spellcheck="false"
+        @input="convert"></textarea>
+      <div class="mt-2">
+        <UButton
+          size="sm"
+          variant="outline"
+          @click="jsonSchema = JSON.stringify({
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              age: { type: 'number' },
+            },
+            required: ['name'],
+          }, null, 2); convert()">
+          サンプルスキーマ
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 注意事項 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>機能と制限事項</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <h3 class="font-semibold mb-2">
-              サポートされている機能
-            </h3>
-            <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>基本的なYAML/JSON構造の相互変換</li>
-              <li>ネストしたオブジェクトと配列</li>
-              <li>各種データ型（文字列、数値、真偽値、null、日付）</li>
-              <li>エラー行のハイライト表示</li>
-              <li>JSON Schema検証（簡易版）</li>
-              <li>キーのソート機能</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="h-4 w-4" />
-            <AlertDescription>
-              このツールは改良されたパーサーを使用していますが、以下のYAML機能はサポートしていません：
-              アンカー(&)、エイリアス(*)、複数ドキュメント(---)、タグ(!!)、複数行文字列(|, >)。
-              完全なYAML仕様のサポートが必要な場合は、js-yamlなどの専用ライブラリの使用を推奨します。
-            </AlertDescription>
-          </Alert>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          機能と制限事項
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-semibold mb-2">
+            サポートされている機能
+          </h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+            <li>基本的なYAML/JSON構造の相互変換</li>
+            <li>ネストしたオブジェクトと配列</li>
+            <li>各種データ型（文字列、数値、真偽値、null、日付）</li>
+            <li>エラー行のハイライト表示</li>
+            <li>JSON Schema検証（簡易版）</li>
+            <li>キーのソート機能</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <UAlert icon="heroicons:information-circle" description="このツールは改良されたパーサーを使用していますが、以下のYAML機能はサポートしていません： アンカー(&)、エイリアス(*)、複数ドキュメント(---)、タグ(!!)、複数行文字列(|, >)。 完全なYAML仕様のサポートが必要な場合は、js-yamlなどの専用ライブラリの使用を推奨します。" />
+      </div>
+    </UCard>
   </div>
 </template>

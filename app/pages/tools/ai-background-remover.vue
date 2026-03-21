@@ -157,17 +157,17 @@ const autoDetectBackground = async () => {
     // マスクを適用
     applyMask()
 
-    toast({
+    toast.add({
       title: '背景検出完了',
       description: '手動で調整が必要な部分を修正してください',
     })
   }
   catch {
     error.value = '背景検出に失敗しました'
-    toast({
+    toast.add({
       title: 'エラー',
       description: error.value,
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -368,7 +368,7 @@ const saveProcessedImage = () => {
 
   processedImage.value = canvasRef.value.toDataURL('image/png')
 
-  toast({
+  toast.add({
     title: '画像を生成しました',
     description: 'ダウンロードボタンから保存できます',
   })
@@ -401,7 +401,7 @@ const reset = () => {
 }
 
 // Toast
-const { toast } = useToast()
+const toast = useToast()
 
 // カーソルスタイル
 const cursorStyle = computed(() => {
@@ -428,239 +428,232 @@ useSeoMeta({
     </div>
 
     <!-- 画像アップロード -->
-    <Card v-if="!originalImage">
-      <CardContent class="p-6">
-        <div
-          class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
-          :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
-          @drop="handleDrop"
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave">
-          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p class="text-muted-foreground mb-2">
-            ドラッグ&ドロップまたはクリックして画像を選択
-          </p>
-          <p class="text-xs text-muted-foreground mb-4">
-            PNG、JPEG、WebP形式に対応
-          </p>
-          <label>
-            <input
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="handleImageUpload">
-            <Button variant="outline" as="span">
-              画像を選択
-            </Button>
-          </label>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard v-if="!originalImage">
+      <div
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+        :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
+        @drop="handleDrop"
+        @dragover="handleDragOver"
+        @dragleave="handleDragLeave">
+        <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <p class="text-muted-foreground mb-2">
+          ドラッグ&ドロップまたはクリックして画像を選択
+        </p>
+        <p class="text-xs text-muted-foreground mb-4">
+          PNG、JPEG、WebP形式に対応
+        </p>
+        <label>
+          <input
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="handleImageUpload">
+          <UButton variant="outline" as="span">
+            画像を選択
+          </UButton>
+        </label>
+      </div>
+    </UCard>
 
     <!-- エディター -->
     <div v-else class="space-y-6">
       <!-- ツールバー -->
-      <Card>
-        <CardHeader>
-          <CardTitle>編集ツール</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div class="flex flex-wrap gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                :class="{ 'bg-primary text-primary-foreground': isErasing }"
-                @click="isErasing = true">
-                <Icon name="heroicons:minus-circle" class="w-4 h-4 mr-2" />
-                背景を消す
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                :class="{ 'bg-primary text-primary-foreground': !isErasing }"
-                @click="isErasing = false">
-                <Icon name="heroicons:plus-circle" class="w-4 h-4 mr-2" />
-                背景を戻す
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                :disabled="processing"
-                @click="autoDetectBackground">
-                <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-                <Icon v-else name="heroicons:sparkles" class="w-4 h-4 mr-2" />
-                自動検出
-              </Button>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            編集ツール
+          </h3>
+        </template>
+        <div class="space-y-4">
+          <div class="flex flex-wrap gap-4">
+            <UButton
+              variant="outline"
+              size="sm"
+              :class="{ 'bg-primary text-primary-foreground': isErasing }"
+              @click="isErasing = true">
+              <Icon name="heroicons:minus-circle" class="w-4 h-4 mr-2" />
+              背景を消す
+            </UButton>
+            <UButton
+              variant="outline"
+              size="sm"
+              :class="{ 'bg-primary text-primary-foreground': !isErasing }"
+              @click="isErasing = false">
+              <Icon name="heroicons:plus-circle" class="w-4 h-4 mr-2" />
+              背景を戻す
+            </UButton>
+            <UButton
+              variant="outline"
+              size="sm"
+              :disabled="processing"
+              @click="autoDetectBackground">
+              <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+              <Icon v-else name="heroicons:sparkles" class="w-4 h-4 mr-2" />
+              自動検出
+            </UButton>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium mb-2 block">
+                ブラシサイズ: {{ brushSize }}px
+              </label>
+              <Slider
+                :model-value="[brushSize]"
+                :min="5"
+                :max="100"
+                :step="5"
+                class="w-full"
+                @update:model-value="brushSize = $event[0]" />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-medium mb-2 block">
-                  ブラシサイズ: {{ brushSize }}px
-                </label>
-                <Slider
-                  :model-value="[brushSize]"
-                  :min="5"
-                  :max="100"
-                  :step="5"
-                  class="w-full"
-                  @update:model-value="brushSize = $event[0]" />
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">
-                  エッジのぼかし: {{ edgeFeather }}px
-                </label>
-                <Slider
-                  :model-value="[edgeFeather]"
-                  :min="0"
-                  :max="10"
-                  :step="1"
-                  class="w-full"
-                  @update:model-value="edgeFeather = $event[0]; applyMask()" />
-              </div>
+            <div>
+              <label class="text-sm font-medium mb-2 block">
+                エッジのぼかし: {{ edgeFeather }}px
+              </label>
+              <Slider
+                :model-value="[edgeFeather]"
+                :min="0"
+                :max="10"
+                :step="1"
+                class="w-full"
+                @update:model-value="edgeFeather = $event[0]; applyMask()" />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- キャンバスエリア -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>画像編集</CardTitle>
+            <h3 class="font-semibold">
+              画像編集
+            </h3>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 variant="outline"
                 size="sm"
                 @click="showOriginal = !showOriginal">
                 <Icon name="heroicons:eye" class="w-4 h-4 mr-2" />
                 {{ showOriginal ? '編集後' : '元画像' }}を表示
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 variant="outline"
                 size="sm"
                 @click="reset">
                 <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
                 リセット
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="relative inline-block max-w-full overflow-auto">
-            <!-- 背景チェッカーパターン -->
-            <div
-              class="absolute inset-0 opacity-10"
-              style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ccc%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ccc%22/></svg>'); background-repeat: repeat;">
-            </div>
-
-            <!-- メインキャンバス -->
-            <canvas
-              ref="canvasRef"
-              class="relative"
-              :class="{ 'opacity-0': showOriginal }"></canvas>
-
-            <!-- オーバーレイキャンバス（マウス操作用） -->
-            <canvas
-              ref="overlayCanvasRef"
-              class="absolute inset-0"
-              :style="{ cursor: cursorStyle }"
-              @mousedown="startDrawing"
-              @mousemove="draw"
-              @mouseup="stopDrawing"
-              @mouseleave="stopDrawing"></canvas>
-
-            <!-- 元画像表示 -->
-            <img
-              v-if="showOriginal"
-              :src="originalImage"
-              class="absolute inset-0"
-              alt="Original">
+        </template>
+        <div class="relative inline-block max-w-full overflow-auto">
+          <!-- 背景チェッカーパターン -->
+          <div
+            class="absolute inset-0 opacity-10"
+            style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ccc%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ccc%22/></svg>'); background-repeat: repeat;">
           </div>
 
-          <Alert v-if="error" variant="destructive" class="mt-4">
-            <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
-        </CardContent>
-        <CardFooter class="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            @click="saveProcessedImage">
-            <Icon name="heroicons:check" class="w-4 h-4 mr-2" />
-            処理を完了
-          </Button>
-        </CardFooter>
-      </Card>
+          <!-- メインキャンバス -->
+          <canvas
+            ref="canvasRef"
+            class="relative"
+            :class="{ 'opacity-0': showOriginal }"></canvas>
+
+          <!-- オーバーレイキャンバス（マウス操作用） -->
+          <canvas
+            ref="overlayCanvasRef"
+            class="absolute inset-0"
+            :style="{ cursor: cursorStyle }"
+            @mousedown="startDrawing"
+            @mousemove="draw"
+            @mouseup="stopDrawing"
+            @mouseleave="stopDrawing"></canvas>
+
+          <!-- 元画像表示 -->
+          <img
+            v-if="showOriginal"
+            :src="originalImage"
+            class="absolute inset-0"
+            alt="Original">
+        </div>
+
+        <UAlert
+          v-if="error" class="mt-4" color="error"
+          icon="heroicons:exclamation-circle" :description="error" />
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton
+              variant="outline"
+              @click="saveProcessedImage">
+              <Icon name="heroicons:check" class="w-4 h-4 mr-2" />
+              処理を完了
+            </UButton>
+          </div>
+        </template>
+      </UCard>
 
       <!-- 処理結果 -->
-      <Card v-if="processedImage">
-        <CardHeader>
-          <CardTitle>処理結果</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="relative inline-block">
-            <!-- 背景チェッカーパターン -->
-            <div
-              class="absolute inset-0 opacity-10"
-              style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ccc%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ccc%22/></svg>'); background-repeat: repeat;">
-            </div>
-            <img
-              :src="processedImage"
-              class="relative max-w-full h-auto"
-              alt="Processed">
+      <UCard v-if="processedImage">
+        <template #header>
+          <h3 class="font-semibold">
+            処理結果
+          </h3>
+        </template>
+        <div class="relative inline-block">
+          <!-- 背景チェッカーパターン -->
+          <div
+            class="absolute inset-0 opacity-10"
+            style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22><rect width=%2210%22 height=%2210%22 fill=%22%23ccc%22/><rect x=%2210%22 y=%2210%22 width=%2210%22 height=%2210%22 fill=%22%23ccc%22/></svg>'); background-repeat: repeat;">
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button @click="downloadImage">
+          <img
+            :src="processedImage"
+            class="relative max-w-full h-auto"
+            alt="Processed">
+        </div>
+        <template #footer>
+          <UButton @click="downloadImage">
             <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
             ダウンロード (PNG)
-          </Button>
-        </CardFooter>
-      </Card>
+          </UButton>
+        </template>
+      </UCard>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>使い方</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              基本的な使い方
-            </h3>
-            <ol class="list-decimal list-inside space-y-1">
-              <li>画像をアップロードします</li>
-              <li>「自動検出」ボタンで背景を自動的に検出します</li>
-              <li>ブラシツールで手動調整を行います</li>
-              <li>「処理を完了」ボタンで結果を生成します</li>
-              <li>透過PNG形式でダウンロードします</li>
-            </ol>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              手動調整のコツ
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>「背景を消す」モードで不要な部分を削除</li>
-              <li>「背景を戻す」モードで必要な部分を復元</li>
-              <li>ブラシサイズを調整して細かい部分を編集</li>
-              <li>エッジのぼかしで自然な仕上がりに</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              このツールは簡易的なエッジ検出アルゴリズムを使用しています。
-              複雑な背景の場合は手動調整が必要になることがあります。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          使い方
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            基本的な使い方
+          </h3>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>画像をアップロードします</li>
+            <li>「自動検出」ボタンで背景を自動的に検出します</li>
+            <li>ブラシツールで手動調整を行います</li>
+            <li>「処理を完了」ボタンで結果を生成します</li>
+            <li>透過PNG形式でダウンロードします</li>
+          </ol>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            手動調整のコツ
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>「背景を消す」モードで不要な部分を削除</li>
+            <li>「背景を戻す」モードで必要な部分を復元</li>
+            <li>ブラシサイズを調整して細かい部分を編集</li>
+            <li>エッジのぼかしで自然な仕上がりに</li>
+          </ul>
+        </div>
+        <UAlert icon="heroicons:information-circle" description="このツールは簡易的なエッジ検出アルゴリズムを使用しています。 複雑な背景の場合は手動調整が必要になることがあります。" />
+      </div>
+    </UCard>
   </div>
 </template>

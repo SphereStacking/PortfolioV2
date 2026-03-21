@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const leftText = ref('')
 const rightText = ref('')
@@ -215,7 +213,7 @@ const copyDiff = async () => {
     .join('\n')
 
   await copy(diffText)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: '差分をクリップボードにコピーしました',
   })
@@ -247,114 +245,128 @@ useSeoMeta({
     </div>
 
     <!-- サンプルプリセット -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルテキスト</CardTitle>
-        <CardDescription>
-          よく使われるテキストパターンを選択できます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleTexts"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            サンプルテキスト
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使われるテキストパターンを選択できます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleTexts"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card class="col-span-full grid grid-cols-2 gap-6">
+    <UCard class="col-span-full grid grid-cols-2 gap-6">
       <!-- コントロール -->
-      <CardHeader class="col-span-full flex flex-row justify-between">
-        <CardTitle>テキストの比較</CardTitle>
-        <div class="flex flex-wrap items-center gap-4">
-          <div class="flex items-center gap-4">
-            <label class="flex items-center gap-2">
-              <input
-                v-model="ignoreCase"
-                type="checkbox"
-                class="rounded">
-              <span class="text-sm">大文字小文字を無視</span>
-            </label>
+      <template #header>
+        <div class="col-span-full flex flex-row justify-between">
+          <h3 class="font-semibold">
+            テキストの比較
+          </h3>
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2">
+                <input
+                  v-model="ignoreCase"
+                  type="checkbox"
+                  class="rounded">
+                <span class="text-sm">大文字小文字を無視</span>
+              </label>
 
-            <label class="flex items-center gap-2">
-              <input
-                v-model="ignoreWhitespace"
-                type="checkbox"
-                class="rounded">
-              <span class="text-sm">空白を無視</span>
-            </label>
+              <label class="flex items-center gap-2">
+                <input
+                  v-model="ignoreWhitespace"
+                  type="checkbox"
+                  class="rounded">
+                <span class="text-sm">空白を無視</span>
+              </label>
+            </div>
+
+            <UButton
+              variant="outline"
+              size="sm"
+              @click="swapTexts">
+              <Icon name="heroicons:arrows-right-left" class="w-4 h-4 mr-1" />
+              左右を入れ替え
+            </UButton>
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            @click="swapTexts">
-            <Icon name="heroicons:arrows-right-left" class="w-4 h-4 mr-1" />
-            左右を入れ替え
-          </Button>
         </div>
-      </CardHeader>
+      </template>
 
       <div>
-        <CardHeader>
-          <CardTitle>元のテキスト</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div class="p-4">
+          <h3 class="font-semibold">
+            元のテキスト
+          </h3>
+        </div>
+        <div class="px-4 pb-4">
           <textarea
             v-model="leftText"
             class="w-full h-64 p-3 rounded-md border bg-background font-mono text-sm resize-y"
             placeholder="比較元のテキストを入力..."></textarea>
-        </CardContent>
+        </div>
       </div>
 
       <div>
-        <CardHeader>
-          <CardTitle>新しいテキスト</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div class="p-4">
+          <h3 class="font-semibold">
+            新しいテキスト
+          </h3>
+        </div>
+        <div class="px-4 pb-4">
           <textarea
             v-model="rightText"
             class="w-full h-64 p-3 rounded-md border bg-background font-mono text-sm resize-y"
             placeholder="比較先のテキストを入力..."></textarea>
-        </CardContent>
+        </div>
       </div>
-    </Card>
+    </UCard>
 
     <!-- 差分表示 -->
-    <Card class="col-span-full">
-      <CardHeader class="flex flex-row justify-between ">
-        <CardTitle>差分</CardTitle>
-        <div class="flex gap-2">
-          <Button
-            :variant="viewMode === 'split' ? 'default' : 'outline'"
-            size="sm"
-            @click="viewMode = 'split'">
-            <Icon name="heroicons:view-columns" class="w-4 h-4 mr-1" />
-            分割表示
-          </Button>
-          <Button
-            :variant="viewMode === 'unified' ? 'default' : 'outline'"
-            size="sm"
-            @click="viewMode = 'unified'">
-            <Icon name="heroicons:bars-3" class="w-4 h-4 mr-1" />
-            統一表示
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            @click="copyDiff">
-            <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
-            差分をコピー
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div class="flex flex-row justify-between">
+          <h3 class="font-semibold">
+            差分
+          </h3>
+          <div class="flex gap-2">
+            <UButton
+              :variant="viewMode === 'split' ? 'solid' : 'outline'"
+              size="sm"
+              @click="viewMode = 'split'">
+              <Icon name="heroicons:view-columns" class="w-4 h-4 mr-1" />
+              分割表示
+            </UButton>
+            <UButton
+              :variant="viewMode === 'unified' ? 'solid' : 'outline'"
+              size="sm"
+              @click="viewMode = 'unified'">
+              <Icon name="heroicons:bars-3" class="w-4 h-4 mr-1" />
+              統一表示
+            </UButton>
+            <UButton
+              variant="outline"
+              size="sm"
+              @click="copyDiff">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
+              差分をコピー
+            </UButton>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent class="pt-6">
+      </template>
+      <div class="pt-6">
         <div class="flex items-center justify-around text-center">
           <div>
             <div class="text-2xl font-bold text-green-600">
@@ -381,8 +393,8 @@ useSeoMeta({
             </div>
           </div>
         </div>
-      </CardContent>
-      <CardContent>
+      </div>
+      <div>
         <div v-if="!leftText && !rightText" class="text-center py-12 text-muted-foreground">
           比較するテキストを入力してください
         </div>
@@ -480,7 +492,7 @@ useSeoMeta({
             </tbody>
           </table>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

@@ -154,19 +154,19 @@ async function decryptText(encryptedText: string, password: string): Promise<str
 // 処理実行
 const process = async () => {
   if (!inputText.value.trim()) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: mode.value === 'encrypt' ? 'テキストを入力してください' : '暗号化されたテキストを入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
 
   if (!password.value) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'パスワードを入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -177,24 +177,24 @@ const process = async () => {
   try {
     if (mode.value === 'encrypt') {
       outputText.value = await encryptText(inputText.value, password.value)
-      toast({
+      toast.add({
         title: '暗号化完了',
         description: 'テキストが暗号化されました',
       })
     }
     else {
       outputText.value = await decryptText(inputText.value, password.value)
-      toast({
+      toast.add({
         title: '復号化完了',
         description: 'テキストが復号化されました',
       })
     }
   }
   catch (error) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: error instanceof Error ? error.message : '処理に失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -252,20 +252,20 @@ const switchMode = () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -317,120 +317,116 @@ useSeoMeta({
     </div>
 
     <!-- 警告 -->
-    <Alert>
-      <Icon name="heroicons:shield-exclamation" class="w-4 h-4" />
-      <AlertTitle>セキュリティに関する注意</AlertTitle>
-      <AlertDescription>
-        このツールはブラウザ上で動作するため、機密性の高い情報の暗号化には適していません。
-        重要なデータの暗号化には、専門的なセキュリティツールを使用してください。
-      </AlertDescription>
-    </Alert>
+    <UAlert
+      icon="heroicons:shield-exclamation"
+      title="セキュリティに関する注意"
+      description="このツールはブラウザ上で動作するため、機密性の高い情報の暗号化には適していません。重要なデータの暗号化には、専門的なセキュリティツールを使用してください。" />
 
     <!-- モード選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>モード選択</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex gap-2">
-          <Button
-            :variant="mode === 'encrypt' ? 'default' : 'outline'"
-            @click="mode = 'encrypt'">
-            <Icon name="heroicons:lock-closed" class="w-4 h-4 mr-2" />
-            暗号化
-          </Button>
-          <Button
-            :variant="mode === 'decrypt' ? 'default' : 'outline'"
-            @click="mode = 'decrypt'">
-            <Icon name="heroicons:lock-open" class="w-4 h-4 mr-2" />
-            復号化
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            @click="switchMode">
-            <Icon name="heroicons:arrows-right-left" class="w-4 h-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          モード選択
+        </h3>
+      </template>
+      <div class="flex gap-2">
+        <UButton
+          :variant="mode === 'encrypt' ? 'default' : 'outline'"
+          @click="mode = 'encrypt'">
+          <Icon name="heroicons:lock-closed" class="w-4 h-4 mr-2" />
+          暗号化
+        </UButton>
+        <UButton
+          :variant="mode === 'decrypt' ? 'default' : 'outline'"
+          @click="mode = 'decrypt'">
+          <Icon name="heroicons:lock-open" class="w-4 h-4 mr-2" />
+          復号化
+        </UButton>
+        <UButton
+          variant="ghost"
+          size="icon"
+          @click="switchMode">
+          <Icon name="heroicons:arrows-right-left" class="w-4 h-4" />
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>暗号化設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          暗号化設定
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            パスワード
+          </label>
+          <div class="relative">
+            <UInput
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="強力なパスワードを入力"
+              class="pr-10" />
+            <UButton
+              variant="ghost"
+              size="icon"
+              class="absolute right-0 top-0 h-full px-3"
+              @click="showPassword = !showPassword">
+              <Icon
+                :name="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
+                class="w-4 h-4" />
+            </UButton>
+          </div>
+          <p class="text-sm mt-1" :class="passwordStrength.color">
+            強度: {{ passwordStrength.label }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="text-sm font-medium mb-2 block">
-              パスワード
+              暗号化方式
             </label>
-            <div class="relative">
-              <Input
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="強力なパスワードを入力"
-                class="pr-10" />
-              <Button
-                variant="ghost"
-                size="icon"
-                class="absolute right-0 top-0 h-full px-3"
-                @click="showPassword = !showPassword">
-                <Icon
-                  :name="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
-                  class="w-4 h-4" />
-              </Button>
+            <div class="flex gap-2">
+              <UButton
+                v-for="alg in ['AES-256', 'AES-128'] as const"
+                :key="alg"
+                :variant="algorithm === alg ? 'default' : 'outline'"
+                size="sm"
+                @click="algorithm = alg">
+                {{ alg }}
+              </UButton>
             </div>
-            <p class="text-sm mt-1" :class="passwordStrength.color">
-              強度: {{ passwordStrength.label }}
-            </p>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                暗号化方式
-              </label>
-              <div class="flex gap-2">
-                <Button
-                  v-for="alg in ['AES-256', 'AES-128'] as const"
-                  :key="alg"
-                  :variant="algorithm === alg ? 'default' : 'outline'"
-                  size="sm"
-                  @click="algorithm = alg">
-                  {{ alg }}
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                出力形式
-              </label>
-              <div class="flex gap-2">
-                <Button
-                  v-for="fmt in ['base64', 'hex'] as const"
-                  :key="fmt"
-                  :variant="outputFormat === fmt ? 'default' : 'outline'"
-                  size="sm"
-                  @click="outputFormat = fmt">
-                  {{ fmt.toUpperCase() }}
-                </Button>
-              </div>
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              出力形式
+            </label>
+            <div class="flex gap-2">
+              <UButton
+                v-for="fmt in ['base64', 'hex'] as const"
+                :key="fmt"
+                :variant="outputFormat === fmt ? 'default' : 'outline'"
+                size="sm"
+                @click="outputFormat = fmt">
+                {{ fmt.toUpperCase() }}
+              </UButton>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 入力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>
+          <h3 class="font-semibold">
             {{ mode === 'encrypt' ? '平文テキスト' : '暗号化テキスト' }}
-          </CardTitle>
+          </h3>
           <div class="flex gap-2">
             <label>
               <input
@@ -438,117 +434,113 @@ useSeoMeta({
                 accept=".txt"
                 class="hidden"
                 @change="loadFile">
-              <Button size="sm" variant="outline" as="span">
+              <UButton size="sm" variant="outline" as="span">
                 <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
                 ファイル読込
-              </Button>
+              </UButton>
             </label>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="inputText"
-          :placeholder="mode === 'encrypt' ? 'ここにテキストを入力してください' : 'ここに暗号化されたテキストを貼り付けてください'"
-          class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-          spellcheck="false"></textarea>
-      </CardContent>
-      <CardFooter>
-        <Button
+      </template>
+      <textarea
+        v-model="inputText"
+        :placeholder="mode === 'encrypt' ? 'ここにテキストを入力してください' : 'ここに暗号化されたテキストを貼り付けてください'"
+        class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+        spellcheck="false"></textarea>
+      <template #footer>
+        <UButton
           class="w-full"
           :disabled="!inputText || !password || processing"
           @click="process">
           <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
           {{ mode === 'encrypt' ? '暗号化' : '復号化' }}
-        </Button>
-      </CardFooter>
-    </Card>
+        </UButton>
+      </template>
+    </UCard>
 
     <!-- 出力 -->
-    <Card v-if="outputText">
-      <CardHeader>
+    <UCard v-if="outputText">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>
+          <h3 class="font-semibold">
             {{ mode === 'encrypt' ? '暗号化結果' : '復号化結果' }}
-          </CardTitle>
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="ghost"
               @click="copyToClipboard(outputText)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               @click="saveToFile">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
               保存
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="outputText"
-          readonly
-          class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-          spellcheck="false"></textarea>
-      </CardContent>
-    </Card>
+      </template>
+      <textarea
+        v-model="outputText"
+        readonly
+        class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+        spellcheck="false"></textarea>
+    </UCard>
 
     <!-- アクション -->
     <div class="flex justify-end">
-      <Button
+      <UButton
         variant="outline"
         @click="clearAll">
         <Icon name="heroicons:x-mark" class="w-4 h-4 mr-2" />
         クリア
-      </Button>
+      </UButton>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>使用方法と技術仕様</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              暗号化プロセス
-            </h3>
-            <ol class="list-decimal list-inside space-y-1">
-              <li>PBKDF2を使用してパスワードからキーを導出（100,000回反復）</li>
-              <li>ランダムなソルト（16バイト）とIV（12バイト）を生成</li>
-              <li>AES-GCMモードで暗号化</li>
-              <li>結果をBase64またはHex形式でエンコード</li>
-            </ol>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              セキュリティ機能
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>認証付き暗号化（AES-GCM）でデータの完全性を保証</li>
-              <li>各暗号化でランダムなソルトとIVを使用</li>
-              <li>PBKDF2による総当たり攻撃への耐性</li>
-              <li>Web Crypto APIを使用した安全な実装</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              パスワードの推奨事項
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>最低8文字以上</li>
-              <li>大文字・小文字・数字・記号を含む</li>
-              <li>辞書に載っている単語を避ける</li>
-              <li>個人情報を含めない</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          使用方法と技術仕様
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            暗号化プロセス
+          </h3>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>PBKDF2を使用してパスワードからキーを導出（100,000回反復）</li>
+            <li>ランダムなソルト（16バイト）とIV（12バイト）を生成</li>
+            <li>AES-GCMモードで暗号化</li>
+            <li>結果をBase64またはHex形式でエンコード</li>
+          </ol>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            セキュリティ機能
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>認証付き暗号化（AES-GCM）でデータの完全性を保証</li>
+            <li>各暗号化でランダムなソルトとIVを使用</li>
+            <li>PBKDF2による総当たり攻撃への耐性</li>
+            <li>Web Crypto APIを使用した安全な実装</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            パスワードの推奨事項
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>最低8文字以上</li>
+            <li>大文字・小文字・数字・記号を含む</li>
+            <li>辞書に載っている単語を避ける</li>
+            <li>個人情報を含めない</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

@@ -93,10 +93,10 @@ const convertFileToBase64 = (file: File): Promise<ConversionResult> => {
 // 一括変換
 const convertAll = async () => {
   if (files.value.length === 0) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -109,17 +109,17 @@ const convertAll = async () => {
     results.value = await Promise.all(conversionPromises)
 
     const successCount = results.value.filter(r => !r.error).length
-    toast({
+    toast.add({
       title: '変換完了',
       description: `${successCount}個のファイルを変換しました`,
     })
   }
   catch (error) {
     console.error('Conversion error:', error)
-    toast({
+    toast.add({
       title: 'エラー',
       description: '変換中にエラーが発生しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -177,20 +177,20 @@ const generateCode = (result: ConversionResult, format: 'dataUrl' | 'css' | 'htm
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -239,304 +239,276 @@ useSeoMeta({
     </div>
 
     <!-- 設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>エンコード設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <label class="flex items-center gap-2 text-sm">
-              <input
-                v-model="includeDataUrl"
-                type="checkbox"
-                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              Data URL形式で出力（data:image/png;base64,...）
-            </label>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          エンコード設定
+        </h3>
+      </template>
 
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              行の長さ（0で改行なし）: {{ chunkSize[0] }}文字
-            </label>
-            <Slider
-              :model-value="chunkSize"
-              :min="0"
-              :max="100"
-              :step="4"
-              class="max-w-md"
-              @update:model-value="chunkSize = $event" />
-            <p class="text-xs text-muted-foreground mt-1">
-              通常は76文字が標準的です
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-
-    <!-- ファイル選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>ファイル選択</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div
-          class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
-          :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
-          @drop="handleDrop"
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave">
-          <Icon name="heroicons:document-arrow-up" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p class="text-muted-foreground mb-2">
-            ドラッグ&ドロップまたはクリックしてファイルを選択
-          </p>
-          <p class="text-xs text-muted-foreground mb-4">
-            任意のファイル形式に対応（推奨: 10MB以下）
-          </p>
-          <label>
+      <div class="space-y-4">
+        <div>
+          <label class="flex items-center gap-2 text-sm">
             <input
-              type="file"
-              multiple
-              class="hidden"
-              @change="handleFileSelect">
-            <Button variant="outline" as="span">
-              ファイルを選択
-            </Button>
+              v-model="includeDataUrl"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            Data URL形式で出力（data:image/png;base64,...）
           </label>
         </div>
 
-        <div v-if="files.length > 0" class="mt-4">
-          <div class="flex items-center justify-between mb-2">
-            <p class="text-sm font-medium">
-              選択中: {{ files.length }}個のファイル
-            </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              @click="clearAll">
-              クリア
-            </Button>
-          </div>
-          <div class="space-y-2 max-h-40 overflow-y-auto">
-            <div
-              v-for="(file, index) in files"
-              :key="index"
-              class="flex items-center justify-between p-2 bg-muted rounded text-sm">
-              <div class="flex items-center gap-2 flex-1 min-w-0">
-                <Icon
-                  :name="file.type.startsWith('image/') ? 'heroicons:photo' : 'heroicons:document'"
-                  class="w-4 h-4 flex-shrink-0" />
-                <span class="truncate">{{ file.name }}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="text-muted-foreground">{{ formatFileSize(file.size) }}</span>
-                <Badge variant="outline" class="text-xs">
-                  {{ file.type || 'unknown' }}
-                </Badge>
-              </div>
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            行の長さ（0で改行なし）: {{ chunkSize[0] }}文字
+          </label>
+          <Slider
+            :model-value="chunkSize"
+            :min="0"
+            :max="100"
+            :step="4"
+            class="max-w-md"
+            @update:model-value="chunkSize = $event" />
+          <p class="text-xs text-muted-foreground mt-1">
+            通常は76文字が標準的です
+          </p>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- ファイル選択 -->
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          ファイル選択
+        </h3>
+      </template>
+
+      <div
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+        :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
+        @drop="handleDrop"
+        @dragover="handleDragOver"
+        @dragleave="handleDragLeave">
+        <Icon name="heroicons:document-arrow-up" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <p class="text-muted-foreground mb-2">
+          ドラッグ&ドロップまたはクリックしてファイルを選択
+        </p>
+        <p class="text-xs text-muted-foreground mb-4">
+          任意のファイル形式に対応（推奨: 10MB以下）
+        </p>
+        <label>
+          <input
+            type="file"
+            multiple
+            class="hidden"
+            @change="handleFileSelect">
+          <UButton variant="outline" as="span">
+            ファイルを選択
+          </UButton>
+        </label>
+      </div>
+
+      <div v-if="files.length > 0" class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium">
+            選択中: {{ files.length }}個のファイル
+          </p>
+          <UButton
+            variant="ghost"
+            size="sm"
+            @click="clearAll">
+            クリア
+          </UButton>
+        </div>
+        <div class="space-y-2 max-h-40 overflow-y-auto">
+          <div
+            v-for="(file, index) in files"
+            :key="index"
+            class="flex items-center justify-between p-2 bg-muted rounded text-sm">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <Icon
+                :name="file.type.startsWith('image/') ? 'heroicons:photo' : 'heroicons:document'"
+                class="w-4 h-4 flex-shrink-0" />
+              <span class="truncate">{{ file.name }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-muted-foreground">{{ formatFileSize(file.size) }}</span>
+              <UBadge variant="outline" class="text-xs">
+                {{ file.type || 'unknown' }}
+              </UBadge>
             </div>
           </div>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button
+      </div>
+
+      <template #footer>
+        <UButton
           class="w-full"
           :disabled="files.length === 0 || processing"
           @click="convertAll">
           <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
           Base64に変換
-        </Button>
-      </CardFooter>
-    </Card>
+        </UButton>
+      </template>
+    </UCard>
 
     <!-- 変換結果 -->
     <div v-if="results.length > 0" class="space-y-4">
-      <Card v-for="(result, index) in results" :key="index">
-        <CardHeader>
+      <UCard v-for="(result, index) in results" :key="index">
+        <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <Icon
                 :name="result.file.type.startsWith('image/') ? 'heroicons:photo' : 'heroicons:document'"
                 class="w-5 h-5" />
-              <CardTitle class="text-lg">
+              <h3 class="font-semibold text-lg">
                 {{ result.file.name }}
-              </CardTitle>
+              </h3>
             </div>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 size="sm"
                 variant="outline"
                 @click="downloadAsText(result)">
                 <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
                 TXT保存
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <!-- エラー表示 -->
-            <Alert v-if="result.error" variant="destructive">
-              <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-              <AlertDescription>{{ result.error }}</AlertDescription>
-            </Alert>
+        </template>
 
-            <!-- 成功時の表示 -->
-            <template v-else>
-              <!-- ファイル情報 -->
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                <div>
-                  <span class="text-muted-foreground">元のサイズ:</span>
-                  <span class="ml-1 font-mono">{{ formatFileSize(result.file.size) }}</span>
-                </div>
-                <div>
-                  <span class="text-muted-foreground">Base64サイズ:</span>
-                  <span class="ml-1 font-mono">{{ formatFileSize(calculateBase64Size(result.base64)) }}</span>
-                </div>
-                <div>
-                  <span class="text-muted-foreground">増加率:</span>
-                  <span class="ml-1 font-mono">
-                    +{{ Math.round((calculateBase64Size(result.base64) / result.file.size - 1) * 100) }}%
-                  </span>
-                </div>
-                <div>
-                  <span class="text-muted-foreground">MIME Type:</span>
-                  <span class="ml-1 font-mono text-xs">{{ result.file.type || 'unknown' }}</span>
-                </div>
+        <div class="space-y-4">
+          <!-- エラー表示 -->
+          <UAlert
+            v-if="result.error" color="error" icon="heroicons:exclamation-circle"
+            :description="result.error" />
+
+          <!-- 成功時の表示 -->
+          <template v-else>
+            <!-- ファイル情報 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              <div>
+                <span class="text-muted-foreground">元のサイズ:</span>
+                <span class="ml-1 font-mono">{{ formatFileSize(result.file.size) }}</span>
               </div>
-
-              <!-- 画像プレビュー -->
-              <div v-if="isPreviewable(result.file.type)" class="border rounded-md p-4 bg-background">
-                <p class="text-sm font-medium mb-2">
-                  プレビュー:
-                </p>
-                <img
-                  :src="result.dataUrl"
-                  :alt="result.file.name"
-                  class="max-w-full max-h-48 object-contain mx-auto">
+              <div>
+                <span class="text-muted-foreground">Base64サイズ:</span>
+                <span class="ml-1 font-mono">{{ formatFileSize(calculateBase64Size(result.base64)) }}</span>
               </div>
-
-              <!-- Base64出力 -->
-              <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <p class="text-sm font-medium">
-                    Base64出力:
-                  </p>
-                  <div class="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      @click="copyToClipboard(includeDataUrl ? result.dataUrl : result.base64)">
-                      <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-                <textarea
-                  :value="includeDataUrl ? result.dataUrl : result.base64"
-                  readonly
-                  class="w-full h-32 p-3 font-mono text-xs border rounded-md bg-muted resize-none"
-                  spellcheck="false"></textarea>
+              <div>
+                <span class="text-muted-foreground">増加率:</span>
+                <span class="ml-1 font-mono">
+                  +{{ Math.round((calculateBase64Size(result.base64) / result.file.size - 1) * 100) }}%
+                </span>
               </div>
+              <div>
+                <span class="text-muted-foreground">MIME Type:</span>
+                <span class="ml-1 font-mono text-xs">{{ result.file.type || 'unknown' }}</span>
+              </div>
+            </div>
 
-              <!-- コード例 -->
-              <div class="space-y-2">
+            <!-- 画像プレビュー -->
+            <div v-if="isPreviewable(result.file.type)" class="border rounded-md p-4 bg-background">
+              <p class="text-sm font-medium mb-2">
+                プレビュー:
+              </p>
+              <img
+                :src="result.dataUrl"
+                :alt="result.file.name"
+                class="max-w-full max-h-48 object-contain mx-auto">
+            </div>
+
+            <!-- Base64出力 -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
                 <p class="text-sm font-medium">
-                  使用例:
+                  Base64出力:
                 </p>
-                <Tabs default-value="html" class="w-full">
-                  <TabsList>
-                    <TabsTrigger value="html">
-                      HTML
-                    </TabsTrigger>
-                    <TabsTrigger value="css">
-                      CSS
-                    </TabsTrigger>
-                    <TabsTrigger value="img">
-                      IMG Tag
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="html" class="space-y-2">
-                    <pre class="p-3 bg-muted rounded-md overflow-x-auto text-xs"><code>{{ generateCode(result, 'html') }}</code></pre>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      @click="copyToClipboard(generateCode(result, 'html'))">
-                      コピー
-                    </Button>
-                  </TabsContent>
-                  <TabsContent value="css" class="space-y-2">
-                    <pre class="p-3 bg-muted rounded-md overflow-x-auto text-xs"><code>{{ generateCode(result, 'css') }}</code></pre>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      @click="copyToClipboard(generateCode(result, 'css'))">
-                      コピー
-                    </Button>
-                  </TabsContent>
-                  <TabsContent value="img" class="space-y-2">
-                    <pre class="p-3 bg-muted rounded-md overflow-x-auto text-xs"><code>{{ generateCode(result, 'img') }}</code></pre>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      @click="copyToClipboard(generateCode(result, 'img'))">
-                      コピー
-                    </Button>
-                  </TabsContent>
-                </Tabs>
+                <div class="flex gap-2">
+                  <UButton
+                    size="sm"
+                    variant="ghost"
+                    @click="copyToClipboard(includeDataUrl ? result.dataUrl : result.base64)">
+                    <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+                  </UButton>
+                </div>
               </div>
-            </template>
-          </div>
-        </CardContent>
-      </Card>
+              <textarea
+                :value="includeDataUrl ? result.dataUrl : result.base64"
+                readonly
+                class="w-full h-32 p-3 font-mono text-xs border rounded-md bg-muted resize-none"
+                spellcheck="false"></textarea>
+            </div>
+
+            <!-- コード例 -->
+            <div class="space-y-2">
+              <p class="text-sm font-medium">
+                使用例:
+              </p>
+              <UTabs
+                :items="[{ label: 'HTML', value: 'html' }, { label: 'CSS', value: 'css' }, { label: 'IMG Tag', value: 'img' }]"
+                default-value="html"
+                class="w-full">
+                <template #content="{ item }">
+                  <div class="space-y-2">
+                    <pre class="p-3 bg-muted rounded-md overflow-x-auto text-xs"><code>{{ generateCode(result, item.value as 'html' | 'css' | 'img') }}</code></pre>
+                    <UButton
+                      size="sm"
+                      variant="outline"
+                      @click="copyToClipboard(generateCode(result, item.value as 'html' | 'css' | 'img'))">
+                      コピー
+                    </UButton>
+                  </div>
+                </template>
+              </UTabs>
+            </div>
+          </template>
+        </div>
+      </UCard>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Base64エンコーディングについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Base64とは
-            </h3>
-            <p>
-              バイナリデータを64種類の印字可能なASCII文字で表現するエンコード方式です。
-              メールやWeb、JSONなどテキストベースのプロトコルでバイナリデータを扱う際に使用されます。
-            </p>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              特徴
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>データサイズが約33%増加する</li>
-              <li>任意のバイナリデータをテキストとして扱える</li>
-              <li>URL安全な変種（Base64URL）も存在</li>
-              <li>パディング文字として'='を使用</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              使用例
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>HTML/CSSへの画像埋め込み（Data URL）</li>
-              <li>メール添付ファイルのエンコード</li>
-              <li>JSONでのバイナリデータ送信</li>
-              <li>認証トークンの生成</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              大きなファイルのBase64エンコードは、ブラウザのメモリを大量に消費する可能性があります。
-              10MB以上のファイルの処理には注意してください。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Base64エンコーディングについて
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Base64とは
+          </h3>
+          <p>
+            バイナリデータを64種類の印字可能なASCII文字で表現するエンコード方式です。
+            メールやWeb、JSONなどテキストベースのプロトコルでバイナリデータを扱う際に使用されます。
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            特徴
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>データサイズが約33%増加する</li>
+            <li>任意のバイナリデータをテキストとして扱える</li>
+            <li>URL安全な変種（Base64URL）も存在</li>
+            <li>パディング文字として'='を使用</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            使用例
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>HTML/CSSへの画像埋め込み（Data URL）</li>
+            <li>メール添付ファイルのエンコード</li>
+            <li>JSONでのバイナリデータ送信</li>
+            <li>認証トークンの生成</li>
+          </ul>
+        </div>
+        <UAlert icon="heroicons:information-circle" description="大きなファイルのBase64エンコードは、ブラウザのメモリを大量に消費する可能性があります。 10MB以上のファイルの処理には注意してください。" />
+      </div>
+    </UCard>
   </div>
 </template>

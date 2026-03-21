@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog, useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 // 画像データ
 const imageUrl = ref<string>('')
@@ -45,10 +43,10 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 // ファイル処理
 const handleFile = (file: File) => {
   if (!file.type.startsWith('image/')) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -129,10 +127,10 @@ const extractColors = () => {
       isExtracting.value = false
     }
     catch {
-      toast({
+      toast.add({
         title: 'エラー',
         description: '色の抽出に失敗しました',
-        variant: 'destructive',
+        color: 'error',
       })
       isExtracting.value = false
     }
@@ -151,7 +149,7 @@ const rgbToHex = (r: number, g: number, b: number): string => {
 // カラーコピー
 const copyColor = async (color: string) => {
   await copy(color)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: `${color}をクリップボードにコピーしました`,
   })
@@ -181,7 +179,7 @@ const copyPalette = async (format: 'hex' | 'rgb' | 'css' | 'json') => {
   }
 
   await copy(text)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'カラーパレットをクリップボードにコピーしました',
   })
@@ -220,46 +218,50 @@ useSeoMeta({
         画像から主要な色を抽出してパレット化。配色の参考やブランドカラーの決定に便利。
       </p>
     </div>
-    <Card>
-      <CardHeader>
-        <CardTitle>画像選択</CardTitle>
-        <CardDescription>
-          カラーパレットを抽出したい画像をアップロード
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div
-          ref="dropZoneRef"
-          :class="[
-            'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-            isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
-          ]"
-          @click="openFileDialog">
-          <div v-if="!imageUrl">
-            <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p class="text-sm text-muted-foreground mb-2">
-              クリックまたはドロップで画像を選択
-            </p>
-          </div>
-          <div v-else class="space-y-4">
-            <img
-              :src="imageUrl"
-              alt="Selected"
-              class="max-w-full max-h-[300px] mx-auto rounded">
-            <p class="text-sm text-muted-foreground">
-              {{ fileName }}
-            </p>
-          </div>
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            画像選択
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            カラーパレットを抽出したい画像をアップロード
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div
+        ref="dropZoneRef"
+        :class="[
+          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+          isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+        ]"
+        @click="openFileDialog">
+        <div v-if="!imageUrl">
+          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p class="text-sm text-muted-foreground mb-2">
+            クリックまたはドロップで画像を選択
+          </p>
+        </div>
+        <div v-else class="space-y-4">
+          <img
+            :src="imageUrl"
+            alt="Selected"
+            class="max-w-full max-h-[300px] mx-auto rounded">
+          <p class="text-sm text-muted-foreground">
+            {{ fileName }}
+          </p>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>抽出設定</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          抽出設定
+        </h3>
+      </template>
+      <div class="space-y-4">
         <div>
           <label class="text-sm font-medium mb-2 block">
             抽出する色の数: {{ colorCount }}色
@@ -278,114 +280,116 @@ useSeoMeta({
         </div>
 
         <div class="flex gap-2">
-          <Button
+          <UButton
             :disabled="!imageUrl || isExtracting"
             class="flex-1"
             @click="extractColors">
             <Icon name="heroicons:eye-dropper" class="w-4 h-4 mr-1" />
             色を抽出
-          </Button>
-          <Button
+          </UButton>
+          <UButton
             variant="outline"
             :disabled="!imageUrl"
             @click="clearAll">
             クリア
-          </Button>
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
     <!-- 抽出された色 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>抽出されたカラーパレット</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              抽出されたカラーパレット
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               クリックでコピー
-            </CardDescription>
+            </p>
           </div>
           <div v-if="extractedColors.length > 0" class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               @click="copyPalette('hex')">
               HEX
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               @click="copyPalette('css')">
               CSS
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               @click="copyPalette('json')">
               JSON
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="isExtracting" class="text-center py-12">
-          <Icon name="heroicons:arrow-path" class="w-8 h-8 mx-auto mb-4 animate-spin" />
-          <p class="text-sm text-muted-foreground">
-            色を抽出中...
-          </p>
-        </div>
-        <div v-else-if="extractedColors.length > 0" class="space-y-4">
-          <!-- カラーバー -->
-          <div class="h-20 rounded-lg overflow-hidden flex">
-            <div
-              v-for="(color, index) in extractedColors"
-              :key="index"
-              :style="{ backgroundColor: color.hex, flex: color.percentage }"
-              class="transition-all hover:flex-grow"></div>
-          </div>
-
-          <!-- カラーリスト -->
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <button
-              v-for="(color, index) in extractedColors"
-              :key="index"
-              class="group"
-              @click="copyColor(color.hex)">
-              <div class="flex items-center gap-3 p-3 rounded-lg border hover:border-primary transition-colors">
-                <div
-                  :style="{ backgroundColor: color.hex }"
-                  class="w-12 h-12 rounded-md shadow-sm"></div>
-                <div class="flex-1 text-left">
-                  <p class="font-mono text-sm">
-                    {{ color.hex }}
-                  </p>
-                  <p class="text-xs text-muted-foreground">
-                    {{ color.percentage }}%
-                  </p>
-                </div>
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </button>
-          </div>
-
-          <!-- グラデーション -->
+      </template>
+      <div v-if="isExtracting" class="text-center py-12">
+        <Icon name="heroicons:arrow-path" class="w-8 h-8 mx-auto mb-4 animate-spin" />
+        <p class="text-sm text-muted-foreground">
+          色を抽出中...
+        </p>
+      </div>
+      <div v-else-if="extractedColors.length > 0" class="space-y-4">
+        <!-- カラーバー -->
+        <div class="h-20 rounded-lg overflow-hidden flex">
           <div
-            v-if="gradientCss"
-            class="h-20 rounded-lg"
-            :style="gradientCss"></div>
+            v-for="(color, index) in extractedColors"
+            :key="index"
+            :style="{ backgroundColor: color.hex, flex: color.percentage }"
+            class="transition-all hover:flex-grow"></div>
         </div>
-        <div v-else class="text-center py-12 text-muted-foreground">
-          <Icon name="heroicons:eye-dropper" class="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p>画像を選択して色を抽出してください</p>
+
+        <!-- カラーリスト -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <button
+            v-for="(color, index) in extractedColors"
+            :key="index"
+            class="group"
+            @click="copyColor(color.hex)">
+            <div class="flex items-center gap-3 p-3 rounded-lg border hover:border-primary transition-colors">
+              <div
+                :style="{ backgroundColor: color.hex }"
+                class="w-12 h-12 rounded-md shadow-sm"></div>
+              <div class="flex-1 text-left">
+                <p class="font-mono text-sm">
+                  {{ color.hex }}
+                </p>
+                <p class="text-xs text-muted-foreground">
+                  {{ color.percentage }}%
+                </p>
+              </div>
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </button>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- グラデーション -->
+        <div
+          v-if="gradientCss"
+          class="h-20 rounded-lg"
+          :style="gradientCss"></div>
+      </div>
+      <div v-else class="text-center py-12 text-muted-foreground">
+        <Icon name="heroicons:eye-dropper" class="w-12 h-12 mx-auto mb-4 opacity-20" />
+        <p>画像を選択して色を抽出してください</p>
+      </div>
+    </UCard>
 
     <!-- エクスポートオプション -->
-    <Card v-if="extractedColors.length > 0">
-      <CardHeader>
-        <CardTitle>エクスポート形式</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard v-if="extractedColors.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          エクスポート形式
+        </h3>
+      </template>
+      <div class="space-y-4">
         <div>
           <h4 class="text-sm font-medium mb-2">
             CSS変数
@@ -414,15 +418,17 @@ ${extractedColors.map((c, i) => `  'brand-${i + 1}': '${c.hex}',`).join('\n')}
 }` }}</code>
 </pre>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 使い方 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>活用例</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          活用例
+        </h3>
+      </template>
+      <div class="space-y-3 text-sm text-muted-foreground">
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <h4 class="font-semibold mb-2 text-foreground">
@@ -447,7 +453,7 @@ ${extractedColors.map((c, i) => `  'brand-${i + 1}': '${c.hex}',`).join('\n')}
             </ul>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

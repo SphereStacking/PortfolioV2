@@ -120,22 +120,22 @@ const escapeHtml = (text: string) => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       title: 'コピーしました',
       description: '正常にコピーされました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -198,38 +198,41 @@ useSeoMeta({
     </div>
 
     <!-- よく使うパターン -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>よく使うパターン</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-4 gap-2">
-          <button
-            v-for="commonPattern in commonPatterns"
-            :key="commonPattern.name"
-            class="w-full text-left p-2 rounded hover:bg-muted transition-colors"
-            @click="loadPattern(commonPattern)">
-            <div class="font-medium text-sm">
-              {{ commonPattern.name }}
-            </div>
-            <div class="text-xs text-muted-foreground">
-              {{ commonPattern.description }}
-            </div>
-          </button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          よく使うパターン
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-4 gap-2">
+        <button
+          v-for="commonPattern in commonPatterns"
+          :key="commonPattern.name"
+          class="w-full text-left p-2 rounded hover:bg-muted transition-colors"
+          @click="loadPattern(commonPattern)">
+          <div class="font-medium text-sm">
+            {{ commonPattern.name }}
+          </div>
+          <div class="text-xs text-muted-foreground">
+            {{ commonPattern.description }}
+          </div>
+        </button>
+      </div>
+    </UCard>
     <div class="space-y-6 col-span-2">
       <!-- パターン入力 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>正規表現パターン</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            正規表現パターン
+          </h3>
+        </template>
+        <div class="space-y-4">
           <div>
             <div class="flex gap-2">
               <span class="text-2xl text-muted-foreground">/</span>
-              <Input
+              <UInput
                 v-model="pattern"
                 placeholder="正規表現パターンを入力..."
                 class="flex-1 font-mono"
@@ -267,91 +270,93 @@ useSeoMeta({
               </span>
             </label>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- テスト文字列 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>テスト文字列</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="testString"
-            placeholder="テストする文字列を入力..."
-            class="w-full h-40 p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-            spellcheck="false">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            テスト文字列
+          </h3>
+        </template>
+
+        <textarea
+          v-model="testString"
+          placeholder="テストする文字列を入力..."
+          class="w-full h-40 p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+          spellcheck="false">
             </textarea>
-        </CardContent>
-      </Card>
+      </UCard>
 
       <!-- マッチ結果 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
             マッチ結果
-            <Badge v-if="matches.length > 0" class="ml-2">
+            <UBadge v-if="matches.length > 0" class="ml-2">
               {{ matches.length }}件
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div v-if="testString && pattern">
-            <!-- ハイライト表示 -->
-            <div class="p-4 bg-muted rounded-md mb-4 font-mono text-sm whitespace-pre-wrap break-all" v-html="highlightedText"></div>
+            </UBadge>
+          </h3>
+        </template>
 
-            <!-- マッチ詳細 -->
-            <div v-if="matches.length > 0" class="space-y-3">
-              <div
-                v-for="(match, index) in matches"
-                :key="index"
-                class="p-3 border rounded-md space-y-2">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium">マッチ {{ index + 1 }}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    @click="copyToClipboard(match.match)">
-                    <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                  </Button>
+        <div v-if="testString && pattern">
+          <!-- ハイライト表示 -->
+          <div class="p-4 bg-muted rounded-md mb-4 font-mono text-sm whitespace-pre-wrap break-all" v-html="highlightedText"></div>
+
+          <!-- マッチ詳細 -->
+          <div v-if="matches.length > 0" class="space-y-3">
+            <div
+              v-for="(match, index) in matches"
+              :key="index"
+              class="p-3 border rounded-md space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium">マッチ {{ index + 1 }}</span>
+                <UButton
+                  size="sm"
+                  variant="ghost"
+                  @click="copyToClipboard(match.match)">
+                  <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+                </UButton>
+              </div>
+              <div class="space-y-1 text-sm">
+                <div>
+                  <span class="text-muted-foreground">テキスト:</span>
+                  <code class="ml-2 px-2 py-0.5 bg-muted rounded">{{ match.match }}</code>
                 </div>
-                <div class="space-y-1 text-sm">
-                  <div>
-                    <span class="text-muted-foreground">テキスト:</span>
-                    <code class="ml-2 px-2 py-0.5 bg-muted rounded">{{ match.match }}</code>
-                  </div>
-                  <div>
-                    <span class="text-muted-foreground">位置:</span>
-                    <span class="ml-2">{{ match.index }}</span>
-                  </div>
-                  <div v-if="match.groups.length > 0">
-                    <span class="text-muted-foreground">グループ:</span>
-                    <span v-for="(group, gIndex) in match.groups" :key="gIndex" class="ml-2">
-                      <code class="px-2 py-0.5 bg-muted rounded">{{ group || '(empty)' }}</code>
-                    </span>
-                  </div>
+                <div>
+                  <span class="text-muted-foreground">位置:</span>
+                  <span class="ml-2">{{ match.index }}</span>
+                </div>
+                <div v-if="match.groups.length > 0">
+                  <span class="text-muted-foreground">グループ:</span>
+                  <span v-for="(group, gIndex) in match.groups" :key="gIndex" class="ml-2">
+                    <code class="px-2 py-0.5 bg-muted rounded">{{ group || '(empty)' }}</code>
+                  </span>
                 </div>
               </div>
             </div>
-            <div v-else class="text-center py-8 text-muted-foreground">
-              マッチする文字列が見つかりませんでした
-            </div>
           </div>
           <div v-else class="text-center py-8 text-muted-foreground">
-            パターンとテスト文字列を入力してください
+            マッチする文字列が見つかりませんでした
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div v-else class="text-center py-8 text-muted-foreground">
+          パターンとテスト文字列を入力してください
+        </div>
+      </UCard>
 
       <!-- 置換 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>置換</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            置換
+          </h3>
+        </template>
+        <div class="space-y-4">
           <div>
             <label class="text-sm font-medium mb-2 block">置換文字列</label>
-            <Input
+            <UInput
               v-model="replacementString"
               placeholder="置換する文字列 ($1, $2... でグループ参照)"
               class="font-mono" />
@@ -361,35 +366,36 @@ useSeoMeta({
             <div class="p-4 bg-muted rounded-md font-mono text-sm whitespace-pre-wrap break-all">
               {{ replacedString }}
             </div>
-            <Button
+            <UButton
               class="mt-2"
               variant="outline"
               size="sm"
               @click="copyToClipboard(replacedString)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
               コピー
-            </Button>
+            </UButton>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- クイックリファレンス -->
-    <Card class="col-span-1">
-      <CardHeader>
-        <CardTitle>クイックリファレンス</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-1 text-sm">
-          <div
-            v-for="refItem in references"
-            :key="refItem.char"
-            class="flex justify-between py-1">
-            <code class="font-mono">{{ refItem.char }}</code>
-            <span class="text-muted-foreground text-xs">{{ refItem.desc }}</span>
-          </div>
+    <UCard class="col-span-1">
+      <template #header>
+        <h3 class="font-semibold">
+          クイックリファレンス
+        </h3>
+      </template>
+
+      <div class="space-y-1 text-sm">
+        <div
+          v-for="refItem in references"
+          :key="refItem.char"
+          class="flex justify-between py-1">
+          <code class="font-mono">{{ refItem.char }}</code>
+          <span class="text-muted-foreground text-xs">{{ refItem.desc }}</span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

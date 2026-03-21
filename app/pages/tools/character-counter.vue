@@ -122,7 +122,7 @@ const clearText = () => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyStats = async () => {
   const stats = `文字数: ${characterCount.value}
@@ -135,16 +135,16 @@ const copyStats = async () => {
 
   try {
     await copy(stats)
-    toast({
+    toast.add({
       title: 'コピーしました',
       description: '統計情報をクリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -200,146 +200,152 @@ useSeoMeta({
     </div>
 
     <!-- サンプルテキスト -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルテキスト</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-3 gap-2">
-          <Button
-            v-for="sample in sampleTexts"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            class="w-full justify-start"
-            @click="loadSampleText(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardHeader>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルテキスト
+        </h3>
+      </template>
+      <div class="grid grid-cols-3 gap-2">
+        <UButton
+          v-for="sample in sampleTexts"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          class="w-full justify-start"
+          @click="loadSampleText(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>テキスト入力</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            テキスト入力
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="clearText">
             <Icon name="heroicons:x-mark" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="text"
-          placeholder="テキストを入力またはペーストしてください..."
-          class="w-full h-[600px] p-4 text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-          spellcheck="false">
+      </template>
+      <textarea
+        v-model="text"
+        placeholder="テキストを入力またはペーストしてください..."
+        class="w-full h-[600px] p-4 text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+        spellcheck="false">
             </textarea>
-      </CardContent>
-    </Card>
+    </UCard>
     <!-- 基本統計 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>基本統計</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            基本統計
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="copyStats">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-3">
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">文字数</span>
-            <span class="text-2xl font-bold">{{ characterCount.toLocaleString() }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">文字数（スペース除外）</span>
-            <span class="text-lg font-semibold">{{ characterCountWithoutSpaces.toLocaleString() }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">単語数</span>
-            <span class="text-lg font-semibold">{{ wordCount.toLocaleString() }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">行数</span>
-            <span class="text-lg font-semibold">{{ lineCount.toLocaleString() }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">段落数</span>
-            <span class="text-lg font-semibold">{{ paragraphCount.toLocaleString() }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">バイト数</span>
-            <span class="text-lg font-semibold">{{ byteCount.toLocaleString() }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">読了時間</span>
-            <span class="text-lg font-semibold">約{{ readingTime }}分</span>
-          </div>
+      </template>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">文字数</span>
+          <span class="text-2xl font-bold">{{ characterCount.toLocaleString() }}</span>
         </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>文字種別</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">ひらがな</span>
-            <span class="text-sm font-medium">{{ characterStats.hiragana }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">カタカナ</span>
-            <span class="text-sm font-medium">{{ characterStats.katakana }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">漢字</span>
-            <span class="text-sm font-medium">{{ characterStats.kanji }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">アルファベット</span>
-            <span class="text-sm font-medium">{{ characterStats.alphabet }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">数字</span>
-            <span class="text-sm font-medium">{{ characterStats.number }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">記号</span>
-            <span class="text-sm font-medium">{{ characterStats.symbol }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">スペース</span>
-            <span class="text-sm font-medium">{{ characterStats.space }}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-muted-foreground">改行</span>
-            <span class="text-sm font-medium">{{ characterStats.newline }}</span>
-          </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">文字数（スペース除外）</span>
+          <span class="text-lg font-semibold">{{ characterCountWithoutSpaces.toLocaleString() }}</span>
         </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>頻出文字 TOP10</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <div
-            v-for="(item, index) in characterFrequency"
-            :key="index"
-            class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-sm text-muted-foreground">{{ index + 1 }}.</span>
-              <code class="px-2 py-0.5 bg-muted rounded text-sm">{{ item.char }}</code>
-            </div>
-            <span class="text-sm font-medium">{{ item.count }}回</span>
-          </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">単語数</span>
+          <span class="text-lg font-semibold">{{ wordCount.toLocaleString() }}</span>
         </div>
-      </CardContent>
-    </Card>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">行数</span>
+          <span class="text-lg font-semibold">{{ lineCount.toLocaleString() }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">段落数</span>
+          <span class="text-lg font-semibold">{{ paragraphCount.toLocaleString() }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">バイト数</span>
+          <span class="text-lg font-semibold">{{ byteCount.toLocaleString() }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">読了時間</span>
+          <span class="text-lg font-semibold">約{{ readingTime }}分</span>
+        </div>
+      </div>
+    </UCard>
+    <!-- 文字種別 -->
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          文字種別
+        </h3>
+      </template>
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">ひらがな</span>
+          <span class="text-sm font-medium">{{ characterStats.hiragana }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">カタカナ</span>
+          <span class="text-sm font-medium">{{ characterStats.katakana }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">漢字</span>
+          <span class="text-sm font-medium">{{ characterStats.kanji }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">アルファベット</span>
+          <span class="text-sm font-medium">{{ characterStats.alphabet }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">数字</span>
+          <span class="text-sm font-medium">{{ characterStats.number }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">記号</span>
+          <span class="text-sm font-medium">{{ characterStats.symbol }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">スペース</span>
+          <span class="text-sm font-medium">{{ characterStats.space }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-muted-foreground">改行</span>
+          <span class="text-sm font-medium">{{ characterStats.newline }}</span>
+        </div>
+      </div>
+    </UCard>
+    <!-- 頻出文字 TOP10 -->
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          頻出文字 TOP10
+        </h3>
+      </template>
+      <div class="space-y-2">
+        <div
+          v-for="(item, index) in characterFrequency"
+          :key="index"
+          class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-muted-foreground">{{ index + 1 }}.</span>
+            <code class="px-2 py-0.5 bg-muted rounded text-sm">{{ item.char }}</code>
+          </div>
+          <span class="text-sm font-medium">{{ item.count }}回</span>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

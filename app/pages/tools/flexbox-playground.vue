@@ -173,22 +173,22 @@ const applyPreset = (preset: typeof presets[0]) => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyToClipboard = async () => {
   try {
     await copy(cssCode.value)
-    toast({
+    toast.add({
       title: 'コピーしました',
       description: 'CSSコードをクリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -212,44 +212,47 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-4 gap-3">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            variant="outline"
-            size="sm"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-4 gap-3">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          variant="outline"
+          size="sm"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 左側：コントロールパネル -->
     <div class="space-y-6 col-span-1">
       <!-- コンテナー設定 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>コンテナー設定</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            コンテナー設定
+          </h3>
+        </template>
+        <div class="space-y-4">
           <!-- flex-direction -->
           <div>
             <label class="text-sm font-medium mb-2 block">flex-direction</label>
             <div class="grid grid-cols-2 gap-2">
-              <Button
+              <UButton
                 v-for="value in ['row', 'row-reverse', 'column', 'column-reverse']"
                 :key="value"
                 :variant="containerProps.flexDirection === value ? 'default' : 'outline'"
                 size="sm"
                 @click="containerProps.flexDirection = value">
                 {{ value }}
-              </Button>
+              </UButton>
             </div>
           </div>
 
@@ -257,14 +260,14 @@ useSeoMeta({
           <div>
             <label class="text-sm font-medium mb-2 block">flex-wrap</label>
             <div class="grid grid-cols-2 gap-2">
-              <Button
+              <UButton
                 v-for="value in ['nowrap', 'wrap', 'wrap-reverse']"
                 :key="value"
                 :variant="containerProps.flexWrap === value ? 'default' : 'outline'"
                 size="sm"
                 @click="containerProps.flexWrap = value">
                 {{ value }}
-              </Button>
+              </UButton>
             </div>
           </div>
 
@@ -272,7 +275,7 @@ useSeoMeta({
           <div>
             <label class="text-sm font-medium mb-2 block">justify-content</label>
             <div class="grid grid-cols-2 gap-2">
-              <Button
+              <UButton
                 v-for="value in ['flex-start', 'flex-end', 'center', 'space-between', 'space-around', 'space-evenly']"
                 :key="value"
                 :variant="containerProps.justifyContent === value ? 'default' : 'outline'"
@@ -280,7 +283,7 @@ useSeoMeta({
                 class="text-xs"
                 @click="containerProps.justifyContent = value">
                 {{ value }}
-              </Button>
+              </UButton>
             </div>
           </div>
 
@@ -288,14 +291,14 @@ useSeoMeta({
           <div>
             <label class="text-sm font-medium mb-2 block">align-items</label>
             <div class="grid grid-cols-2 gap-2">
-              <Button
+              <UButton
                 v-for="value in ['stretch', 'flex-start', 'flex-end', 'center', 'baseline']"
                 :key="value"
                 :variant="containerProps.alignItems === value ? 'default' : 'outline'"
                 size="sm"
                 @click="containerProps.alignItems = value">
                 {{ value }}
-              </Button>
+              </UButton>
             </div>
           </div>
 
@@ -303,7 +306,7 @@ useSeoMeta({
           <div>
             <label class="text-sm font-medium mb-2 block">align-content</label>
             <div class="grid grid-cols-2 gap-2">
-              <Button
+              <UButton
                 v-for="value in ['stretch', 'flex-start', 'flex-end', 'center', 'space-between', 'space-around']"
                 :key="value"
                 :variant="containerProps.alignContent === value ? 'default' : 'outline'"
@@ -311,7 +314,7 @@ useSeoMeta({
                 class="text-xs"
                 @click="containerProps.alignContent = value">
                 {{ value }}
-              </Button>
+              </UButton>
             </div>
           </div>
 
@@ -327,28 +330,30 @@ useSeoMeta({
               :step="1"
               @update:model-value="containerProps.gap = $event[0]" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- アイテム設定 -->
-      <Card v-if="selectedItem">
-        <CardHeader>
+      <UCard v-if="selectedItem">
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>アイテム {{ selectedItemId }} の設定</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              アイテム {{ selectedItemId }} の設定
+            </h3>
+            <UButton
               size="sm"
               variant="ghost"
               :disabled="items.length <= 1"
               @click="removeItem(selectedItemId!)">
               <Icon name="heroicons:trash" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent class="space-y-4">
+        </template>
+        <div class="space-y-4">
           <!-- order -->
           <div>
             <label class="text-sm font-medium mb-2 block">order</label>
-            <Input
+            <UInput
               v-model.number="selectedItem.order"
               type="number"
               class="h-9" />
@@ -383,7 +388,7 @@ useSeoMeta({
           <!-- flex-basis -->
           <div>
             <label class="text-sm font-medium mb-2 block">flex-basis</label>
-            <Input
+            <UInput
               v-model="selectedItem.flexBasis"
               placeholder="auto, 100px, 50%..."
               class="h-9" />
@@ -393,18 +398,18 @@ useSeoMeta({
           <div>
             <label class="text-sm font-medium mb-2 block">align-self</label>
             <div class="grid grid-cols-2 gap-2">
-              <Button
+              <UButton
                 v-for="value in ['auto', 'flex-start', 'flex-end', 'center', 'baseline', 'stretch']"
                 :key="value"
                 :variant="selectedItem.alignSelf === value ? 'default' : 'outline'"
                 size="sm"
                 @click="selectedItem.alignSelf = value">
                 {{ value }}
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <div v-else class="text-center p-8 border-2 border-dashed rounded-lg text-muted-foreground">
         アイテムをクリックして編集
@@ -414,49 +419,51 @@ useSeoMeta({
     <!-- 右側：メインエリア -->
     <div class="space-y-6 col-span-2">
       <!-- プレビュー -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>プレビュー</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              プレビュー
+            </h3>
+            <UButton
               size="sm"
               @click="addItem">
               <Icon name="heroicons:plus" class="w-4 h-4 mr-1" />
               アイテム追加
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div :style="containerStyle">
-            <div
-              v-for="item in items"
-              :key="item.id"
-              :style="getItemStyle(item)"
-              class="hover:opacity-90"
-              @click="selectedItemId = item.id">
-              <span class="font-bold text-lg">{{ item.id }}</span>
-            </div>
+        </template>
+
+        <div :style="containerStyle">
+          <div
+            v-for="item in items"
+            :key="item.id"
+            :style="getItemStyle(item)"
+            class="hover:opacity-90"
+            @click="selectedItemId = item.id">
+            <span class="font-bold text-lg">{{ item.id }}</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- 生成されたコード -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>生成されたCSS</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              生成されたCSS
+            </h3>
+            <UButton
               size="sm"
               variant="ghost"
               @click="copyToClipboard">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssCode }}</code></pre>
-        </CardContent>
-      </Card>
+        </template>
+
+        <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssCode }}</code></pre>
+      </UCard>
     </div>
   </div>
 </template>

@@ -355,10 +355,10 @@ onUnmounted(() => {
 <template>
   <div class="shader-demo my-8">
     <div v-if="errorMessage" class="mb-4">
-      <Alert variant="destructive">
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{{ errorMessage }}</AlertDescription>
-      </Alert>
+      <UAlert
+        color="error"
+        title="Error"
+        :description="errorMessage" />
     </div>
     <canvas
       ref="canvasRef"

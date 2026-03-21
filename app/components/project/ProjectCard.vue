@@ -88,13 +88,13 @@ const overviewText = computed(() => {
 
       <!-- タグ -->
       <div v-if="data.tags.length" class="flex flex-wrap items-center gap-1.5">
-        <Badge
+        <UBadge
           v-for="tag in data.tags"
           :key="tag"
           variant="secondary"
           class="text-xs">
           {{ tag }}
-        </Badge>
+        </UBadge>
       </div>
 
       <!-- 概要 -->

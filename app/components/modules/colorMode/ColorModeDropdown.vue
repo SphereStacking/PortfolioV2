@@ -30,8 +30,9 @@ const changeColorMode = () => {
 </script>
 
 <template>
-  <Button
-    variant="ghost" size="icon" @click="changeColorMode">
+  <UButton
+    variant="ghost" size="md" square
+    @click="changeColorMode">
     <Icon :name="currentColorMode.icon" class="transition-all duration-300" />
-  </Button>
+  </UButton>
 </template>

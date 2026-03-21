@@ -52,14 +52,14 @@ defineProps<Props>()
         </div>
       </template>
       <div v-if="data.tags && data.tags.length > 0" class="absolute top-2 flex flex-wrap gap-1 px-2">
-        <Badge
+        <UBadge
           v-for="tag in data.tags"
           :key="tag"
           class="cursor-pointer"
           variant="outline"
           @click.stop.prevent="navigateTo(`/blog?tag=${encodeURIComponent(tag)}`)">
           {{ tag }}
-        </Badge>
+        </UBadge>
       </div>
     </div>
     <div class="flex flex-col">

@@ -43,7 +43,7 @@
     "shadcn-nuxt": "^2.4.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7",
-    "three": "^0.176.0",
+    "three": "^0.182.0",
     "tw-animate-css": "^1.3.0",
     "tweakpane": "^4.0.5",
     "typescript": "^5.8.3",

@@ -11,9 +11,8 @@ tags:
   - "テックリード"
   - "ポエム"
 icons:
-  - "mdi:briefcase-account"
-  - "mdi:star-rising"
-  - "mdi:head-cog"
+  - "tabler:man-filled"
+  - "tabler:stairs-up"
 ---
 
 # テックリードになることになった

@@ -1,10 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from '@tailwindcss/vite'
 import glsl from 'vite-plugin-glsl'
 import llmsConfig from './llms.config'
 
 export default defineNuxtConfig({
   modules: [
+    '@nuxt/ui',
     '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/icon',
@@ -13,9 +13,9 @@ export default defineNuxtConfig({
     'nuxt-og-image',
     'motion-v/nuxt',
     '@nuxt/scripts',
-    'shadcn-nuxt',
     '@nuxt/fonts',
     'nuxt-llms',
+    '@barzhsieh/nuxt-content-mermaid',
   ],
   components: {
     global: true,
@@ -61,7 +61,6 @@ export default defineNuxtConfig({
   vite: {
     assetsInclude: ['**/*.glsl'],
     plugins: [
-      tailwindcss(),
       glsl({
         include: [
           '**/*.glsl',
@@ -71,7 +70,6 @@ export default defineNuxtConfig({
     ],
     optimizeDeps: {
       include: ['monaco-editor'],
-      exclude: ['mermaid'],
     },
   },
   eslint: {
@@ -83,8 +81,6 @@ export default defineNuxtConfig({
   ogImage: {
     fonts: [
       'WDXL+Lubrifont+JP+N:400',
-      'WDXL+Lubrifont+JP+N:700',
-      'WDXL+Lubrifont+JP+N:900',
       'Zen+Maru+Gothic:700',
     ],
   },
@@ -94,17 +90,6 @@ export default defineNuxtConfig({
         id: 'G-8BWRNH7DMP',
       },
     },
-  },
-  shadcn: {
-    /**
-     * Prefix for all the imported component
-     */
-    prefix: '',
-    /**
-     * Directory that the component lives in.
-     * @default "./components/ui"
-     */
-    componentDir: '~/components/ui',
   },
   tres: {
     devtools: true,

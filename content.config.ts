@@ -12,6 +12,7 @@ export default defineContentConfig({
         image: z.string().optional(),
         tags: z.array(z.string()),
         icons: z.array(z.string()),
+        mermaid: z.record(z.unknown()).optional(),
       }),
     }),
     career: defineCollection({

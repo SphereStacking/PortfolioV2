@@ -39,33 +39,35 @@ const artCategories = [
           :key="category.path"
           :to="category.path"
           class="group">
-          <Card class="h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-            <CardHeader>
+          <UCard class="h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <template #header>
               <div class="flex items-center gap-3">
                 <span class="text-3xl">{{ category.icon }}</span>
-                <CardTitle>{{ category.title }}</CardTitle>
+                <h3 class="font-semibold">{{ category.title }}</h3>
               </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{{ category.description }}</CardDescription>
-            </CardContent>
-            <CardFooter>
+            </template>
+
+            <p class="text-sm text-(--ui-text-muted)">{{ category.description }}</p>
+
+            <template #footer>
               <div
                 :class="[
                   'w-full h-2 rounded-full bg-gradient-to-r opacity-50 group-hover:opacity-100 transition-opacity',
                   category.gradient,
                 ]"></div>
-            </CardFooter>
-          </Card>
+            </template>
+          </UCard>
         </NuxtLink>
       </div>
 
       <div class="mt-12">
-        <Card>
-          <CardHeader>
-            <CardTitle>About This Section</CardTitle>
-          </CardHeader>
-          <CardContent class="prose prose-zinc dark:prose-invert max-w-none">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              About This Section
+            </h3>
+          </template>
+          <div class="prose prose-zinc dark:prose-invert max-w-none">
             <p>
               Welcome to my creative playground where I explore various forms of digital art and graphics programming.
               Each section showcases different technologies and techniques for creating visual experiences on the web.
@@ -75,8 +77,8 @@ const artCategories = [
               <li><strong>CSS Art</strong> - Pure CSS animations and gradients pushing the boundaries of styling</li>
               <li><strong>Graphics Programming</strong> - Low-level graphics APIs comparison between WebGL and WebGPU</li>
             </ul>
-          </CardContent>
-        </Card>
+          </div>
+        </UCard>
       </div>
     </div>
   </div>

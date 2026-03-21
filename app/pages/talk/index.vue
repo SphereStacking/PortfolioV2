@@ -41,19 +41,19 @@ const {
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">
-          <Input
+          <UInput
             v-model="searchQuery"
             placeholder="タイトル、説明で検索..."
             variant="outline"
             size="lg" />
           <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
-            <Button
+            <UButton
               v-if="searchQuery || selectedYear"
               variant="outline" size="xs" rounded="full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
-            </Button>
+            </UButton>
           </div>
         </div>
       </template>
@@ -61,29 +61,17 @@ const {
 
     <div class="container mx-auto px-4 -mt-8 relative z-10">
       <!-- フィルターエリア -->
-      <Card class="p-4 mb-8">
+      <UCard class="p-4 mb-8">
         <div class="flex flex-wrap gap-4">
           <!-- 年フィルター -->
-          <Select
+          <USelect
             :model-value="selectedYear"
-            @update:model-value="(value) => setYear(value)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="年を選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="null">
-                すべての年
-              </SelectItem>
-              <SelectItem
-                v-for="year in availableYears"
-                :key="year"
-                :value="year">
-                {{ year }}年
-              </SelectItem>
-            </SelectContent>
-          </Select>
+            :items="[{ label: 'すべての年', value: null }, ...availableYears.map(y => ({ label: `${y}年`, value: y }))]"
+            placeholder="年を選択"
+            class="w-[180px]"
+            @update:model-value="(value) => setYear(value)" />
         </div>
-      </Card>
+      </UCard>
 
       <!-- ローディング状態 -->
       <div v-if="pending" class="text-center py-16">
@@ -114,9 +102,9 @@ const {
           <p class="mb-8 max-w-md mx-auto">
             検索条件を変更してみてください。
           </p>
-          <Button variant="default" color="primary" @click="resetFilters">
+          <UButton variant="default" color="primary" @click="resetFilters">
             フィルターをリセット
-          </Button>
+          </UButton>
         </div>
 
         <ul v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

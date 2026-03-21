@@ -70,7 +70,7 @@ useSeoMeta({
       </PageHeader>
 
       <div class="container mx-auto px-4 -mt-8 relative z-10">
-        <Card class="overflow-hidden">
+        <UCard class="overflow-hidden">
           <!-- スライド埋め込み -->
           <div class="aspect-video">
             <iframe
@@ -95,7 +95,7 @@ useSeoMeta({
               <Icon name="heroicons:arrow-top-right-on-square" />
             </a>
           </div>
-        </Card>
+        </UCard>
       </div>
     </template>
   </div>

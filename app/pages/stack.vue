@@ -41,21 +41,21 @@ const handleSelectCategory = (categoryId: string) => {
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">
-          <Input
+          <UInput
             v-model="searchQuery"
             placeholder="技術名で検索..."
             variant="outline"
             size="lg" />
           <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
-            <Button
+            <UButton
               v-if="searchQuery || selectedType"
               variant="outline"
               size="xs"
               rounded="full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
-            </Button>
+            </UButton>
           </div>
         </div>
       </template>

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -100,20 +97,20 @@ const currentTimeFormatted = computed(() => {
 // エポック時間から日時への変換
 const epochToDate = () => {
   if (!epochInput.value) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'エポック時間を入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
 
   const epochValue = parseInt(epochInput.value)
   if (isNaN(epochValue)) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '有効な数値を入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -123,16 +120,16 @@ const epochToDate = () => {
   const date = new Date(timestamp)
 
   if (isNaN(date.getTime())) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '無効な日時です',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
 
   dateTimeInput.value = formatDateTimeLocal(date)
-  toast({
+  toast.add({
     title: '変換完了',
     description: `エポック時間 ${epochValue} を日時に変換しました`,
   })
@@ -141,20 +138,20 @@ const epochToDate = () => {
 // 日時からエポック時間への変換
 const dateToEpoch = () => {
   if (!dateTimeInput.value) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '日時を入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
 
   const date = new Date(dateTimeInput.value)
   if (isNaN(date.getTime())) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '無効な日時形式です',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -162,7 +159,7 @@ const dateToEpoch = () => {
   const epochValue = showMilliseconds.value ? date.getTime() : Math.floor(date.getTime() / 1000)
   epochInput.value = epochValue.toString()
 
-  toast({
+  toast.add({
     title: '変換完了',
     description: `日時をエポック時間 ${epochValue} に変換しました`,
   })
@@ -171,10 +168,10 @@ const dateToEpoch = () => {
 // 日時差分計算
 const calculateDifference = () => {
   if (!fromDate.value || !toDate.value) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '開始日時と終了日時を入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -183,10 +180,10 @@ const calculateDifference = () => {
   const to = new Date(toDate.value)
 
   if (isNaN(from.getTime()) || isNaN(to.getTime())) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '無効な日時形式です',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -288,24 +285,8 @@ const setDateTime = (getValue: () => Date) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // SEO設定
 useSeoMeta({
@@ -326,266 +307,266 @@ useSeoMeta({
     </div>
 
     <!-- 現在時刻 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>現在時刻</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-sm text-muted-foreground mb-1">
-                エポック時間
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          現在時刻
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-muted-foreground mb-1">
+              エポック時間
+            </p>
+            <div class="flex items-center gap-2">
+              <p class="font-mono text-2xl">
+                {{ currentEpochTime }}
               </p>
-              <div class="flex items-center gap-2">
-                <p class="font-mono text-2xl">
-                  {{ currentEpochTime }}
-                </p>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="copyToClipboard(currentEpochTime.toString())">
-                  <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <p class="text-sm text-muted-foreground mb-1">
-                日時 ({{ selectedTimezone }})
-              </p>
-              <p class="font-mono text-lg">
-                {{ currentTimeFormatted }}
-              </p>
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="copyToClipboard(currentEpochTime.toString())">
+                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+              </UButton>
             </div>
           </div>
-
-          <div class="flex items-center gap-4">
-            <label class="flex items-center gap-2 text-sm">
-              <input
-                v-model="showMilliseconds"
-                type="checkbox"
-                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              ミリ秒表示
-            </label>
-
-            <div class="flex items-center gap-2">
-              <label class="text-sm">タイムゾーン:</label>
-              <select
-                v-model="selectedTimezone"
-                class="px-3 py-1 text-sm border rounded-md bg-background">
-                <option v-for="tz in timezones" :key="tz.value" :value="tz.value">
-                  {{ tz.label }}
-                </option>
-              </select>
-            </div>
+          <div>
+            <p class="text-sm text-muted-foreground mb-1">
+              日時 ({{ selectedTimezone }})
+            </p>
+            <p class="font-mono text-lg">
+              {{ currentTimeFormatted }}
+            </p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              v-model="showMilliseconds"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            ミリ秒表示
+          </label>
+
+          <div class="flex items-center gap-2">
+            <label class="text-sm">タイムゾーン:</label>
+            <select
+              v-model="selectedTimezone"
+              class="px-3 py-1 text-sm border rounded-md bg-background">
+              <option v-for="tz in timezones" :key="tz.value" :value="tz.value">
+                {{ tz.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 相互変換 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- エポック時間 → 日時 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>エポック時間 → 日時</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                エポック時間
-              </label>
-              <Input
-                v-model="epochInput"
-                type="text"
-                placeholder="1234567890 または 1234567890000"
-                class="font-mono" />
-              <p class="text-xs text-muted-foreground mt-1">
-                10桁以下は秒、11桁以上はミリ秒として扱います
-              </p>
-            </div>
-            <Button class="w-full" @click="epochToDate">
-              <Icon name="heroicons:arrow-down" class="w-4 h-4 mr-2" />
-              日時に変換
-            </Button>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            エポック時間 → 日時
+          </h3>
+        </template>
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              エポック時間
+            </label>
+            <UInput
+              v-model="epochInput"
+              type="text"
+              placeholder="1234567890 または 1234567890000"
+              class="font-mono" />
+            <p class="text-xs text-muted-foreground mt-1">
+              10桁以下は秒、11桁以上はミリ秒として扱います
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          <UButton class="w-full" @click="epochToDate">
+            <Icon name="heroicons:arrow-down" class="w-4 h-4 mr-2" />
+            日時に変換
+          </UButton>
+        </div>
+      </UCard>
 
       <!-- 日時 → エポック時間 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>日時 → エポック時間</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                日時（ローカルタイム）
-              </label>
-              <input
-                v-model="dateTimeInput"
-                type="datetime-local"
-                step="1"
-                class="w-full px-3 py-2 border rounded-md bg-background">
-            </div>
-
-            <div class="grid grid-cols-3 gap-2">
-              <Button
-                v-for="date in commonDates.slice(0, 3)"
-                :key="date.label"
-                size="sm"
-                variant="outline"
-                @click="setDateTime(date.getValue)">
-                {{ date.label }}
-              </Button>
-            </div>
-
-            <Button class="w-full" @click="dateToEpoch">
-              <Icon name="heroicons:arrow-up" class="w-4 h-4 mr-2" />
-              エポック時間に変換
-            </Button>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            日時 → エポック時間
+          </h3>
+        </template>
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              日時（ローカルタイム）
+            </label>
+            <input
+              v-model="dateTimeInput"
+              type="datetime-local"
+              step="1"
+              class="w-full px-3 py-2 border rounded-md bg-background">
           </div>
-        </CardContent>
-      </Card>
+
+          <div class="grid grid-cols-3 gap-2">
+            <UButton
+              v-for="date in commonDates.slice(0, 3)"
+              :key="date.label"
+              size="sm"
+              variant="outline"
+              @click="setDateTime(date.getValue)">
+              {{ date.label }}
+            </UButton>
+          </div>
+
+          <UButton class="w-full" @click="dateToEpoch">
+            <Icon name="heroicons:arrow-up" class="w-4 h-4 mr-2" />
+            エポック時間に変換
+          </UButton>
+        </div>
+      </UCard>
     </div>
 
     <!-- よく使う日時 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>よく使う日時</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div v-for="date in commonDates" :key="date.label">
-            <Button
-              variant="outline"
-              size="sm"
-              class="w-full"
-              @click="setDateTime(date.getValue)">
-              {{ date.label }}
-            </Button>
-            <p class="text-xs text-muted-foreground mt-1 text-center">
-              {{ getRelativeTime(date.getValue()) }}
-            </p>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          よく使う日時
+        </h3>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div v-for="date in commonDates" :key="date.label">
+          <UButton
+            variant="outline"
+            size="sm"
+            class="w-full"
+            @click="setDateTime(date.getValue)">
+            {{ date.label }}
+          </UButton>
+          <p class="text-xs text-muted-foreground mt-1 text-center">
+            {{ getRelativeTime(date.getValue()) }}
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 期間計算 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>期間計算</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                開始日時
-              </label>
-              <input
-                v-model="fromDate"
-                type="datetime-local"
-                step="1"
-                class="w-full px-3 py-2 border rounded-md bg-background">
-            </div>
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                終了日時
-              </label>
-              <input
-                v-model="toDate"
-                type="datetime-local"
-                step="1"
-                class="w-full px-3 py-2 border rounded-md bg-background">
-            </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          期間計算
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              開始日時
+            </label>
+            <input
+              v-model="fromDate"
+              type="datetime-local"
+              step="1"
+              class="w-full px-3 py-2 border rounded-md bg-background">
           </div>
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              終了日時
+            </label>
+            <input
+              v-model="toDate"
+              type="datetime-local"
+              step="1"
+              class="w-full px-3 py-2 border rounded-md bg-background">
+          </div>
+        </div>
 
-          <div v-if="differenceDetails" class="space-y-2 p-4 bg-muted rounded-md">
-            <p class="font-medium">
-              期間: {{ differenceDetails.formatted }}
-            </p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-              <div>
-                <span class="text-muted-foreground">ミリ秒:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.milliseconds }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">秒:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.seconds }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">分:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.minutes }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">時間:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.hours }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">日:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.days }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">週:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.weeks }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">月:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.months }}</span>
-              </div>
-              <div>
-                <span class="text-muted-foreground">年:</span>
-                <span class="font-mono ml-1">{{ differenceDetails.years }}</span>
-              </div>
+        <div v-if="differenceDetails" class="space-y-2 p-4 bg-muted rounded-md">
+          <p class="font-medium">
+            期間: {{ differenceDetails.formatted }}
+          </p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+            <div>
+              <span class="text-muted-foreground">ミリ秒:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.milliseconds }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">秒:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.seconds }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">分:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.minutes }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">時間:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.hours }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">日:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.days }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">週:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.weeks }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">月:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.months }}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground">年:</span>
+              <span class="font-mono ml-1">{{ differenceDetails.years }}</span>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>エポック時間について</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              エポック時間とは
-            </h3>
-            <p>
-              Unix時間とも呼ばれ、1970年1月1日00:00:00 UTC（協定世界時）からの経過秒数です。
-              コンピュータシステムで時刻を表現する標準的な方法として広く使用されています。
-            </p>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              形式
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>秒単位:</strong> 10桁の数値（例: 1640995200）</li>
-              <li><strong>ミリ秒単位:</strong> 13桁の数値（例: 1640995200000）</li>
-              <li><strong>マイクロ秒単位:</strong> 16桁の数値（プログラミング言語による）</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              使用例
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>データベースのタイムスタンプ</li>
-              <li>APIレスポンスの日時フィールド</li>
-              <li>ログファイルの記録時刻</li>
-              <li>キャッシュの有効期限管理</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          エポック時間について
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            エポック時間とは
+          </h3>
+          <p>
+            Unix時間とも呼ばれ、1970年1月1日00:00:00 UTC（協定世界時）からの経過秒数です。
+            コンピュータシステムで時刻を表現する標準的な方法として広く使用されています。
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            形式
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>秒単位:</strong> 10桁の数値（例: 1640995200）</li>
+            <li><strong>ミリ秒単位:</strong> 13桁の数値（例: 1640995200000）</li>
+            <li><strong>マイクロ秒単位:</strong> 16桁の数値（プログラミング言語による）</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            使用例
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>データベースのタイムスタンプ</li>
+            <li>APIレスポンスの日時フィールド</li>
+            <li>ログファイルの記録時刻</li>
+            <li>キャッシュの有効期限管理</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -213,26 +208,7 @@ const unescapeJson = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      title: 'コピーしました',
-      description: 'JSONをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const pasteFromClipboard = async () => {
   try {
@@ -316,68 +292,72 @@ useSeoMeta({
     </div>
 
     <!-- プリセットセクション -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルJSON</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="preset in jsonPresets"
-            :key="preset.label"
-            variant="outline"
-            size="sm"
-            @click="selectPreset(preset.value)">
-            {{ preset.label }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルJSON
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="preset in jsonPresets"
+          :key="preset.label"
+          variant="outline"
+          size="sm"
+          @click="selectPreset(preset.value)">
+          {{ preset.label }}
+        </UButton>
+      </div>
+    </UCard>
     <!-- 左側：操作パネル -->
     <div class="space-y-6 col-span-1">
       <!-- コントロールパネル -->
-      <Card>
-        <CardHeader>
-          <CardTitle>コントロールパネル</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-3">
-          <Button class="w-full" @click="formatJson">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            コントロールパネル
+          </h3>
+        </template>
+        <div class="space-y-3">
+          <UButton class="w-full" @click="formatJson">
             <Icon name="heroicons:code-bracket" class="w-4 h-4 mr-2" />
             整形
-          </Button>
-          <Button variant="outline" class="w-full" @click="minifyJson">
+          </UButton>
+          <UButton variant="outline" class="w-full" @click="minifyJson">
             <Icon name="heroicons:arrows-pointing-in" class="w-4 h-4 mr-2" />
             圧縮
-          </Button>
+          </UButton>
           <div class="grid grid-cols-2 gap-2">
-            <Button variant="outline" @click="escapeJson">
+            <UButton variant="outline" @click="escapeJson">
               <Icon name="heroicons:chat-bubble-bottom-center-text" class="w-4 h-4 mr-2" />
               エスケープ
-            </Button>
-            <Button variant="outline" @click="unescapeJson">
+            </UButton>
+            <UButton variant="outline" @click="unescapeJson">
               <Icon name="heroicons:code-bracket" class="w-4 h-4 mr-2" />
               アンエスケープ
-            </Button>
+            </UButton>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <Button variant="outline" @click="pasteFromClipboard">
+            <UButton variant="outline" @click="pasteFromClipboard">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
               貼り付け
-            </Button>
-            <Button variant="outline" @click="loadSample">
+            </UButton>
+            <UButton variant="outline" @click="loadSample">
               <Icon name="heroicons:document-text" class="w-4 h-4 mr-2" />
               サンプル
-            </Button>
+            </UButton>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- 設定 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>設定</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-3">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            設定
+          </h3>
+        </template>
+        <div class="space-y-3">
           <label class="flex items-center gap-2">
             <input
               v-model="sortKeys"
@@ -403,60 +383,62 @@ useSeoMeta({
               </option>
             </select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- JSON統計情報 -->
-      <Card v-if="jsonStats">
-        <CardHeader>
-          <CardTitle>統計情報</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2 text-sm">
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">オブジェクト</span>
-              <span class="font-medium">{{ jsonStats.objects }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">配列</span>
-              <span class="font-medium">{{ jsonStats.arrays }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">文字列</span>
-              <span class="font-medium">{{ jsonStats.strings }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">数値</span>
-              <span class="font-medium">{{ jsonStats.numbers }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">真偽値</span>
-              <span class="font-medium">{{ jsonStats.booleans }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">null</span>
-              <span class="font-medium">{{ jsonStats.nulls }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">最大深度</span>
-              <span class="font-medium">{{ jsonStats.depth }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">サイズ</span>
-              <span class="font-medium">{{ (jsonStats.size / 1024).toFixed(1) }}KB</span>
-            </div>
+      <UCard v-if="jsonStats">
+        <template #header>
+          <h3 class="font-semibold">
+            統計情報
+          </h3>
+        </template>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">オブジェクト</span>
+            <span class="font-medium">{{ jsonStats.objects }}</span>
           </div>
-        </CardContent>
-      </Card>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">配列</span>
+            <span class="font-medium">{{ jsonStats.arrays }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">文字列</span>
+            <span class="font-medium">{{ jsonStats.strings }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">数値</span>
+            <span class="font-medium">{{ jsonStats.numbers }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">真偽値</span>
+            <span class="font-medium">{{ jsonStats.booleans }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">null</span>
+            <span class="font-medium">{{ jsonStats.nulls }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">最大深度</span>
+            <span class="font-medium">{{ jsonStats.depth }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">サイズ</span>
+            <span class="font-medium">{{ (jsonStats.size / 1024).toFixed(1) }}KB</span>
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- 右側：入出力エリア -->
     <div class="space-y-4 col-span-2">
       <!-- 入力エリア -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>入力</CardTitle>
+            <h3 class="font-semibold">
+              入力
+            </h3>
             <div class="flex gap-2">
               <label>
                 <input
@@ -464,85 +446,74 @@ useSeoMeta({
                   accept=".json"
                   class="hidden"
                   @change="loadFile">
-                <Button size="sm" variant="ghost" as="span">
+                <UButton size="sm" variant="ghost" as="span">
                   <Icon name="heroicons:arrow-up-tray" class="w-4 h-4" />
-                </Button>
+                </UButton>
               </label>
-              <Button
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="inputJson = ''">
                 <Icon name="heroicons:x-mark" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="inputJson"
-            placeholder="JSONを入力またはペーストしてください..."
-            class="w-full h-[300px] p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-            spellcheck="false">
-            </textarea>
-        </CardContent>
-      </Card>
+        </template>
+        <textarea
+          v-model="inputJson"
+          placeholder="JSONを入力またはペーストしてください..."
+          class="w-full h-[300px] p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+          spellcheck="false"></textarea>
+      </UCard>
 
       <!-- 出力エリア -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>
+            <h3 class="font-semibold">
               出力
-              <Badge
+              <UBadge
                 v-if="isValidJson"
-                variant="default"
                 class="ml-2">
                 Valid
-              </Badge>
-              <Badge
+              </UBadge>
+              <UBadge
                 v-else-if="error"
-                variant="destructive"
+                color="error"
                 class="ml-2">
                 Invalid
-              </Badge>
-            </CardTitle>
+              </UBadge>
+            </h3>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 size="sm"
                 variant="ghost"
                 :disabled="!formattedJson && !inputJson"
                 @click="copyToClipboard(formattedJson || inputJson)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 size="sm"
                 variant="ghost"
                 :disabled="!formattedJson && !inputJson"
                 @click="downloadJson">
                 <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div v-if="error" class="mb-4">
-            <Alert variant="destructive">
-              <Icon name="heroicons:exclamation-circle" class="h-4 w-4" />
-              <AlertDescription>
-                {{ error }}
-              </AlertDescription>
-            </Alert>
-          </div>
-          <pre
-            v-if="formattedJson"
-            class="w-full h-[300px] p-3 font-mono text-sm border rounded-md bg-muted overflow-auto">{{ formattedJson }}</pre>
-          <div
-            v-else
-            class="w-full h-[300px] p-3 border rounded-md bg-muted flex items-center justify-center text-muted-foreground">
-            整形されたJSONがここに表示されます
-          </div>
-        </CardContent>
-      </Card>
+        </template>
+        <div v-if="error" class="mb-4">
+          <UAlert color="error" :description="error" icon="i-heroicons-exclamation-circle" />
+        </div>
+        <pre
+          v-if="formattedJson"
+          class="w-full h-[300px] p-3 font-mono text-sm border rounded-md bg-muted overflow-auto">{{ formattedJson }}</pre>
+        <div
+          v-else
+          class="w-full h-[300px] p-3 border rounded-md bg-muted flex items-center justify-center text-muted-foreground">
+          整形されたJSONがここに表示されます
+        </div>
+      </UCard>
     </div>
   </div>
 </template>

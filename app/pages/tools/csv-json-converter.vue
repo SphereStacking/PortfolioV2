@@ -12,24 +12,13 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table'
-import { Input } from '~/components/ui/input'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const csvInput = ref('')
 const jsonInput = ref('')
@@ -132,10 +121,10 @@ const loadSample = (sample: typeof sampleData[0]) => {
 const csvToJson = () => {
   try {
     if (!csvInput.value.trim()) {
-      toast({
+      toast.add({
         title: 'エラー',
         description: 'CSVデータを入力してください',
-        variant: 'destructive',
+        color: 'error',
       })
       return
     }
@@ -171,10 +160,10 @@ const csvToJson = () => {
       : JSON.stringify(result)
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'CSV変換中にエラーが発生しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -183,10 +172,10 @@ const csvToJson = () => {
 const jsonToCsv = () => {
   try {
     if (!jsonInput.value.trim()) {
-      toast({
+      toast.add({
         title: 'エラー',
         description: 'JSONデータを入力してください',
-        variant: 'destructive',
+        color: 'error',
       })
       return
     }
@@ -194,10 +183,10 @@ const jsonToCsv = () => {
     const data = JSON.parse(jsonInput.value)
 
     if (!Array.isArray(data)) {
-      toast({
+      toast.add({
         title: 'エラー',
         description: 'JSONは配列である必要があります',
-        variant: 'destructive',
+        color: 'error',
       })
       return
     }
@@ -236,10 +225,10 @@ const jsonToCsv = () => {
     }
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'JSON解析中にエラーが発生しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -343,7 +332,7 @@ const copyCsv = async () => {
   if (!csvInput.value) return
 
   await copy(csvInput.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'CSVデータをクリップボードにコピーしました',
   })
@@ -353,7 +342,7 @@ const copyJson = async () => {
   if (!jsonInput.value) return
 
   await copy(jsonInput.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'JSONデータをクリップボードにコピーしました',
   })
@@ -366,10 +355,10 @@ const formatJson = () => {
     jsonInput.value = JSON.stringify(parsed, null, 2)
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'JSONのフォーマットに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -393,173 +382,183 @@ useSeoMeta({
     </div>
 
     <!-- サンプルデータ -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルデータ</CardTitle>
-        <CardDescription>
-          よく使われるデータパターンを選択できます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleData"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            サンプルデータ
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            よく使われるデータパターンを選択できます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleData"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 設定 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>変換設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid md:grid-cols-4 gap-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">区切り文字</label>
-            <select
-              v-model="delimiter"
-              class="w-full h-10 px-3 rounded-md border border-input bg-background">
-              <option value=",">
-                カンマ (,)
-              </option>
-              <option value="\t">
-                タブ
-              </option>
-              <option value=";">
-                セミコロン (;)
-              </option>
-              <option value="|">
-                パイプ (|)
-              </option>
-            </select>
-          </div>
-
-          <div class="flex items-end">
-            <label class="flex items-center gap-2">
-              <input
-                v-model="hasHeader"
-                type="checkbox"
-                class="rounded">
-              <span class="text-sm">ヘッダー行あり</span>
-            </label>
-          </div>
-
-          <div class="flex items-end">
-            <label class="flex items-center gap-2">
-              <input
-                v-model="prettyPrint"
-                type="checkbox"
-                class="rounded">
-              <span class="text-sm">JSON整形</span>
-            </label>
-          </div>
-
-          <div class="flex items-end">
-            <Button
-              variant="outline"
-              size="sm"
-              @click="clearAll">
-              <Icon name="heroicons:x-mark" class="w-4 h-4 mr-1" />
-              クリア
-            </Button>
-          </div>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          変換設定
+        </h3>
+      </template>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">区切り文字</label>
+          <select
+            v-model="delimiter"
+            class="w-full h-10 px-3 rounded-md border border-input bg-background">
+            <option value=",">
+              カンマ (,)
+            </option>
+            <option value="\t">
+              タブ
+            </option>
+            <option value=";">
+              セミコロン (;)
+            </option>
+            <option value="|">
+              パイプ (|)
+            </option>
+          </select>
         </div>
-      </CardContent>
-    </Card>
+
+        <div class="flex items-end">
+          <label class="flex items-center gap-2">
+            <input
+              v-model="hasHeader"
+              type="checkbox"
+              class="rounded">
+            <span class="text-sm">ヘッダー行あり</span>
+          </label>
+        </div>
+
+        <div class="flex items-end">
+          <label class="flex items-center gap-2">
+            <input
+              v-model="prettyPrint"
+              type="checkbox"
+              class="rounded">
+            <span class="text-sm">JSON整形</span>
+          </label>
+        </div>
+
+        <div class="flex items-end">
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="clearAll">
+            <Icon name="heroicons:x-mark" class="w-4 h-4 mr-1" />
+            クリア
+          </UButton>
+        </div>
+      </div>
+    </UCard>
 
     <!-- CSV入力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>CSV</CardTitle>
-            <CardDescription>CSVデータを入力</CardDescription>
+            <h3 class="font-semibold">
+              CSV
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
+              CSVデータを入力
+            </p>
           </div>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               @click="jsonToCsv">
               <Icon name="heroicons:arrow-left" class="w-4 h-4 mr-1" />
               JSONから変換
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="csvInput"
               size="sm"
               variant="outline"
               @click="copyCsv">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="csvInput"
-          class="w-full h-64 p-3 rounded-md border bg-background font-mono text-sm resize-y"
-          placeholder="id,name,email&#10;1,John Doe,john@example.com&#10;2,Jane Smith,jane@example.com"></textarea>
-      </CardContent>
-    </Card>
+      </template>
+      <textarea
+        v-model="csvInput"
+        class="w-full h-64 p-3 rounded-md border bg-background font-mono text-sm resize-y"
+        placeholder="id,name,email&#10;1,John Doe,john@example.com&#10;2,Jane Smith,jane@example.com"></textarea>
+    </UCard>
     <!-- JSON入力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>JSON</CardTitle>
-            <CardDescription>JSONデータを入力</CardDescription>
+            <h3 class="font-semibold">
+              JSON
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
+              JSONデータを入力
+            </p>
           </div>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               @click="csvToJson">
               <Icon name="heroicons:arrow-right" class="w-4 h-4 mr-1" />
               CSVから変換
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="jsonInput"
               size="sm"
               variant="outline"
               @click="formatJson">
               <Icon name="heroicons:code-bracket" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="jsonInput"
               size="sm"
               variant="outline"
               @click="copyJson">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="jsonInput"
-          class="w-full h-64 p-3 rounded-md border bg-background font-mono text-sm resize-y"
-          placeholder="[&#10;  {&#10;    &quot;id&quot;: 1,&#10;    &quot;name&quot;: &quot;John Doe&quot;&#10;  }&#10;]"></textarea>
-      </CardContent>
-    </Card>
+      </template>
+      <textarea
+        v-model="jsonInput"
+        class="w-full h-64 p-3 rounded-md border bg-background font-mono text-sm resize-y"
+        placeholder="[&#10;  {&#10;    &quot;id&quot;: 1,&#10;    &quot;name&quot;: &quot;John Doe&quot;&#10;  }&#10;]"></textarea>
+    </UCard>
 
     <!-- テーブルプレビュー -->
-    <Card v-if="tableData.length > 0" class="col-span-full">
-      <CardHeader>
-        <CardTitle>テーブルプレビュー</CardTitle>
-        <CardDescription>
-          {{ tableData.length }}行のデータ
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard v-if="tableData.length > 0" class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            テーブルプレビュー
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            {{ tableData.length }}行のデータ
+          </p>
+        </div>
+      </template>
+      <div class="space-y-4">
         <!-- 検索フィルター -->
         <div class="flex items-center gap-4">
-          <Input
+          <UInput
             v-model="globalFilter"
             placeholder="検索..."
             class="max-w-sm"
@@ -571,14 +570,16 @@ useSeoMeta({
 
         <!-- データテーブル -->
         <div class="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow
+          <table class="w-full caption-bottom text-sm">
+            <thead>
+              <tr
                 v-for="headerGroup in table.getHeaderGroups()"
-                :key="headerGroup.id">
-                <TableHead
+                :key="headerGroup.id"
+                class="border-b transition-colors hover:bg-muted/50">
+                <th
                   v-for="header in headerGroup.headers"
                   :key="header.id"
+                  class="h-10 px-2 text-left align-middle font-medium text-muted-foreground"
                   :class="{
                     'cursor-pointer select-none': header.column.getCanSort(),
                   }"
@@ -596,35 +597,37 @@ useSeoMeta({
                       name="heroicons:chevron-down"
                       class="w-4 h-4" />
                   </div>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
               <template v-if="table.getRowModel().rows?.length">
-                <TableRow
+                <tr
                   v-for="row in table.getRowModel().rows"
                   :key="row.id"
+                  class="border-b transition-colors hover:bg-muted/50"
                   :data-state="row.getIsSelected() && 'selected'">
-                  <TableCell
+                  <td
                     v-for="cell in row.getVisibleCells()"
-                    :key="cell.id">
+                    :key="cell.id"
+                    class="p-2 align-middle">
                     <FlexRender
                       :render="cell.column.columnDef.cell"
                       :props="cell.getContext()" />
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               </template>
               <template v-else>
-                <TableRow>
-                  <TableCell
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                  <td
                     :colspan="columns.length"
-                    class="h-24 text-center">
+                    class="p-2 align-middle h-24 text-center">
                     データがありません
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               </template>
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
 
         <!-- ページネーション -->
@@ -633,33 +636,35 @@ useSeoMeta({
             ページ {{ table.getState().pagination.pageIndex + 1 }} / {{ table.getPageCount() }}
           </div>
           <div class="flex items-center gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               :disabled="!table.getCanPreviousPage()"
               @click="table.previousPage()">
               <Icon name="heroicons:chevron-left" class="w-4 h-4" />
               前へ
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               :disabled="!table.getCanNextPage()"
               @click="table.nextPage()">
               次へ
               <Icon name="heroicons:chevron-right" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 使い方 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>使い方のヒント</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          使い方のヒント
+        </h3>
+      </template>
+      <div class="space-y-3 text-sm text-muted-foreground">
         <div class="grid md:grid-cols-2 gap-4">
           <div>
             <h4 class="font-semibold mb-2">
@@ -682,7 +687,7 @@ useSeoMeta({
             </ul>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

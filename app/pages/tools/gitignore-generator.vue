@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -661,7 +658,7 @@ const applyPopularCombination = (combination: typeof popularCombinations[0]) => 
   selectedIDEs.value = [...combination.ides]
   selectedOS.value = [...combination.os]
 
-  toast({
+  toast.add({
     title: '組み合わせを適用',
     description: `「${combination.name}」の設定を適用しました`,
   })
@@ -713,24 +710,8 @@ const reset = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async () => {
-  try {
-    await copy(generatedGitignore.value)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
+const toast = useToast()
 
 // ダウンロード
 const downloadGitignore = () => {
@@ -769,306 +750,304 @@ useSeoMeta({
     </div>
 
     <!-- 人気の組み合わせ -->
-    <Card>
-      <CardHeader>
-        <CardTitle>人気の組み合わせ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="combo in popularCombinations"
-            :key="combo.name"
-            variant="outline"
-            size="sm"
-            @click="applyPopularCombination(combo)">
-            {{ combo.name }}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            @click="reset">
-            リセット
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          人気の組み合わせ
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="combo in popularCombinations"
+          :key="combo.name"
+          variant="outline"
+          size="sm"
+          @click="applyPopularCombination(combo)">
+          {{ combo.name }}
+        </UButton>
+        <UButton
+          variant="ghost"
+          size="sm"
+          @click="reset">
+          リセット
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 選択エリア -->
       <div class="space-y-6">
         <!-- 言語 -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>プログラミング言語</CardTitle>
+              <h3 class="font-semibold">
+                プログラミング言語
+              </h3>
               <div class="flex gap-1">
-                <Button
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="selectAll('languages')">
                   全選択
-                </Button>
-                <Button
+                </UButton>
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="deselectAll('languages')">
                   解除
-                </Button>
+                </UButton>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="grid grid-cols-2 gap-3">
-              <label
-                v-for="lang in templates.languages"
-                :key="lang.id"
-                class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
-                <input
-                  v-model="selectedLanguages"
-                  :value="lang.id"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                <Icon :name="lang.icon" class="w-5 h-5" />
-                <span class="text-sm">{{ lang.name }}</span>
-              </label>
-            </div>
-          </CardContent>
-        </Card>
+          </template>
+          <div class="grid grid-cols-2 gap-3">
+            <label
+              v-for="lang in templates.languages"
+              :key="lang.id"
+              class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
+              <input
+                v-model="selectedLanguages"
+                :value="lang.id"
+                type="checkbox"
+                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+              <Icon :name="lang.icon" class="w-5 h-5" />
+              <span class="text-sm">{{ lang.name }}</span>
+            </label>
+          </div>
+        </UCard>
 
         <!-- フレームワーク -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>フレームワーク</CardTitle>
+              <h3 class="font-semibold">
+                フレームワーク
+              </h3>
               <div class="flex gap-1">
-                <Button
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="selectAll('frameworks')">
                   全選択
-                </Button>
-                <Button
+                </UButton>
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="deselectAll('frameworks')">
                   解除
-                </Button>
+                </UButton>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="grid grid-cols-2 gap-3">
-              <label
-                v-for="fw in templates.frameworks"
-                :key="fw.id"
-                class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
-                <input
-                  v-model="selectedFrameworks"
-                  :value="fw.id"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                <Icon :name="fw.icon" class="w-5 h-5" />
-                <span class="text-sm">{{ fw.name }}</span>
-              </label>
-            </div>
-          </CardContent>
-        </Card>
+          </template>
+          <div class="grid grid-cols-2 gap-3">
+            <label
+              v-for="fw in templates.frameworks"
+              :key="fw.id"
+              class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
+              <input
+                v-model="selectedFrameworks"
+                :value="fw.id"
+                type="checkbox"
+                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+              <Icon :name="fw.icon" class="w-5 h-5" />
+              <span class="text-sm">{{ fw.name }}</span>
+            </label>
+          </div>
+        </UCard>
 
         <!-- IDE -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>IDE / エディタ</CardTitle>
+              <h3 class="font-semibold">
+                IDE / エディタ
+              </h3>
               <div class="flex gap-1">
-                <Button
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="selectAll('ides')">
                   全選択
-                </Button>
-                <Button
+                </UButton>
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="deselectAll('ides')">
                   解除
-                </Button>
+                </UButton>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="grid grid-cols-2 gap-3">
-              <label
-                v-for="ide in templates.ides"
-                :key="ide.id"
-                class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
-                <input
-                  v-model="selectedIDEs"
-                  :value="ide.id"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                <Icon :name="ide.icon" class="w-5 h-5" />
-                <span class="text-sm">{{ ide.name }}</span>
-              </label>
-            </div>
-          </CardContent>
-        </Card>
+          </template>
+          <div class="grid grid-cols-2 gap-3">
+            <label
+              v-for="ide in templates.ides"
+              :key="ide.id"
+              class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
+              <input
+                v-model="selectedIDEs"
+                :value="ide.id"
+                type="checkbox"
+                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+              <Icon :name="ide.icon" class="w-5 h-5" />
+              <span class="text-sm">{{ ide.name }}</span>
+            </label>
+          </div>
+        </UCard>
 
         <!-- OS -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>OS</CardTitle>
+              <h3 class="font-semibold">
+                OS
+              </h3>
               <div class="flex gap-1">
-                <Button
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="selectAll('os')">
                   全選択
-                </Button>
-                <Button
+                </UButton>
+                <UButton
                   variant="ghost"
                   size="sm"
                   @click="deselectAll('os')">
                   解除
-                </Button>
+                </UButton>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div class="grid grid-cols-2 gap-3">
-              <label
-                v-for="os in templates.os"
-                :key="os.id"
-                class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
-                <input
-                  v-model="selectedOS"
-                  :value="os.id"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-                <Icon :name="os.icon" class="w-5 h-5" />
-                <span class="text-sm">{{ os.name }}</span>
-              </label>
-            </div>
-          </CardContent>
-        </Card>
-
-        <!-- カスタムルール -->
-        <Card>
-          <CardHeader>
-            <CardTitle>カスタムルール</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <textarea
-              v-model="customRules"
-              placeholder="# 追加したいルールを入力&#10;*.custom&#10;special-folder/"
-              class="w-full h-32 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-              spellcheck="false"></textarea>
-          </CardContent>
-        </Card>
-
-        <!-- オプション -->
-        <Card>
-          <CardHeader>
-            <CardTitle>オプション</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <label class="flex items-center gap-2">
+          </template>
+          <div class="grid grid-cols-2 gap-3">
+            <label
+              v-for="os in templates.os"
+              :key="os.id"
+              class="flex items-center gap-2 cursor-pointer hover:bg-muted p-2 rounded">
               <input
-                v-model="includeComments"
+                v-model="selectedOS"
+                :value="os.id"
                 type="checkbox"
                 class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              <span class="text-sm">コメントを含める</span>
+              <Icon :name="os.icon" class="w-5 h-5" />
+              <span class="text-sm">{{ os.name }}</span>
             </label>
-          </CardContent>
-        </Card>
+          </div>
+        </UCard>
+
+        <!-- カスタムルール -->
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              カスタムルール
+            </h3>
+          </template>
+          <textarea
+            v-model="customRules"
+            placeholder="# 追加したいルールを入力&#10;*.custom&#10;special-folder/"
+            class="w-full h-32 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+            spellcheck="false"></textarea>
+        </UCard>
+
+        <!-- オプション -->
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              オプション
+            </h3>
+          </template>
+          <label class="flex items-center gap-2">
+            <input
+              v-model="includeComments"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            <span class="text-sm">コメントを含める</span>
+          </label>
+        </UCard>
       </div>
 
       <!-- 出力エリア -->
       <div class="space-y-6">
         <!-- 統計情報 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>選択内容</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-2 text-sm">
-              <div v-if="selectedLanguages.length > 0">
-                <span class="text-muted-foreground">言語:</span>
-                <span class="ml-2">
-                  {{ selectedLanguages.map(id => templates.languages.find(l => l.id === id)?.name).filter(Boolean).join(', ') }}
-                </span>
-              </div>
-              <div v-if="selectedFrameworks.length > 0">
-                <span class="text-muted-foreground">フレームワーク:</span>
-                <span class="ml-2">
-                  {{ selectedFrameworks.map(id => templates.frameworks.find(f => f.id === id)?.name).filter(Boolean).join(', ') }}
-                </span>
-              </div>
-              <div v-if="selectedIDEs.length > 0">
-                <span class="text-muted-foreground">IDE:</span>
-                <span class="ml-2">
-                  {{ selectedIDEs.map(id => templates.ides.find(i => i.id === id)?.name).filter(Boolean).join(', ') }}
-                </span>
-              </div>
-              <div v-if="selectedOS.length > 0">
-                <span class="text-muted-foreground">OS:</span>
-                <span class="ml-2">
-                  {{ selectedOS.map(id => templates.os.find(o => o.id === id)?.name).filter(Boolean).join(', ') }}
-                </span>
-              </div>
-              <div v-if="!selectedLanguages.length && !selectedFrameworks.length && !selectedIDEs.length && !selectedOS.length">
-                <span class="text-muted-foreground">選択されていません</span>
-              </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              選択内容
+            </h3>
+          </template>
+          <div class="space-y-2 text-sm">
+            <div v-if="selectedLanguages.length > 0">
+              <span class="text-muted-foreground">言語:</span>
+              <span class="ml-2">
+                {{ selectedLanguages.map(id => templates.languages.find(l => l.id === id)?.name).filter(Boolean).join(', ') }}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div v-if="selectedFrameworks.length > 0">
+              <span class="text-muted-foreground">フレームワーク:</span>
+              <span class="ml-2">
+                {{ selectedFrameworks.map(id => templates.frameworks.find(f => f.id === id)?.name).filter(Boolean).join(', ') }}
+              </span>
+            </div>
+            <div v-if="selectedIDEs.length > 0">
+              <span class="text-muted-foreground">IDE:</span>
+              <span class="ml-2">
+                {{ selectedIDEs.map(id => templates.ides.find(i => i.id === id)?.name).filter(Boolean).join(', ') }}
+              </span>
+            </div>
+            <div v-if="selectedOS.length > 0">
+              <span class="text-muted-foreground">OS:</span>
+              <span class="ml-2">
+                {{ selectedOS.map(id => templates.os.find(o => o.id === id)?.name).filter(Boolean).join(', ') }}
+              </span>
+            </div>
+            <div v-if="!selectedLanguages.length && !selectedFrameworks.length && !selectedIDEs.length && !selectedOS.length">
+              <span class="text-muted-foreground">選択されていません</span>
+            </div>
+          </div>
+        </UCard>
 
         <!-- 生成された.gitignore -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>.gitignore</CardTitle>
+              <h3 class="font-semibold">
+                .gitignore
+              </h3>
               <div class="flex gap-2">
-                <Button
+                <UButton
                   size="sm"
                   variant="ghost"
-                  @click="copyToClipboard">
+                  @click="copyToClipboard(generatedGitignore)">
                   <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                </Button>
-                <Button
+                </UButton>
+                <UButton
                   size="sm"
                   variant="ghost"
                   @click="downloadGitignore">
                   <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-                </Button>
+                </UButton>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <textarea
-              v-model="generatedGitignore"
-              readonly
-              class="w-full h-96 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-              spellcheck="false"></textarea>
-            <div class="mt-2 text-sm text-muted-foreground">
-              {{ generatedGitignore.split('\n').length }}行 / {{ generatedGitignore.length }}文字
-            </div>
-          </CardContent>
-        </Card>
+          </template>
+          <textarea
+            v-model="generatedGitignore"
+            readonly
+            class="w-full h-96 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+            spellcheck="false"></textarea>
+          <div class="mt-2 text-sm text-muted-foreground">
+            {{ generatedGitignore.split('\n').length }}行 / {{ generatedGitignore.length }}文字
+          </div>
+        </UCard>
 
         <!-- 使い方 -->
-        <Alert>
-          <Icon name="heroicons:information-circle" class="w-4 h-4" />
-          <AlertTitle>使い方</AlertTitle>
-          <AlertDescription>
+        <UAlert icon="heroicons:information-circle" title="使い方">
+          <template #description>
             <ol class="list-decimal list-inside mt-2 space-y-1">
               <li>使用する言語、フレームワーク、IDE、OSを選択</li>
               <li>必要に応じてカスタムルールを追加</li>
               <li>生成された内容をコピーまたはダウンロード</li>
               <li>プロジェクトルートに.gitignoreファイルとして保存</li>
             </ol>
-          </AlertDescription>
-        </Alert>
+          </template>
+        </UAlert>
       </div>
     </div>
   </div>

@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog, useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 // 画像データ
 interface SpriteImage {
@@ -57,10 +54,10 @@ const handleFiles = async (files: File[]) => {
   const imageFiles = files.filter(file => file.type.startsWith('image/'))
 
   if (imageFiles.length === 0) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -93,10 +90,10 @@ const removeImage = (id: string) => {
 // スプライトシート生成
 const generateSpriteSheet = () => {
   if (images.value.length === 0) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像を追加してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -185,7 +182,7 @@ const downloadSpriteSheet = () => {
   link.click()
   document.body.removeChild(link)
 
-  toast({
+  toast.add({
     title: 'ダウンロード完了',
     description: 'スプライトシートをダウンロードしました',
   })
@@ -196,7 +193,7 @@ const copyCss = async () => {
   if (!cssCode.value) return
 
   await copy(cssCode.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'CSSコードをクリップボードにコピーしました',
   })
@@ -229,195 +226,200 @@ useSeoMeta({
     </div>
 
     <!-- 画像アップロード -->
-    <Card>
-      <CardHeader class="flex items-center justify-between">
-        <div>
-          <CardTitle>
-            画像を追加
-          </CardTitle>
-          <CardDescription>
-            含める画像を選択（複数選択可）
-          </CardDescription>
+    <UCard>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold">
+              画像を追加
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
+              含める画像を選択（複数選択可）
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <UButton
+              :disabled="images.length === 0"
+              class="flex-1"
+              @click="generateSpriteSheet">
+              <Icon name="heroicons:squares-plus" class="w-4 h-4 mr-1" />
+              生成
+            </UButton>
+            <UButton
+              variant="outline"
+              :disabled="images.length === 0"
+              @click="clearAll">
+              クリア
+            </UButton>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <Button
-            :disabled="images.length === 0"
-            class="flex-1"
-            @click="generateSpriteSheet">
-            <Icon name="heroicons:squares-plus" class="w-4 h-4 mr-1" />
-            生成
-          </Button>
-          <Button
-            variant="outline"
-            :disabled="images.length === 0"
-            @click="clearAll">
-            クリア
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div
-          ref="dropZoneRef"
-          :class="[
-            'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-            isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
-          ]"
-          @click="openFileDialog">
-          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p class="text-sm text-muted-foreground mb-2">
-            クリックまたはドロップで画像を追加
-          </p>
-          <p class="text-xs text-muted-foreground">
-            複数ファイル選択可能
-          </p>
-        </div>
+      </template>
+      <div
+        ref="dropZoneRef"
+        :class="[
+          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+          isOverDropZone ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+        ]"
+        @click="openFileDialog">
+        <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <p class="text-sm text-muted-foreground mb-2">
+          クリックまたはドロップで画像を追加
+        </p>
+        <p class="text-xs text-muted-foreground">
+          複数ファイル選択可能
+        </p>
+      </div>
 
-        <!-- 追加済み画像 -->
-        <div v-if="images.length > 0" class="mt-6">
-          <h4 class="text-sm font-medium mb-3">
-            追加済み画像 ({{ images.length }}枚)
-          </h4>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div
-              v-for="image in images"
-              :key="image.id"
-              class="relative group">
-              <img
-                :src="image.url"
-                :alt="image.name"
-                class="w-full h-24 object-contain bg-muted rounded border">
-              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  @click="removeImage(image.id)">
-                  <Icon name="heroicons:trash" class="w-4 h-4" />
-                </Button>
-              </div>
-              <p class="text-xs text-center mt-1 truncate">
-                {{ image.name }}
-              </p>
-              <p class="text-xs text-center text-muted-foreground">
-                {{ image.width }}×{{ image.height }}
-              </p>
+      <!-- 追加済み画像 -->
+      <div v-if="images.length > 0" class="mt-6">
+        <h4 class="text-sm font-medium mb-3">
+          追加済み画像 ({{ images.length }}枚)
+        </h4>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div
+            v-for="image in images"
+            :key="image.id"
+            class="relative group">
+            <img
+              :src="image.url"
+              :alt="image.name"
+              class="w-full h-24 object-contain bg-muted rounded border">
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
+              <UButton
+                size="sm"
+                color="error"
+                @click="removeImage(image.id)">
+                <Icon name="heroicons:trash" class="w-4 h-4" />
+              </UButton>
+            </div>
+            <p class="text-xs text-center mt-1 truncate">
+              {{ image.name }}
+            </p>
+            <p class="text-xs text-center text-muted-foreground">
+              {{ image.width }}×{{ image.height }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <div class="space-y-4">
+          <h3 class="font-semibold">
+            設定
+          </h3>
+          <div>
+            <label class="text-sm font-medium mb-2 block">列数</label>
+            <UInput
+              v-model="columns"
+              type="number"
+              min="1"
+              max="20"
+              placeholder="4" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">余白 (px)</label>
+            <UInput
+              v-model="padding"
+              type="number"
+              min="0"
+              max="50"
+              placeholder="10" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">背景色</label>
+            <div class="flex gap-2">
+              <input
+                v-model="backgroundColor"
+                type="color"
+                class="h-10 w-16 rounded border cursor-pointer">
+              <UInput
+                v-model="backgroundColor"
+                class="flex-1"
+                placeholder="#ffffff" />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">出力形式</label>
+            <div class="flex gap-2">
+              <UButton
+                :variant="outputFormat === 'png' ? 'solid' : 'outline'"
+                size="sm"
+                @click="outputFormat = 'png'">
+                PNG（透過対応）
+              </UButton>
+              <UButton
+                :variant="outputFormat === 'jpeg' ? 'solid' : 'outline'"
+                size="sm"
+                @click="outputFormat = 'jpeg'">
+                JPEG
+              </UButton>
             </div>
           </div>
         </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>設定</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <div>
-          <label class="text-sm font-medium mb-2 block">列数</label>
-          <Input
-            v-model="columns"
-            type="number"
-            min="1"
-            max="20"
-            placeholder="4" />
-        </div>
-
-        <div>
-          <label class="text-sm font-medium mb-2 block">余白 (px)</label>
-          <Input
-            v-model="padding"
-            type="number"
-            min="0"
-            max="50"
-            placeholder="10" />
-        </div>
-
-        <div>
-          <label class="text-sm font-medium mb-2 block">背景色</label>
-          <div class="flex gap-2">
-            <input
-              v-model="backgroundColor"
-              type="color"
-              class="h-10 w-16 rounded border cursor-pointer">
-            <Input
-              v-model="backgroundColor"
-              class="flex-1"
-              placeholder="#ffffff" />
-          </div>
-        </div>
-
-        <div>
-          <label class="text-sm font-medium mb-2 block">出力形式</label>
-          <div class="flex gap-2">
-            <Button
-              :variant="outputFormat === 'png' ? 'default' : 'outline'"
-              size="sm"
-              @click="outputFormat = 'png'">
-              PNG（透過対応）
-            </Button>
-            <Button
-              :variant="outputFormat === 'jpeg' ? 'default' : 'outline'"
-              size="sm"
-              @click="outputFormat = 'jpeg'">
-              JPEG
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+    </UCard>
     <!-- スプライトシート -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>スプライトシート</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              スプライトシート
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               生成された画像
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             v-if="spriteSheetUrl"
             size="sm"
             @click="downloadSpriteSheet">
             <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
             ダウンロード
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="spriteSheetUrl" class="rounded overflow-auto bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
-          <img
-            :src="spriteSheetUrl"
-            alt="Sprite Sheet"
-            class="max-w-full">
-        </div>
-        <div v-else class="text-center py-12 text-muted-foreground">
-          <Icon name="heroicons:squares-plus" class="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p>画像を追加して生成ボタンを押してください</p>
-        </div>
-      </CardContent>
-      <CardHeader>
-        <div class="flex items-center justify-between">
+      </template>
+      <div v-if="spriteSheetUrl" class="rounded overflow-auto bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
+        <img
+          :src="spriteSheetUrl"
+          alt="Sprite Sheet"
+          class="max-w-full">
+      </div>
+      <div v-else class="text-center py-12 text-muted-foreground">
+        <Icon name="heroicons:squares-plus" class="w-12 h-12 mx-auto mb-4 opacity-20" />
+        <p>画像を追加して生成ボタンを押してください</p>
+      </div>
+
+      <div class="mt-6">
+        <div class="flex items-center justify-between mb-3">
           <div>
-            <CardTitle>CSSコード</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              CSSコード
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               スプライトシート用のCSS
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             size="sm"
             variant="outline"
             @click="copyCss">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
         <pre class="p-4 bg-muted rounded-md text-sm overflow-x-auto"><code>{{ cssCode }}</code></pre>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
     <!-- 使い方 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>スプライトシートの利点</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          スプライトシートの利点
+        </h3>
+      </template>
+      <div class="space-y-3 text-sm text-muted-foreground">
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <h4 class="font-semibold mb-2 text-foreground">
@@ -442,7 +444,7 @@ useSeoMeta({
             </ul>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Slider } from '~/components/ui/slider'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const password = ref('')
-const length = ref([16])
+const length = ref(16)
 const includeUppercase = ref(true)
 const includeLowercase = ref(true)
 const includeNumbers = ref(true)
@@ -34,10 +31,10 @@ const generatePassword = () => {
   if (includeSymbols.value) chars += symbolChars
 
   if (!chars) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '少なくとも1つの文字種類を選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -47,10 +44,10 @@ const generatePassword = () => {
   }
 
   let result = ''
-  const array = new Uint32Array(length.value[0])
+  const array = new Uint32Array(length.value)
   crypto.getRandomValues(array)
 
-  for (let i = 0; i < length.value[0]; i++) {
+  for (let i = 0; i < length.value; i++) {
     result += chars[array[i] % chars.length]
   }
 
@@ -72,14 +69,14 @@ const copyPassword = async () => {
   if (!password.value) return
 
   await copy(password.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'パスワードをクリップボードにコピーしました',
   })
 }
 
 const getPasswordStrength = () => {
-  const len = length.value[0]
+  const len = length.value
   const types = [includeUppercase.value, includeLowercase.value, includeNumbers.value, includeSymbols.value].filter(Boolean).length
 
   if (len < 8 || types < 2) return { label: '弱い', color: 'text-red-500', progress: 25 }
@@ -162,7 +159,7 @@ const presets = [
 
 const applyPreset = (preset: typeof presets[0]) => {
   const config = preset.config
-  length.value = [config.length]
+  length.value = config.length
   includeUppercase.value = config.uppercase
   includeLowercase.value = config.lowercase
   includeNumbers.value = config.numbers
@@ -194,41 +191,47 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット設定</CardTitle>
-        <CardDescription>
-          用途に応じたパスワード設定を選択できます
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            variant="outline"
-            size="sm"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            プリセット設定
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            用途に応じたパスワード設定を選択できます
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          variant="outline"
+          size="sm"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card class="mb-6">
-      <CardHeader>
-        <CardTitle>設定</CardTitle>
-        <CardDescription>
-          パスワードの長さと使用する文字を設定
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-6">
+    <UCard class="mb-6">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            設定
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            パスワードの長さと使用する文字を設定
+          </p>
+        </div>
+      </template>
+      <div class="space-y-6">
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <label class="text-sm font-medium">長さ</label>
-            <span class="text-sm font-mono bg-muted px-2 py-1 rounded">{{ length[0] }}文字</span>
+            <span class="text-sm font-mono bg-muted px-2 py-1 rounded">{{ length }}文字</span>
           </div>
-          <Slider
+          <USlider
             v-model="length"
             :min="4"
             :max="64"
@@ -298,26 +301,30 @@ useSeoMeta({
             <span class="text-xs text-muted-foreground font-mono">il1Lo0O</span>
           </label>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
-    <Card class="mb-6">
-      <CardHeader>
-        <CardTitle>生成されたパスワード</CardTitle>
-        <CardDescription>
-          クリックしてコピー、または再生成してください
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard class="mb-6">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            生成されたパスワード
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            クリックしてコピー、または再生成してください
+          </p>
+        </div>
+      </template>
+      <div class="space-y-4">
         <div class="relative">
           <div class="flex items-center gap-3 p-4 bg-muted rounded-lg">
             <code class="flex-1 text-lg font-mono break-all">{{ password }}</code>
-            <Button
+            <UButton
               size="sm"
               variant="ghost"
               @click="copyPassword">
               <Icon name="heroicons:clipboard-document" class="w-5 h-5" />
-            </Button>
+            </UButton>
           </div>
         </div>
 
@@ -333,20 +340,22 @@ useSeoMeta({
           </div>
         </div>
 
-        <Button
+        <UButton
           class="w-full"
           @click="generatePassword">
           <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
           新しいパスワードを生成
-        </Button>
-      </CardContent>
-    </Card>
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>パスワードのヒント</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          パスワードのヒント
+        </h3>
+      </template>
+      <div class="space-y-3 text-sm text-muted-foreground">
         <ul class="space-y-2 list-disc list-inside">
           <li>12文字以上のパスワードを推奨します</li>
           <li>大文字・小文字・数字・記号を組み合わせると強度が上がります</li>
@@ -354,7 +363,7 @@ useSeoMeta({
           <li>定期的にパスワードを変更することをお勧めします</li>
           <li>パスワードマネージャーの使用を検討してください</li>
         </ul>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -350,7 +347,7 @@ const generateData = () => {
       }
     }
 
-    toast({
+    toast.add({
       description: `${count}件のダミーデータを生成しました`,
     })
   }
@@ -427,24 +424,8 @@ const downloadData = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // 初期データ生成
 onMounted(() => {
@@ -470,225 +451,229 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card>
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <Button
-            v-for="(preset, key) in presets"
-            :key="key"
-            variant="outline"
-            @click="loadPreset(key)">
-            {{ preset.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <UButton
+          v-for="(preset, key) in presets"
+          :key="key"
+          variant="outline"
+          @click="loadPreset(key)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- スキーマ設定 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>フィールド設定</CardTitle>
-            <Button size="sm" @click="addField">
+            <h3 class="font-semibold">
+              フィールド設定
+            </h3>
+            <UButton size="sm" @click="addField">
               <Icon name="heroicons:plus" class="w-4 h-4 mr-2" />
               フィールド追加
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div v-for="(field, index) in fields" :key="field.id" class="p-3 border rounded-md">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-                <Input
-                  v-model="field.name"
-                  placeholder="フィールド名"
-                  class="text-sm" />
-                <select
-                  v-model="field.type"
-                  class="w-full px-3 py-2 text-sm border rounded-md bg-background">
-                  <optgroup
-                    v-for="(group, groupName) in {
-                      ID系: ['id', 'uuid'],
-                      人物系: ['fullName', 'firstName', 'lastName', 'email', 'phone', 'age', 'gender'],
-                      住所系: ['address', 'city', 'prefecture', 'zipCode', 'country'],
-                      会社系: ['company', 'jobTitle', 'department'],
-                      商品系: ['productName', 'price', 'category'],
-                      日時系: ['date', 'datetime', 'timestamp'],
-                      基本型: ['boolean', 'number', 'text', 'url'],
-                      その他: ['bloodType', 'status'],
-                    }" :key="groupName" :label="groupName">
-                    <option v-for="type in group" :key="type" :value="type">
-                      {{ dataTypes[type]?.name }}
-                    </option>
-                  </optgroup>
-                </select>
-              </div>
-              <div class="flex items-center justify-between">
-                <div class="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    :disabled="index === 0"
-                    @click="moveField(index, 'up')">
-                    <Icon name="heroicons:arrow-up" class="w-3 h-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    :disabled="index === fields.length - 1"
-                    @click="moveField(index, 'down')">
-                    <Icon name="heroicons:arrow-down" class="w-3 h-3" />
-                  </Button>
-                </div>
-                <Button
+        </template>
+
+        <div class="space-y-4">
+          <div v-for="(field, index) in fields" :key="field.id" class="p-3 border rounded-md">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+              <UInput
+                v-model="field.name"
+                placeholder="フィールド名"
+                class="text-sm" />
+              <select
+                v-model="field.type"
+                class="w-full px-3 py-2 text-sm border rounded-md bg-background">
+                <optgroup
+                  v-for="(group, groupName) in {
+                    ID系: ['id', 'uuid'],
+                    人物系: ['fullName', 'firstName', 'lastName', 'email', 'phone', 'age', 'gender'],
+                    住所系: ['address', 'city', 'prefecture', 'zipCode', 'country'],
+                    会社系: ['company', 'jobTitle', 'department'],
+                    商品系: ['productName', 'price', 'category'],
+                    日時系: ['date', 'datetime', 'timestamp'],
+                    基本型: ['boolean', 'number', 'text', 'url'],
+                    その他: ['bloodType', 'status'],
+                  }" :key="groupName" :label="groupName">
+                  <option v-for="type in group" :key="type" :value="type">
+                    {{ dataTypes[type]?.name }}
+                  </option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex gap-1">
+                <UButton
                   size="sm"
                   variant="ghost"
-                  @click="removeField(field.id)">
-                  <Icon name="heroicons:trash" class="w-3 h-3" />
-                </Button>
+                  :disabled="index === 0"
+                  @click="moveField(index, 'up')">
+                  <Icon name="heroicons:arrow-up" class="w-3 h-3" />
+                </UButton>
+                <UButton
+                  size="sm"
+                  variant="ghost"
+                  :disabled="index === fields.length - 1"
+                  @click="moveField(index, 'down')">
+                  <Icon name="heroicons:arrow-down" class="w-3 h-3" />
+                </UButton>
               </div>
+              <UButton
+                size="sm"
+                variant="ghost"
+                @click="removeField(field.id)">
+                <Icon name="heroicons:trash" class="w-3 h-3" />
+              </UButton>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- 生成設定 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>生成設定</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                生成件数: {{ recordCount[0] }}件
-              </label>
-              <Slider
-                v-model="recordCount"
-                :min="1"
-                :max="1000"
-                :step="1"
-                class="w-full" />
-            </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            生成設定
+          </h3>
+        </template>
 
-            <div>
-              <label class="text-sm font-medium mb-2 block">出力形式</label>
-              <div class="grid grid-cols-3 gap-2">
-                <Button
-                  v-for="format in ['json', 'csv', 'sql']"
-                  :key="format"
-                  :variant="outputFormat === format ? 'default' : 'outline'"
-                  size="sm"
-                  @click="outputFormat = format">
-                  {{ format.toUpperCase() }}
-                </Button>
-              </div>
-            </div>
-
-            <div v-if="outputFormat === 'sql'">
-              <label class="text-sm font-medium mb-2 block">テーブル名</label>
-              <Input
-                v-model="tableName"
-                placeholder="table_name" />
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">シード値（再現性のため）</label>
-              <Input
-                v-model="seedValue"
-                placeholder="空の場合はランダム" />
-            </div>
-
-            <Alert v-if="error" variant="destructive">
-              <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-              <AlertDescription>{{ error }}</AlertDescription>
-            </Alert>
-
-            <Button
-              class="w-full"
-              :disabled="fields.length === 0"
-              @click="generateData">
-              <Icon name="heroicons:sparkles" class="w-4 h-4 mr-2" />
-              データ生成
-            </Button>
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              生成件数: {{ recordCount[0] }}件
+            </label>
+            <Slider
+              v-model="recordCount"
+              :min="1"
+              :max="1000"
+              :step="1"
+              class="w-full" />
           </div>
-        </CardContent>
-      </Card>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">出力形式</label>
+            <div class="grid grid-cols-3 gap-2">
+              <UButton
+                v-for="format in ['json', 'csv', 'sql']"
+                :key="format"
+                :variant="outputFormat === format ? 'default' : 'outline'"
+                size="sm"
+                @click="outputFormat = format">
+                {{ format.toUpperCase() }}
+              </UButton>
+            </div>
+          </div>
+
+          <div v-if="outputFormat === 'sql'">
+            <label class="text-sm font-medium mb-2 block">テーブル名</label>
+            <UInput
+              v-model="tableName"
+              placeholder="table_name" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">シード値（再現性のため）</label>
+            <UInput
+              v-model="seedValue"
+              placeholder="空の場合はランダム" />
+          </div>
+
+          <UAlert
+            v-if="error" color="error" icon="heroicons:exclamation-circle"
+            :description="error" />
+
+          <UButton
+            class="w-full"
+            :disabled="fields.length === 0"
+            @click="generateData">
+            <Icon name="heroicons:sparkles" class="w-4 h-4 mr-2" />
+            データ生成
+          </UButton>
+        </div>
+      </UCard>
     </div>
 
     <!-- 生成結果 -->
-    <Card v-if="generatedData">
-      <CardHeader>
+    <UCard v-if="generatedData">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>生成データ</CardTitle>
+          <h3 class="font-semibold">
+            生成データ
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="ghost"
               @click="copyToClipboard(generatedData)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="ghost"
               @click="downloadData">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm max-h-96"><code>{{ generatedData }}</code></pre>
-      </CardContent>
-    </Card>
+      </template>
+
+      <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm max-h-96"><code>{{ generatedData }}</code></pre>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>使い方とデータ型</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              主要データ型
-            </h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-              <div v-for="(type, key) in dataTypes" :key="key">
-                <code class="bg-muted px-1 rounded">{{ key }}</code>
-                <span class="ml-1">{{ type.name }}</span>
-              </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          使い方とデータ型
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            主要データ型
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+            <div v-for="(type, key) in dataTypes" :key="key">
+              <code class="bg-muted px-1 rounded">{{ key }}</code>
+              <span class="ml-1">{{ type.name }}</span>
             </div>
           </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              特徴
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>日本語データに完全対応</li>
-              <li>シード値による再現可能な生成</li>
-              <li>JSON、CSV、SQL形式での出力</li>
-              <li>カスタムフィールド定義</li>
-              <li>最大1000件まで生成可能</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              用途例
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>データベースのテストデータ作成</li>
-              <li>APIのモックデータ生成</li>
-              <li>UIコンポーネントのサンプルデータ</li>
-              <li>パフォーマンステスト用データ</li>
-            </ul>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            特徴
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>日本語データに完全対応</li>
+            <li>シード値による再現可能な生成</li>
+            <li>JSON、CSV、SQL形式での出力</li>
+            <li>カスタムフィールド定義</li>
+            <li>最大1000件まで生成可能</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            用途例
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>データベースのテストデータ作成</li>
+            <li>APIのモックデータ生成</li>
+            <li>UIコンポーネントのサンプルデータ</li>
+            <li>パフォーマンステスト用データ</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

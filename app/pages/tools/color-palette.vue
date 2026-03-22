@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -197,26 +191,8 @@ const generatePalette = computed(() => {
 })
 
 // クリップボードにコピー
-const { copy } = useClipboard()
-const { toast } = useToast()
 
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      title: 'コピーしました',
-      description: text,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const copyPalette = () => {
   const paletteText = generatePalette.value.join(', ')
@@ -242,41 +218,43 @@ useSeoMeta({
     </div>
 
     <!-- プリセットセクション -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="preset in colorPresets"
-            :key="preset.value"
-            variant="outline"
-            size="sm"
-            class="gap-2"
-            @click="selectPreset(preset.value)">
-            <div
-              class="w-4 h-4 rounded border"
-              :style="{ backgroundColor: preset.value }"></div>
-            {{ preset.label }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-    <Card class="col-span-1 row-start-3 row-end-6">
-      <CardHeader>
-        <CardTitle>設定</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="preset in colorPresets"
+          :key="preset.value"
+          variant="outline"
+          size="sm"
+          class="gap-2"
+          @click="selectPreset(preset.value)">
+          <div
+            class="w-4 h-4 rounded border"
+            :style="{ backgroundColor: preset.value }"></div>
+          {{ preset.label }}
+        </UButton>
+      </div>
+    </UCard>
+    <UCard class="col-span-1 row-start-3 row-end-6">
+      <template #header>
+        <h3 class="font-semibold">
+          設定
+        </h3>
+      </template>
+      <div class="space-y-4">
         <!-- ベースカラー選択 -->
         <div>
           <label class="text-sm font-medium mb-2 block">基準色</label>
           <div class="flex gap-2">
-            <Input
+            <UInput
               v-model="baseColor"
               type="color"
               class="w-16 h-10 p-1 cursor-pointer" />
-            <Input
+            <UInput
               v-model="baseColor"
               type="text"
               placeholder="#3b82f6"
@@ -309,16 +287,16 @@ useSeoMeta({
         </div>
 
         <!-- 一括コピー -->
-        <Button
+        <UButton
           class="w-full"
           variant="outline"
           @click="copyPalette">
           <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
           パレットをコピー
-        </Button>
-      </CardContent>
-      <CardHeader>
-        <CardTitle class="text-sm">
+        </UButton>
+      </div>
+      <div class="mt-6">
+        <h3 class="font-semibold text-sm">
           {{
             {
               analogous: '類似色配色',
@@ -328,10 +306,8 @@ useSeoMeta({
               monochromatic: 'モノクロマティック配色',
             }[paletteType]
           }}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p class="text-sm text-muted-foreground">
+        </h3>
+        <p class="text-sm text-muted-foreground mt-2">
           {{
             {
               analogous: '色相環で隣り合う色を使った調和のとれた配色です。',
@@ -342,97 +318,97 @@ useSeoMeta({
             }[paletteType]
           }}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- カラーパレット -->
-    <Card>
-      <CardHeader>
-        <CardTitle>生成されたパレット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-5 gap-4">
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          生成されたパレット
+        </h3>
+      </template>
+      <div class="grid grid-cols-5 gap-4">
+        <div
+          v-for="(color, index) in generatePalette"
+          :key="index"
+          class="space-y-2">
           <div
-            v-for="(color, index) in generatePalette"
-            :key="index"
-            class="space-y-2">
-            <div
-              :style="{ backgroundColor: color }"
-              class="aspect-square rounded-lg shadow-sm border cursor-pointer hover:scale-105 transition-transform"
-              @click="copyToClipboard(color)">
-            </div>
-            <div class="text-center">
-              <p class="text-xs font-mono">
-                {{ color }}
-              </p>
-              <p class="text-xs text-muted-foreground">
-                {{ index === 0 ? '基準色' : '' }}
-              </p>
-            </div>
+            :style="{ backgroundColor: color }"
+            class="aspect-square rounded-lg shadow-sm border cursor-pointer hover:scale-105 transition-transform"
+            @click="copyToClipboard(color)">
+          </div>
+          <div class="text-center">
+            <p class="text-xs font-mono">
+              {{ color }}
+            </p>
+            <p class="text-xs text-muted-foreground">
+              {{ index === 0 ? '基準色' : '' }}
+            </p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- コントラスト比チェック -->
-    <Card>
-      <CardHeader>
-        <CardTitle>アクセシビリティチェック</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div class="grid md:grid-cols-2 gap-4">
-            <!-- 白背景でのテスト -->
-            <div>
-              <h4 class="text-sm font-medium mb-2">
-                白背景（#FFFFFF）
-              </h4>
-              <div class="space-y-2">
-                <div
-                  v-for="(color, index) in generatePalette"
-                  :key="`white-${index}`"
-                  class="flex items-center justify-between p-2 bg-white rounded border">
-                  <span
-                    :style="{ color }"
-                    class="font-medium">
-                    サンプルテキスト
-                  </span>
-                  <Badge
-                    :variant="getContrastRatio(color, '#ffffff') >= 4.5 ? 'default' : 'destructive'">
-                    {{ getContrastRatio(color, '#ffffff').toFixed(2) }}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-
-            <!-- 黒背景でのテスト -->
-            <div>
-              <h4 class="text-sm font-medium mb-2">
-                黒背景（#000000）
-              </h4>
-              <div class="space-y-2">
-                <div
-                  v-for="(color, index) in generatePalette"
-                  :key="`black-${index}`"
-                  class="flex items-center justify-between p-2 bg-black rounded border">
-                  <span
-                    :style="{ color }"
-                    class="font-medium">
-                    サンプルテキスト
-                  </span>
-                  <Badge
-                    :variant="getContrastRatio(color, '#000000') >= 4.5 ? 'default' : 'destructive'">
-                    {{ getContrastRatio(color, '#000000').toFixed(2) }}
-                  </Badge>
-                </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          アクセシビリティチェック
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div class="grid md:grid-cols-2 gap-4">
+          <!-- 白背景でのテスト -->
+          <div>
+            <h4 class="text-sm font-medium mb-2">
+              白背景（#FFFFFF）
+            </h4>
+            <div class="space-y-2">
+              <div
+                v-for="(color, index) in generatePalette"
+                :key="`white-${index}`"
+                class="flex items-center justify-between p-2 bg-white rounded border">
+                <span
+                  :style="{ color }"
+                  class="font-medium">
+                  サンプルテキスト
+                </span>
+                <UBadge
+                  :color="getContrastRatio(color, '#ffffff') >= 4.5 ? 'neutral' : 'error'">
+                  {{ getContrastRatio(color, '#ffffff').toFixed(2) }}
+                </UBadge>
               </div>
             </div>
           </div>
-          <p class="text-xs text-muted-foreground">
-            WCAG AA準拠には4.5以上、AAA準拠には7以上のコントラスト比が必要です。
-          </p>
+
+          <!-- 黒背景でのテスト -->
+          <div>
+            <h4 class="text-sm font-medium mb-2">
+              黒背景（#000000）
+            </h4>
+            <div class="space-y-2">
+              <div
+                v-for="(color, index) in generatePalette"
+                :key="`black-${index}`"
+                class="flex items-center justify-between p-2 bg-black rounded border">
+                <span
+                  :style="{ color }"
+                  class="font-medium">
+                  サンプルテキスト
+                </span>
+                <UBadge
+                  :color="getContrastRatio(color, '#000000') >= 4.5 ? 'neutral' : 'error'">
+                  {{ getContrastRatio(color, '#000000').toFixed(2) }}
+                </UBadge>
+              </div>
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+        <p class="text-xs text-muted-foreground">
+          WCAG AA準拠には4.5以上、AAA準拠には7以上のコントラスト比が必要です。
+        </p>
+      </div>
+    </UCard>
   </div>
 </template>

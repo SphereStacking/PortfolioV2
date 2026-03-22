@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -352,24 +349,7 @@ const cssVariables = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // 色覚異常タイプ
 const colorBlindTypes = [
@@ -427,408 +407,434 @@ useSeoMeta({
     </div>
 
     <!-- サンプル -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルの組み合わせ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleCombinations"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルの組み合わせ
+        </h3>
+      </template>
+
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleCombinations"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- カラー選択 -->
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle>前景色（テキスト）</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div class="flex items-center gap-4">
-              <input
-                v-model="foregroundColor"
-                type="color"
-                class="w-20 h-20 border rounded cursor-pointer">
-              <input
-                v-model="foregroundColor"
-                type="text"
-                class="flex-1 px-3 py-2 border rounded-md font-mono"
-                placeholder="#000000">
-            </div>
-            <div class="grid grid-cols-4 gap-2">
-              <button
-                v-for="color in recommendedColors"
-                :key="color.name"
-                class="p-3 border rounded text-xs"
-                :style="{ backgroundColor: color.value, color: getLuminance(color.value) > 0.5 ? '#000' : '#fff' }"
-                @click="foregroundColor = color.value">
-                {{ color.name }}
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            前景色（テキスト）
+          </h3>
+        </template>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>背景色</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <div class="flex items-center gap-4">
-              <input
-                v-model="backgroundColor"
-                type="color"
-                class="w-20 h-20 border rounded cursor-pointer">
-              <input
-                v-model="backgroundColor"
-                type="text"
-                class="flex-1 px-3 py-2 border rounded-md font-mono"
-                placeholder="#FFFFFF">
-            </div>
-            <div class="grid grid-cols-4 gap-2">
-              <button
-                v-for="color in recommendedColors"
-                :key="color.name"
-                class="p-3 border rounded text-xs"
-                :style="{ backgroundColor: color.value, color: getLuminance(color.value) > 0.5 ? '#000' : '#fff' }"
-                @click="backgroundColor = color.value">
-                {{ color.name }}
-              </button>
-            </div>
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <input
+              v-model="foregroundColor"
+              type="color"
+              class="w-20 h-20 border rounded cursor-pointer">
+            <input
+              v-model="foregroundColor"
+              type="text"
+              class="flex-1 px-3 py-2 border rounded-md font-mono"
+              placeholder="#000000">
           </div>
-        </CardContent>
-      </Card>
+          <div class="grid grid-cols-4 gap-2">
+            <button
+              v-for="color in recommendedColors"
+              :key="color.name"
+              class="p-3 border rounded text-xs"
+              :style="{ backgroundColor: color.value, color: getLuminance(color.value) > 0.5 ? '#000' : '#fff' }"
+              @click="foregroundColor = color.value">
+              {{ color.name }}
+            </button>
+          </div>
+        </div>
+      </UCard>
+
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            背景色
+          </h3>
+        </template>
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <input
+              v-model="backgroundColor"
+              type="color"
+              class="w-20 h-20 border rounded cursor-pointer">
+            <input
+              v-model="backgroundColor"
+              type="text"
+              class="flex-1 px-3 py-2 border rounded-md font-mono"
+              placeholder="#FFFFFF">
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <button
+              v-for="color in recommendedColors"
+              :key="color.name"
+              class="p-3 border rounded text-xs"
+              :style="{ backgroundColor: color.value, color: getLuminance(color.value) > 0.5 ? '#000' : '#fff' }"
+              @click="backgroundColor = color.value">
+              {{ color.name }}
+            </button>
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- コントラスト比の結果 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>コントラスト比</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="text-center">
-          <div class="text-6xl font-bold mb-4">
-            {{ contrastRatio.toFixed(2) }}:1
-          </div>
-          <div class="flex justify-center gap-4 mb-6">
-            <Badge
-              :variant="wcagLevels.aa.passed ? 'default' : 'destructive'"
-              class="text-lg px-4 py-2">
-              WCAG AA: {{ wcagLevels.aa.passed ? '合格' : '不合格' }}
-            </Badge>
-            <Badge
-              :variant="wcagLevels.aaa.passed ? 'default' : 'destructive'"
-              class="text-lg px-4 py-2">
-              WCAG AAA: {{ wcagLevels.aaa.passed ? '合格' : '不合格' }}
-            </Badge>
-          </div>
-          <div class="text-sm text-muted-foreground">
-            {{ wcagLevels.isLargeText ? '大きなテキストとして評価' : '通常のテキストとして評価' }}
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          コントラスト比
+        </h3>
+      </template>
+
+      <div class="text-center">
+        <div class="text-6xl font-bold mb-4">
+          {{ contrastRatio.toFixed(2) }}:1
         </div>
-      </CardContent>
-    </Card>
+        <div class="flex justify-center gap-4 mb-6">
+          <UBadge
+            :color="wcagLevels.aa.passed ? 'neutral' : 'error'"
+            class="text-lg px-4 py-2">
+            WCAG AA: {{ wcagLevels.aa.passed ? '合格' : '不合格' }}
+          </UBadge>
+          <UBadge
+            :color="wcagLevels.aaa.passed ? 'neutral' : 'error'"
+            class="text-lg px-4 py-2">
+            WCAG AAA: {{ wcagLevels.aaa.passed ? '合格' : '不合格' }}
+          </UBadge>
+        </div>
+        <div class="text-sm text-muted-foreground">
+          {{ wcagLevels.isLargeText ? '大きなテキストとして評価' : '通常のテキストとして評価' }}
+        </div>
+      </div>
+    </UCard>
 
     <!-- プレビュー -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>プレビュー</CardTitle>
+          <h3 class="font-semibold">
+            プレビュー
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               variant="outline"
               size="sm"
               @click="showRecommendations = !showRecommendations">
               <Icon name="heroicons:light-bulb" class="w-4 h-4 mr-2" />
               推奨色
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               variant="outline"
               size="sm"
               @click="swapColors">
               <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
               色を入れ替え
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div
-            class="p-8 rounded-md"
-            :style="{
-              backgroundColor: colorBlindMode === 'normal' ? backgroundColor : simulatedColors.background,
-              color: colorBlindMode === 'normal' ? foregroundColor : simulatedColors.foreground,
-            }">
-            <p
-              :style="{ fontSize: fontSize + 'px', fontWeight: fontWeight }"
-              class="mb-4">
-              {{ sampleText }}
-            </p>
-            <p class="text-sm">
-              日本語のサンプルテキスト: 私は猫です。名前はまだありません。
-            </p>
-            <p class="text-xs mt-4">
-              小さなテキスト (12px): Lorem ipsum dolor sit amet
-            </p>
-          </div>
+      </template>
 
-          <!-- 色覚異常シミュレーション選択 -->
-          <div>
-            <label class="text-sm font-medium mb-2 block">色覚異常シミュレーション</label>
-            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              <Button
-                v-for="type in colorBlindTypes"
-                :key="type.value"
-                size="sm"
-                :variant="colorBlindMode === type.value ? 'default' : 'outline'"
-                class="text-xs"
-                @click="colorBlindMode = type.value">
-                {{ type.label }}
-              </Button>
-            </div>
-            <p v-if="colorBlindMode !== 'normal'" class="mt-2 text-sm text-muted-foreground">
-              {{ colorBlindTypes.find(t => t.value === colorBlindMode)?.description }}
-              <br>
-              シミュレーション後のコントラスト比: {{ simulatedContrastRatio.toFixed(2) }}:1
-            </p>
-          </div>
+      <div class="space-y-4">
+        <div
+          class="p-8 rounded-md"
+          :style="{
+            backgroundColor: colorBlindMode === 'normal' ? backgroundColor : simulatedColors.background,
+            color: colorBlindMode === 'normal' ? foregroundColor : simulatedColors.foreground,
+          }">
+          <p
+            :style="{ fontSize: fontSize + 'px', fontWeight: fontWeight }"
+            class="mb-4">
+            {{ sampleText }}
+          </p>
+          <p class="text-sm">
+            日本語のサンプルテキスト: 私は猫です。名前はまだありません。
+          </p>
+          <p class="text-xs mt-4">
+            小さなテキスト (12px): Lorem ipsum dolor sit amet
+          </p>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- 色覚異常シミュレーション選択 -->
+        <div>
+          <label class="text-sm font-medium mb-2 block">色覚異常シミュレーション</label>
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <UButton
+              v-for="type in colorBlindTypes"
+              :key="type.value"
+              size="sm"
+              :variant="colorBlindMode === type.value ? 'default' : 'outline'"
+              class="text-xs"
+              @click="colorBlindMode = type.value">
+              {{ type.label }}
+            </UButton>
+          </div>
+          <p v-if="colorBlindMode !== 'normal'" class="mt-2 text-sm text-muted-foreground">
+            {{ colorBlindTypes.find(t => t.value === colorBlindMode)?.description }}
+            <br>
+            シミュレーション後のコントラスト比: {{ simulatedContrastRatio.toFixed(2) }}:1
+          </p>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 推奨色 -->
-    <Card v-if="showRecommendations">
-      <CardHeader>
-        <CardTitle>推奨色の提案</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <h3 class="font-medium mb-2">
-              推奨前景色（テキスト色）
-            </h3>
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                v-for="color in recommendedForegroundColors"
-                :key="color"
-                class="p-4 rounded border-2 transition-all hover:scale-105"
-                :style="{ backgroundColor: backgroundColor, color: color, borderColor: color }"
-                @click="foregroundColor = color">
-                <span class="font-mono text-sm">{{ color }}</span>
-                <br>
-                <span class="text-xs">
-                  比率: {{ getContrastRatio(color, backgroundColor).toFixed(2) }}:1
-                </span>
-              </button>
-            </div>
-          </div>
+    <UCard v-if="showRecommendations">
+      <template #header>
+        <h3 class="font-semibold">
+          推奨色の提案
+        </h3>
+      </template>
 
-          <div>
-            <h3 class="font-medium mb-2">
-              推奨背景色
-            </h3>
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                v-for="color in recommendedBackgroundColors"
-                :key="color"
-                class="p-4 rounded border-2 transition-all hover:scale-105"
-                :style="{ backgroundColor: color, color: foregroundColor, borderColor: foregroundColor }"
-                @click="backgroundColor = color">
-                <span class="font-mono text-sm">{{ color }}</span>
-                <br>
-                <span class="text-xs">
-                  比率: {{ getContrastRatio(foregroundColor, color).toFixed(2) }}:1
-                </span>
-              </button>
-            </div>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-medium mb-2">
+            推奨前景色（テキスト色）
+          </h3>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="color in recommendedForegroundColors"
+              :key="color"
+              class="p-4 rounded border-2 transition-all hover:scale-105"
+              :style="{ backgroundColor: backgroundColor, color: color, borderColor: color }"
+              @click="foregroundColor = color">
+              <span class="font-mono text-sm">{{ color }}</span>
+              <br>
+              <span class="text-xs">
+                比率: {{ getContrastRatio(color, backgroundColor).toFixed(2) }}:1
+              </span>
+            </button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <h3 class="font-medium mb-2">
+            推奨背景色
+          </h3>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="color in recommendedBackgroundColors"
+              :key="color"
+              class="p-4 rounded border-2 transition-all hover:scale-105"
+              :style="{ backgroundColor: color, color: foregroundColor, borderColor: foregroundColor }"
+              @click="backgroundColor = color">
+              <span class="font-mono text-sm">{{ color }}</span>
+              <br>
+              <span class="text-xs">
+                比率: {{ getContrastRatio(foregroundColor, color).toFixed(2) }}:1
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- テキスト設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>テキスト設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              フォントサイズ: {{ fontSize }}px
-            </label>
-            <Slider
-              v-model="fontSize"
-              :min="8"
-              :max="48"
-              :step="1"
-              class="w-full" />
-          </div>
-          <div>
-            <label class="text-sm font-medium mb-2 block">フォントウェイト</label>
-            <div class="flex gap-2">
-              <Button
-                v-for="weight in ['normal', 'bold'] as const"
-                :key="weight"
-                size="sm"
-                :variant="fontWeight === weight ? 'default' : 'outline'"
-                @click="fontWeight = weight">
-                {{ weight === 'normal' ? '通常' : '太字' }}
-              </Button>
-            </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          テキスト設定
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            フォントサイズ: {{ fontSize }}px
+          </label>
+          <Slider
+            v-model="fontSize"
+            :min="8"
+            :max="48"
+            :step="1"
+            class="w-full" />
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-2 block">フォントウェイト</label>
+          <div class="flex gap-2">
+            <UButton
+              v-for="weight in ['normal', 'bold'] as const"
+              :key="weight"
+              size="sm"
+              :variant="fontWeight === weight ? 'default' : 'outline'"
+              @click="fontWeight = weight">
+              {{ weight === 'normal' ? '通常' : '太字' }}
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- WCAG基準の詳細 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>WCAG基準の詳細</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>基準</TableHead>
-              <TableHead>通常のテキスト</TableHead>
-              <TableHead>大きなテキスト</TableHead>
-              <TableHead>現在の状態</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell class="font-medium">
-                WCAG AA
-              </TableCell>
-              <TableCell>4.5:1 以上</TableCell>
-              <TableCell>3:1 以上</TableCell>
-              <TableCell>
-                <Badge :variant="wcagLevels.aa.passed ? 'default' : 'destructive'">
-                  {{ wcagLevels.aa.passed ? '合格' : '不合格' }}
-                </Badge>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-medium">
-                WCAG AAA
-              </TableCell>
-              <TableCell>7:1 以上</TableCell>
-              <TableCell>4.5:1 以上</TableCell>
-              <TableCell>
-                <Badge :variant="wcagLevels.aaa.passed ? 'default' : 'destructive'">
-                  {{ wcagLevels.aaa.passed ? '合格' : '不合格' }}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-        <div class="mt-4 text-sm text-muted-foreground">
-          <p>※ 大きなテキスト: 24px以上、または18px以上の太字</p>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          WCAG基準の詳細
+        </h3>
+      </template>
+
+      <table class="w-full caption-bottom text-sm">
+        <thead class="[&_tr]:border-b">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              基準
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              通常のテキスト
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              大きなテキスト
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              現在の状態
+            </th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr:last-child]:border-0">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <td class="p-2 align-middle font-medium">
+              WCAG AA
+            </td>
+            <td class="p-2 align-middle">
+              4.5:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              3:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              <UBadge :color="wcagLevels.aa.passed ? 'neutral' : 'error'">
+                {{ wcagLevels.aa.passed ? '合格' : '不合格' }}
+              </UBadge>
+            </td>
+          </tr>
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <td class="p-2 align-middle font-medium">
+              WCAG AAA
+            </td>
+            <td class="p-2 align-middle">
+              7:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              4.5:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              <UBadge :color="wcagLevels.aaa.passed ? 'neutral' : 'error'">
+                {{ wcagLevels.aaa.passed ? '合格' : '不合格' }}
+              </UBadge>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="mt-4 text-sm text-muted-foreground">
+        <p>※ 大きなテキスト: 24px以上、または18px以上の太字</p>
+      </div>
+    </UCard>
 
     <!-- 改善提案 -->
-    <Card v-if="getSuggestions.length > 0">
-      <CardHeader>
-        <CardTitle>改善提案</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Alert>
-          <Icon name="heroicons:light-bulb" class="h-4 w-4" />
-          <AlertDescription>
-            <ul class="list-disc list-inside space-y-1">
-              <li v-for="(suggestion, index) in getSuggestions" :key="index">
-                {{ suggestion }}
-              </li>
-            </ul>
-          </AlertDescription>
-        </Alert>
-      </CardContent>
-    </Card>
+    <UCard v-if="getSuggestions.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          改善提案
+        </h3>
+      </template>
+
+      <UAlert icon="heroicons:light-bulb">
+        <template #description>
+          <ul class="list-disc list-inside space-y-1">
+            <li v-for="(suggestion, index) in getSuggestions" :key="index">
+              {{ suggestion }}
+            </li>
+          </ul>
+        </template>
+      </UAlert>
+    </UCard>
 
     <!-- CSS変数生成 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>CSS変数生成</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <label class="flex items-center gap-2 text-sm">
-            <input
-              v-model="generateCSSVariables"
-              type="checkbox"
-              class="rounded">
-            CSS変数を生成
-          </label>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          CSS変数生成
+        </h3>
+      </template>
 
-          <div v-if="generateCSSVariables">
-            <div class="relative">
-              <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm font-mono">{{ cssVariables }}</pre>
-              <Button
-                size="sm"
-                variant="ghost"
-                class="absolute top-2 right-2"
-                @click="copyToClipboard(cssVariables)">
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-            </div>
+      <div class="space-y-4">
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            v-model="generateCSSVariables"
+            type="checkbox"
+            class="rounded">
+          CSS変数を生成
+        </label>
+
+        <div v-if="generateCSSVariables">
+          <div class="relative">
+            <pre class="p-4 bg-muted rounded-md overflow-x-auto text-sm font-mono">{{ cssVariables }}</pre>
+            <UButton
+              size="sm"
+              variant="ghost"
+              class="absolute top-2 right-2"
+              @click="copyToClipboard(cssVariables)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 機能説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>機能説明</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              WCAG基準について
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>AA基準:</strong> 最低限のアクセシビリティ要件</li>
-              <li><strong>AAA基準:</strong> より高いアクセシビリティ要件</li>
-              <li><strong>大きなテキスト:</strong> 24px以上、または18px以上の太字</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              色覚異常シミュレーション
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>世界の男性の約8%、女性の約0.5%が何らかの色覚異常を持つ</li>
-              <li>最も一般的なのは赤緑色覚異常（第1・第2色覚異常）</li>
-              <li>シミュレーションで実際の見え方を確認できます</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              推奨色の提案
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>現在の色を基準にWCAG基準を満たす色を自動生成</li>
-              <li>明度調整と色相シフトで複数の選択肢を提供</li>
-              <li>クリックして直接適用可能</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          機能説明
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            WCAG基準について
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>AA基準:</strong> 最低限のアクセシビリティ要件</li>
+            <li><strong>AAA基準:</strong> より高いアクセシビリティ要件</li>
+            <li><strong>大きなテキスト:</strong> 24px以上、または18px以上の太字</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            色覚異常シミュレーション
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>世界の男性の約8%、女性の約0.5%が何らかの色覚異常を持つ</li>
+            <li>最も一般的なのは赤緑色覚異常（第1・第2色覚異常）</li>
+            <li>シミュレーションで実際の見え方を確認できます</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            推奨色の提案
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>現在の色を基準にWCAG基準を満たす色を自動生成</li>
+            <li>明度調整と色相シフトで複数の選択肢を提供</li>
+            <li>クリックして直接適用可能</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

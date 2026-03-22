@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -291,24 +288,7 @@ const conversionTable = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // リセット
 const reset = () => {
@@ -345,227 +325,233 @@ useSeoMeta({
     </div>
 
     <!-- カテゴリ選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>カテゴリ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
-          <Button
-            v-for="(category, key) in unitCategories"
-            :key="key"
-            :variant="selectedCategory === key ? 'default' : 'outline'"
-            size="sm"
-            @click="selectedCategory = key">
-            <Icon :name="category.icon" class="w-4 h-4 mr-1" />
-            {{ category.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          カテゴリ
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+        <UButton
+          v-for="(category, key) in unitCategories"
+          :key="key"
+          :variant="selectedCategory === key ? 'default' : 'outline'"
+          size="sm"
+          @click="selectedCategory = key">
+          <Icon :name="category.icon" class="w-4 h-4 mr-1" />
+          {{ category.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- クイック変換 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>よく使う変換</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="conversion in quickConversions"
-            :key="`${conversion.from}-${conversion.to}`"
-            variant="outline"
-            size="sm"
-            @click="applyQuickConversion(conversion)">
-            {{ conversion.label }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          よく使う変換
+        </h3>
+      </template>
+
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="conversion in quickConversions"
+          :key="`${conversion.from}-${conversion.to}`"
+          variant="outline"
+          size="sm"
+          @click="applyQuickConversion(conversion)">
+          {{ conversion.label }}
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 変換設定 -->
       <div class="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>変換設定</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <!-- From -->
-              <div>
-                <label class="text-sm font-medium mb-2 block">変換元</label>
-                <div class="grid grid-cols-[1fr,2fr] gap-2">
-                  <Input
-                    v-model="fromValue"
-                    type="number"
-                    step="any"
-                    placeholder="値を入力" />
-                  <select
-                    v-model="fromUnit"
-                    class="w-full px-3 py-2 border rounded-md bg-background">
-                    <option v-for="(unit, key) in currentUnits" :key="key" :value="key">
-                      {{ unit.name }}
-                    </option>
-                  </select>
-                </div>
-              </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              変換設定
+            </h3>
+          </template>
 
-              <!-- 入れ替えボタン -->
-              <div class="flex justify-center">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  @click="swapUnits">
-                  <Icon name="heroicons:arrows-up-down" class="w-4 h-4" />
-                </Button>
+          <div class="space-y-4">
+            <!-- From -->
+            <div>
+              <label class="text-sm font-medium mb-2 block">変換元</label>
+              <div class="grid grid-cols-[1fr,2fr] gap-2">
+                <UInput
+                  v-model="fromValue"
+                  type="number"
+                  step="any"
+                  placeholder="値を入力" />
+                <select
+                  v-model="fromUnit"
+                  class="w-full px-3 py-2 border rounded-md bg-background">
+                  <option v-for="(unit, key) in currentUnits" :key="key" :value="key">
+                    {{ unit.name }}
+                  </option>
+                </select>
               </div>
-
-              <!-- To -->
-              <div>
-                <label class="text-sm font-medium mb-2 block">変換先</label>
-                <div class="grid grid-cols-[1fr,2fr] gap-2">
-                  <div class="flex items-center px-3 py-2 border rounded-md bg-muted">
-                    {{ convertedValue || '-' }}
-                  </div>
-                  <select
-                    v-model="toUnit"
-                    class="w-full px-3 py-2 border rounded-md bg-background">
-                    <option v-for="(unit, key) in currentUnits" :key="key" :value="key">
-                      {{ unit.name }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- 精度設定 -->
-              <div>
-                <label class="text-sm font-medium mb-2 block">
-                  小数点以下の桁数: {{ precision[0] }}
-                </label>
-                <Slider
-                  :model-value="precision"
-                  :min="0"
-                  :max="10"
-                  :step="1"
-                  class="w-full"
-                  @update:model-value="precision = $event" />
-              </div>
-
-              <!-- 変換式 -->
-              <Alert v-if="conversionFormula">
-                <Icon name="heroicons:information-circle" class="w-4 h-4" />
-                <AlertDescription>
-                  {{ conversionFormula }}
-                </AlertDescription>
-              </Alert>
             </div>
-          </CardContent>
-          <CardFooter class="flex gap-2">
-            <Button
+
+            <!-- 入れ替えボタン -->
+            <div class="flex justify-center">
+              <UButton
+                variant="ghost"
+                size="sm"
+                @click="swapUnits">
+                <Icon name="heroicons:arrows-up-down" class="w-4 h-4" />
+              </UButton>
+            </div>
+
+            <!-- To -->
+            <div>
+              <label class="text-sm font-medium mb-2 block">変換先</label>
+              <div class="grid grid-cols-[1fr,2fr] gap-2">
+                <div class="flex items-center px-3 py-2 border rounded-md bg-muted">
+                  {{ convertedValue || '-' }}
+                </div>
+                <select
+                  v-model="toUnit"
+                  class="w-full px-3 py-2 border rounded-md bg-background">
+                  <option v-for="(unit, key) in currentUnits" :key="key" :value="key">
+                    {{ unit.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 精度設定 -->
+            <div>
+              <label class="text-sm font-medium mb-2 block">
+                小数点以下の桁数: {{ precision[0] }}
+              </label>
+              <Slider
+                :model-value="precision"
+                :min="0"
+                :max="10"
+                :step="1"
+                class="w-full"
+                @update:model-value="precision = $event" />
+            </div>
+
+            <!-- 変換式 -->
+            <UAlert v-if="conversionFormula" icon="heroicons:information-circle" :description="conversionFormula" />
+          </div>
+
+          <template #footer>
+            <UButton
               variant="outline"
               size="sm"
               @click="reset">
               リセット
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               v-if="convertedValue"
               size="sm"
               @click="copyToClipboard(convertedValue)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
               結果をコピー
-            </Button>
-          </CardFooter>
-        </Card>
+            </UButton>
+          </template>
+        </UCard>
 
         <!-- 変換テーブル -->
-        <Card v-if="fromUnit && toUnit">
-          <CardHeader>
-            <CardTitle>変換テーブル</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{{ currentUnits[fromUnit]?.name }}</TableHead>
-                  <TableHead class="text-right">
-                    {{ currentUnits[toUnit]?.name }}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-for="row in conversionTable" :key="row.input">
-                  <TableCell>{{ row.input }}</TableCell>
-                  <TableCell class="text-right font-mono">
-                    {{ row.output }}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <UCard v-if="fromUnit && toUnit">
+          <template #header>
+            <h3 class="font-semibold">
+              変換テーブル
+            </h3>
+          </template>
+
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  {{ currentUnits[fromUnit]?.name }}
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground text-right">
+                  {{ currentUnits[toUnit]?.name }}
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr v-for="row in conversionTable" :key="row.input" class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle">
+                  {{ row.input }}
+                </td>
+                <td class="p-2 align-middle text-right font-mono">
+                  {{ row.output }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </UCard>
       </div>
 
       <!-- 単位一覧 -->
       <div>
-        <Card>
-          <CardHeader>
-            <CardTitle>{{ unitCategories[selectedCategory].name }}の単位一覧</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-3">
-              <div v-for="(unit, key) in currentUnits" :key="key" class="p-3 bg-muted rounded-md">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="font-medium">
-                      {{ unit.name }}
-                    </p>
-                    <p class="text-sm text-muted-foreground">
-                      {{ key }}
-                    </p>
-                  </div>
-                  <Badge variant="outline">
-                    {{ unit.factor ? `×${unit.factor}` : '特殊' }}
-                  </Badge>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              {{ unitCategories[selectedCategory].name }}の単位一覧
+            </h3>
+          </template>
+
+          <div class="space-y-3">
+            <div v-for="(unit, key) in currentUnits" :key="key" class="p-3 bg-muted rounded-md">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">
+                    {{ unit.name }}
+                  </p>
+                  <p class="text-sm text-muted-foreground">
+                    {{ key }}
+                  </p>
                 </div>
+                <UBadge variant="outline">
+                  {{ unit.factor ? `×${unit.factor}` : '特殊' }}
+                </UBadge>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </UCard>
       </div>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>単位変換について</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              変換精度
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>一般的な用途には十分な精度で変換</li>
-              <li>科学計算には専門ツールの使用を推奨</li>
-              <li>CSS単位の相対値は基準値を仮定</li>
-              <li>月の日数は30日として計算</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              CSS単位について
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>rem/em: 基準フォントサイズ16pxを仮定</li>
-              <li>vw: 画面幅1920pxを仮定</li>
-              <li>vh: 画面高さ1080pxを仮定</li>
-              <li>実際の値はコンテキストにより異なります</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          単位変換について
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            変換精度
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>一般的な用途には十分な精度で変換</li>
+            <li>科学計算には専門ツールの使用を推奨</li>
+            <li>CSS単位の相対値は基準値を仮定</li>
+            <li>月の日数は30日として計算</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            CSS単位について
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>rem/em: 基準フォントサイズ16pxを仮定</li>
+            <li>vw: 画面幅1920pxを仮定</li>
+            <li>vh: 画面高さ1080pxを仮定</li>
+            <li>実際の値はコンテキストにより異なります</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

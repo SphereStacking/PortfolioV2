@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -472,24 +469,7 @@ const performanceMetrics = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // リセット
 const reset = () => {
@@ -518,458 +498,468 @@ useSeoMeta({
     </div>
 
     <!-- カテゴリフィルター -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Filter by Style</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="category in [
-              { value: 'all', label: 'All Styles', icon: 'heroicons:squares-2x2' },
-              { value: 'modern', label: 'Modern', icon: 'heroicons:sparkles' },
-              { value: 'technical', label: 'Technical', icon: 'heroicons:code-bracket' },
-              { value: 'classic', label: 'Classic', icon: 'heroicons:bookmark' },
-            ]"
-            :key="category.value"
-            :variant="selectedCategory === category.value ? 'default' : 'outline'"
-            size="sm"
-            @click="selectedCategory = category.value">
-            <Icon :name="category.icon" class="w-4 h-4 mr-2" />
-            {{ category.label }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Filter by Style
+        </h3>
+      </template>
+
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="category in [
+            { value: 'all', label: 'All Styles', icon: 'heroicons:squares-2x2' },
+            { value: 'modern', label: 'Modern', icon: 'heroicons:sparkles' },
+            { value: 'technical', label: 'Technical', icon: 'heroicons:code-bracket' },
+            { value: 'classic', label: 'Classic', icon: 'heroicons:bookmark' },
+          ]"
+          :key="category.value"
+          :variant="selectedCategory === category.value ? 'default' : 'outline'"
+          size="sm"
+          @click="selectedCategory = category.value">
+          <Icon :name="category.icon" class="w-4 h-4 mr-2" />
+          {{ category.label }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- フォントペア一覧 -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <Card
+      <UCard
         v-for="pair in filteredPairs"
         :key="pair.id"
         class="cursor-pointer transition-colors"
         :class="selectedPair === pair.id ? 'border-primary' : 'hover:border-primary/50'"
         @click="selectedPair = pair.id">
-        <CardHeader>
-          <CardTitle class="text-lg">
+        <template #header>
+          <h3 class="font-semibold text-lg">
             {{ pair.name }}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            <div>
-              <p class="text-xs text-muted-foreground mb-1">
-                HEADINGS
-              </p>
-              <p :style="{ fontFamily: pair.heading.family }" class="text-lg font-bold">
-                {{ pair.heading.family }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-muted-foreground mb-1">
-                BODY TEXT
-              </p>
-              <p :style="{ fontFamily: pair.body.family }" class="text-sm">
-                {{ pair.body.family }}
-              </p>
-            </div>
-            <div v-if="pair.mono">
-              <p class="text-xs text-muted-foreground mb-1">
-                CODE
-              </p>
-              <p :style="{ fontFamily: pair.mono.family }" class="text-sm font-mono">
-                {{ pair.mono.family }}
-              </p>
-            </div>
-            <p class="text-sm text-muted-foreground">
-              {{ pair.description }}
+          </h3>
+        </template>
+
+        <div class="space-y-3">
+          <div>
+            <p class="text-xs text-muted-foreground mb-1">
+              HEADINGS
             </p>
-            <div class="space-y-2">
-              <div class="flex flex-wrap gap-1">
-                <Badge
-                  v-for="tag in pair.tags" :key="tag" variant="secondary"
-                  class="text-xs">
-                  {{ tag }}
-                </Badge>
-              </div>
-              <div v-if="pair.cssFrameworks.length > 0" class="flex items-center gap-2">
-                <Icon name="heroicons:cube" class="w-3 h-3 text-muted-foreground" />
-                <span class="text-xs text-muted-foreground">
-                  {{ pair.cssFrameworks.join(', ') }}
-                </span>
-              </div>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1">
-                  <Icon name="heroicons:fire" class="w-3 h-3 text-orange-500" />
-                  <span class="text-xs font-medium">{{ pair.popularity }}% popular</span>
-                </div>
+            <p :style="{ fontFamily: pair.heading.family }" class="text-lg font-bold">
+              {{ pair.heading.family }}
+            </p>
+          </div>
+          <div>
+            <p class="text-xs text-muted-foreground mb-1">
+              BODY TEXT
+            </p>
+            <p :style="{ fontFamily: pair.body.family }" class="text-sm">
+              {{ pair.body.family }}
+            </p>
+          </div>
+          <div v-if="pair.mono">
+            <p class="text-xs text-muted-foreground mb-1">
+              CODE
+            </p>
+            <p :style="{ fontFamily: pair.mono.family }" class="text-sm font-mono">
+              {{ pair.mono.family }}
+            </p>
+          </div>
+          <p class="text-sm text-muted-foreground">
+            {{ pair.description }}
+          </p>
+          <div class="space-y-2">
+            <div class="flex flex-wrap gap-1">
+              <UBadge
+                v-for="tag in pair.tags" :key="tag" color="neutral"
+                variant="subtle"
+                class="text-xs">
+                {{ tag }}
+              </UBadge>
+            </div>
+            <div v-if="pair.cssFrameworks.length > 0" class="flex items-center gap-2">
+              <Icon name="heroicons:cube" class="w-3 h-3 text-muted-foreground" />
+              <span class="text-xs text-muted-foreground">
+                {{ pair.cssFrameworks.join(', ') }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1">
+                <Icon name="heroicons:fire" class="w-3 h-3 text-orange-500" />
+                <span class="text-xs font-medium">{{ pair.popularity }}% popular</span>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- 詳細設定とプレビュー -->
     <div v-if="selectedPairData" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 設定 -->
       <div class="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>フォント設定</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <div>
-                <h3 class="font-medium mb-3">
-                  見出し設定
-                </h3>
-                <div class="space-y-3">
-                  <div>
-                    <label class="text-sm font-medium mb-2 block">
-                      サイズ: {{ fontSize.heading[0] }}px
-                    </label>
-                    <Slider
-                      :model-value="fontSize.heading"
-                      :min="16"
-                      :max="64"
-                      :step="1"
-                      class="w-full"
-                      @update:model-value="fontSize.heading = $event" />
-                  </div>
-                  <div>
-                    <label class="text-sm font-medium mb-2 block">
-                      太さ: {{ fontWeight.heading[0] }}
-                    </label>
-                    <Slider
-                      :model-value="fontWeight.heading"
-                      :min="100"
-                      :max="900"
-                      :step="100"
-                      class="w-full"
-                      @update:model-value="fontWeight.heading = $event" />
-                  </div>
-                  <div>
-                    <label class="text-sm font-medium mb-2 block">
-                      行間: {{ lineHeight.heading[0] }}
-                    </label>
-                    <Slider
-                      :model-value="lineHeight.heading"
-                      :min="1"
-                      :max="2"
-                      :step="0.1"
-                      class="w-full"
-                      @update:model-value="lineHeight.heading = $event" />
-                  </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              フォント設定
+            </h3>
+          </template>
+
+          <div class="space-y-4">
+            <div>
+              <h3 class="font-medium mb-3">
+                見出し設定
+              </h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="text-sm font-medium mb-2 block">
+                    サイズ: {{ fontSize.heading[0] }}px
+                  </label>
+                  <Slider
+                    :model-value="fontSize.heading"
+                    :min="16"
+                    :max="64"
+                    :step="1"
+                    class="w-full"
+                    @update:model-value="fontSize.heading = $event" />
                 </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 class="font-medium mb-3">
-                  本文設定
-                </h3>
-                <div class="space-y-3">
-                  <div>
-                    <label class="text-sm font-medium mb-2 block">
-                      サイズ: {{ fontSize.body[0] }}px
-                    </label>
-                    <Slider
-                      :model-value="fontSize.body"
-                      :min="12"
-                      :max="24"
-                      :step="1"
-                      class="w-full"
-                      @update:model-value="fontSize.body = $event" />
-                  </div>
-                  <div>
-                    <label class="text-sm font-medium mb-2 block">
-                      太さ: {{ fontWeight.body[0] }}
-                    </label>
-                    <Slider
-                      :model-value="fontWeight.body"
-                      :min="100"
-                      :max="900"
-                      :step="100"
-                      class="w-full"
-                      @update:model-value="fontWeight.body = $event" />
-                  </div>
-                  <div>
-                    <label class="text-sm font-medium mb-2 block">
-                      行間: {{ lineHeight.body[0] }}
-                    </label>
-                    <Slider
-                      :model-value="lineHeight.body"
-                      :min="1"
-                      :max="2.5"
-                      :step="0.1"
-                      class="w-full"
-                      @update:model-value="lineHeight.body = $event" />
-                  </div>
+                <div>
+                  <label class="text-sm font-medium mb-2 block">
+                    太さ: {{ fontWeight.heading[0] }}
+                  </label>
+                  <Slider
+                    :model-value="fontWeight.heading"
+                    :min="100"
+                    :max="900"
+                    :step="100"
+                    class="w-full"
+                    @update:model-value="fontWeight.heading = $event" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium mb-2 block">
+                    行間: {{ lineHeight.heading[0] }}
+                  </label>
+                  <Slider
+                    :model-value="lineHeight.heading"
+                    :min="1"
+                    :max="2"
+                    :step="0.1"
+                    class="w-full"
+                    @update:model-value="lineHeight.heading = $event" />
                 </div>
               </div>
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" size="sm" @click="reset">
+
+            <USeparator />
+
+            <div>
+              <h3 class="font-medium mb-3">
+                本文設定
+              </h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="text-sm font-medium mb-2 block">
+                    サイズ: {{ fontSize.body[0] }}px
+                  </label>
+                  <Slider
+                    :model-value="fontSize.body"
+                    :min="12"
+                    :max="24"
+                    :step="1"
+                    class="w-full"
+                    @update:model-value="fontSize.body = $event" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium mb-2 block">
+                    太さ: {{ fontWeight.body[0] }}
+                  </label>
+                  <Slider
+                    :model-value="fontWeight.body"
+                    :min="100"
+                    :max="900"
+                    :step="100"
+                    class="w-full"
+                    @update:model-value="fontWeight.body = $event" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium mb-2 block">
+                    行間: {{ lineHeight.body[0] }}
+                  </label>
+                  <Slider
+                    :model-value="lineHeight.body"
+                    :min="1"
+                    :max="2.5"
+                    :step="0.1"
+                    class="w-full"
+                    @update:model-value="lineHeight.body = $event" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <template #footer>
+            <UButton variant="outline" size="sm" @click="reset">
               リセット
-            </Button>
-          </CardFooter>
-        </Card>
+            </UButton>
+          </template>
+        </UCard>
 
         <!-- 出力設定 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>Output Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <div>
-                <label class="text-sm font-medium mb-2 block">Code Format</label>
-                <div class="grid grid-cols-2 gap-2">
-                  <Button
-                    v-for="format in [
-                      { value: 'css-vars', label: 'CSS Variables' },
-                      { value: 'tailwind', label: 'Tailwind' },
-                      { value: 'scss', label: 'SCSS' },
-                      { value: 'css', label: 'Basic CSS' },
-                    ]"
-                    :key="format.value"
-                    :variant="outputFormat === format.value ? 'default' : 'outline'"
-                    size="sm"
-                    @click="outputFormat = format.value">
-                    {{ format.label }}
-                  </Button>
-                </div>
-              </div>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Output Settings
+            </h3>
+          </template>
 
-              <div>
-                <label class="text-sm font-medium mb-2 block">Font Loading</label>
-                <div class="grid grid-cols-2 gap-2">
-                  <Button
-                    v-for="strategy in [
-                      { value: 'swap', label: 'Swap' },
-                      { value: 'block', label: 'Block' },
-                      { value: 'fallback', label: 'Fallback' },
-                      { value: 'optional', label: 'Optional' },
-                    ]"
-                    :key="strategy.value"
-                    :variant="fontLoadingStrategy === strategy.value ? 'default' : 'outline'"
-                    size="sm"
-                    @click="fontLoadingStrategy = strategy.value">
-                    {{ strategy.label }}
-                  </Button>
-                </div>
-                <p class="text-xs text-muted-foreground mt-2">
-                  {{ fontLoadingStrategy === 'swap' ? 'Shows fallback immediately, swaps when loaded'
-                    : fontLoadingStrategy === 'block' ? 'Blocks text rendering until font loads'
-                      : fontLoadingStrategy === 'fallback' ? '100ms block period, then fallback'
-                        : 'Minimal blocking, may use fallback permanently' }}
-                </p>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm font-medium mb-2 block">Code Format</label>
+              <div class="grid grid-cols-2 gap-2">
+                <UButton
+                  v-for="format in [
+                    { value: 'css-vars', label: 'CSS Variables' },
+                    { value: 'tailwind', label: 'Tailwind' },
+                    { value: 'scss', label: 'SCSS' },
+                    { value: 'css', label: 'Basic CSS' },
+                  ]"
+                  :key="format.value"
+                  :variant="outputFormat === format.value ? 'default' : 'outline'"
+                  size="sm"
+                  @click="outputFormat = format.value">
+                  {{ format.label }}
+                </UButton>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <label class="text-sm font-medium mb-2 block">Font Loading</label>
+              <div class="grid grid-cols-2 gap-2">
+                <UButton
+                  v-for="strategy in [
+                    { value: 'swap', label: 'Swap' },
+                    { value: 'block', label: 'Block' },
+                    { value: 'fallback', label: 'Fallback' },
+                    { value: 'optional', label: 'Optional' },
+                  ]"
+                  :key="strategy.value"
+                  :variant="fontLoadingStrategy === strategy.value ? 'default' : 'outline'"
+                  size="sm"
+                  @click="fontLoadingStrategy = strategy.value">
+                  {{ strategy.label }}
+                </UButton>
+              </div>
+              <p class="text-xs text-muted-foreground mt-2">
+                {{ fontLoadingStrategy === 'swap' ? 'Shows fallback immediately, swaps when loaded'
+                  : fontLoadingStrategy === 'block' ? 'Blocks text rendering until font loads'
+                    : fontLoadingStrategy === 'fallback' ? '100ms block period, then fallback'
+                      : 'Minimal blocking, may use fallback permanently' }}
+              </p>
+            </div>
+          </div>
+        </UCard>
 
         <!-- Performance Metrics -->
-        <Card v-if="performanceMetrics">
-          <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-muted-foreground">Font Weights</span>
-                <span class="text-sm font-medium">{{ performanceMetrics.weights }}</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-muted-foreground">Estimated Size</span>
-                <span class="text-sm font-medium">~{{ performanceMetrics.estimatedSize }}KB</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-muted-foreground">Load Time (3G)</span>
-                <span class="text-sm font-medium">~{{ performanceMetrics.loadTime }}s</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-muted-foreground">Variable Font</span>
-                <Badge :variant="performanceMetrics.variableFont ? 'default' : 'secondary'">
-                  {{ performanceMetrics.variableFont ? 'Yes' : 'No' }}
-                </Badge>
-              </div>
+        <UCard v-if="performanceMetrics">
+          <template #header>
+            <h3 class="font-semibold">
+              Performance Metrics
+            </h3>
+          </template>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground">Font Weights</span>
+              <span class="text-sm font-medium">{{ performanceMetrics.weights }}</span>
             </div>
-          </CardContent>
-        </Card>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground">Estimated Size</span>
+              <span class="text-sm font-medium">~{{ performanceMetrics.estimatedSize }}KB</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground">Load Time (3G)</span>
+              <span class="text-sm font-medium">~{{ performanceMetrics.loadTime }}s</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground">Variable Font</span>
+              <UBadge :variant="performanceMetrics.variableFont ? 'default' : 'secondary'">
+                {{ performanceMetrics.variableFont ? 'Yes' : 'No' }}
+              </UBadge>
+            </div>
+          </div>
+        </UCard>
       </div>
 
       <!-- プレビューとコード -->
       <div class="space-y-6">
         <!-- ライブプレビュー -->
-        <Card>
-          <CardHeader>
-            <CardTitle>プレビュー</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="p-6 bg-background rounded-md border">
-              <h1
-                :style="{
-                  fontFamily: selectedPairData.heading.family,
-                  fontSize: `${fontSize.heading[0]}px`,
-                  fontWeight: fontWeight.heading[0],
-                  lineHeight: lineHeight.heading[0],
-                }"
-                class="mb-4">
-                {{ previewText.heading }}
-              </h1>
-              <h2
-                :style="{
-                  fontFamily: selectedPairData.heading.family,
-                  fontSize: `${fontSize.heading[0] * 0.75}px`,
-                  fontWeight: fontWeight.heading[0] - 100,
-                  lineHeight: lineHeight.heading[0],
-                }"
-                class="my-3">
-                {{ previewText.subheading }}
-              </h2>
-              <p
-                :style="{
-                  fontFamily: selectedPairData.body.family,
-                  fontSize: `${fontSize.body[0]}px`,
-                  fontWeight: fontWeight.body[0],
-                  lineHeight: lineHeight.body[0],
-                }"
-                class="mb-3">
-                {{ previewText.body }}
-              </p>
-              <pre
-                v-if="selectedPairData.mono"
-                :style="{
-                  fontFamily: selectedPairData.mono.family,
-                  fontSize: `${fontSize.body[0] * 0.875}px`,
-                  fontWeight: 400,
-                  lineHeight: 1.5,
-                }"
-                class="p-3 bg-muted rounded"><code>{{ previewText.code }}</code></pre>
-            </div>
-          </CardContent>
-        </Card>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              プレビュー
+            </h3>
+          </template>
+
+          <div class="p-6 bg-background rounded-md border">
+            <h1
+              :style="{
+                fontFamily: selectedPairData.heading.family,
+                fontSize: `${fontSize.heading[0]}px`,
+                fontWeight: fontWeight.heading[0],
+                lineHeight: lineHeight.heading[0],
+              }"
+              class="mb-4">
+              {{ previewText.heading }}
+            </h1>
+            <h2
+              :style="{
+                fontFamily: selectedPairData.heading.family,
+                fontSize: `${fontSize.heading[0] * 0.75}px`,
+                fontWeight: fontWeight.heading[0] - 100,
+                lineHeight: lineHeight.heading[0],
+              }"
+              class="my-3">
+              {{ previewText.subheading }}
+            </h2>
+            <p
+              :style="{
+                fontFamily: selectedPairData.body.family,
+                fontSize: `${fontSize.body[0]}px`,
+                fontWeight: fontWeight.body[0],
+                lineHeight: lineHeight.body[0],
+              }"
+              class="mb-3">
+              {{ previewText.body }}
+            </p>
+            <pre
+              v-if="selectedPairData.mono"
+              :style="{
+                fontFamily: selectedPairData.mono.family,
+                fontSize: `${fontSize.body[0] * 0.875}px`,
+                fontWeight: 400,
+                lineHeight: 1.5,
+              }"
+              class="p-3 bg-muted rounded"><code>{{ previewText.code }}</code></pre>
+          </div>
+        </UCard>
 
         <!-- インポートリンク -->
-        <Card v-if="generateImportLink">
-          <CardHeader>
+        <UCard v-if="generateImportLink">
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>Google Fonts インポート</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                Google Fonts インポート
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(generateImportLink)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generateImportLink }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generateImportLink }}</code></pre>
+        </UCard>
 
         <!-- CSSコード -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>CSS コード</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                CSS コード
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(generateCSS)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generateCSS }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generateCSS }}</code></pre>
+        </UCard>
       </div>
     </div>
 
     <!-- Quick Start Guide -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Quick Implementation Guide</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <h3 class="font-semibold mb-2">
-              1. Add Font Links
-            </h3>
-            <p class="text-sm text-muted-foreground mb-2">
-              Add the Google Fonts link to your HTML head or import in CSS
-            </p>
-          </div>
-          <div>
-            <h3 class="font-semibold mb-2">
-              2. Apply CSS Variables
-            </h3>
-            <p class="text-sm text-muted-foreground mb-2">
-              Use the generated CSS variables for consistent typography
-            </p>
-          </div>
-          <div>
-            <h3 class="font-semibold mb-2">
-              3. Optimize Loading
-            </h3>
-            <p class="text-sm text-muted-foreground">
-              Consider using font-display: swap and preloading critical fonts
-            </p>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Quick Implementation Guide
+        </h3>
+      </template>
+
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-semibold mb-2">
+            1. Add Font Links
+          </h3>
+          <p class="text-sm text-muted-foreground mb-2">
+            Add the Google Fonts link to your HTML head or import in CSS
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold mb-2">
+            2. Apply CSS Variables
+          </h3>
+          <p class="text-sm text-muted-foreground mb-2">
+            Use the generated CSS variables for consistent typography
+          </p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">
+            3. Optimize Loading
+          </h3>
+          <p class="text-sm text-muted-foreground">
+            Consider using font-display: swap and preloading critical fonts
+          </p>
+        </div>
+      </div>
+    </UCard>
 
     <!-- Best Practices -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Developer Best Practices</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Performance Tips
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Use variable fonts when available (single file, multiple weights)</li>
-              <li>Limit font weights to only what you need</li>
-              <li>Preload critical fonts with &lt;link rel="preload"&gt;</li>
-              <li>Use font-display: swap for better perceived performance</li>
-              <li>Consider system font stacks for optimal performance</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Accessibility
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Maintain minimum 16px for body text</li>
-              <li>Ensure sufficient line-height (1.5+ for body)</li>
-              <li>Test contrast ratios with your color scheme</li>
-              <li>Avoid fonts with ambiguous characters for code</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Framework Integration
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Use CSS custom properties for easy theming</li>
-              <li>Define a consistent type scale</li>
-              <li>Create utility classes for common text styles</li>
-              <li>Document your typography system</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          Developer Best Practices
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Performance Tips
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Use variable fonts when available (single file, multiple weights)</li>
+            <li>Limit font weights to only what you need</li>
+            <li>Preload critical fonts with &lt;link rel="preload"&gt;</li>
+            <li>Use font-display: swap for better perceived performance</li>
+            <li>Consider system font stacks for optimal performance</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Accessibility
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Maintain minimum 16px for body text</li>
+            <li>Ensure sufficient line-height (1.5+ for body)</li>
+            <li>Test contrast ratios with your color scheme</li>
+            <li>Avoid fonts with ambiguous characters for code</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Framework Integration
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Use CSS custom properties for easy theming</li>
+            <li>Define a consistent type scale</li>
+            <li>Create utility classes for common text styles</li>
+            <li>Document your typography system</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

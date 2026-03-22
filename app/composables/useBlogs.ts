@@ -1,6 +1,6 @@
-import { ref, computed, watch } from 'vue'
 import type { ParsedContent } from '@nuxt/content'
 import type { Ref } from 'vue'
+import { refDebounced } from '@vueuse/core'
 
 // ブログ記事の型定義
 export interface BlogPost extends ParsedContent {
@@ -34,14 +34,13 @@ export const useBlogs = (allBlogData: Ref<BlogPost[] | null>) => {
   })
 
   // 検索入力時の遅延処理
-  const debouncedSearch = ref(searchQuery.value)
-  watch(searchQuery, (newValue) => {
-    isLoading.value = true
-    setTimeout(() => {
-      debouncedSearch.value = newValue
-      isLoading.value = false
-      updateUrlQuery()
-    }, 300)
+  const debouncedSearch = refDebounced(searchQuery, 300)
+  const isDebouncing = computed(() => searchQuery.value !== debouncedSearch.value)
+  watch(isDebouncing, (value) => {
+    isLoading.value = value
+  })
+  watch(debouncedSearch, () => {
+    updateUrlQuery()
   })
 
   // URLクエリパラメータを更新

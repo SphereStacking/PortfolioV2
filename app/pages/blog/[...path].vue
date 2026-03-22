@@ -1,14 +1,6 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
 import { withLeadingSlash, joinURL } from 'ufo'
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '~/components/ui/breadcrumb'
 
 const DIR = 'blog'
 const route = useRoute()
@@ -177,22 +169,7 @@ defineOgImageComponent('Article', {
         :animate="{ opacity: 1, x: 0 }"
         :transition="{ duration: 0.5 }"
         class="mt-2">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <template v-for="(item, index) in breadcrumbItems" :key="item.label">
-              <BreadcrumbItem>
-                <BreadcrumbLink v-if="item.to" :href="item.to" as="NuxtLink">
-                  <Icon v-if="item.icon" :name="item.icon" class="h-4 w-4" />
-                  <span v-else>{{ item.label }}</span>
-                </BreadcrumbLink>
-                <BreadcrumbPage v-else>
-                  {{ item.label }}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator v-if="index < breadcrumbItems.length - 1" />
-            </template>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <UBreadcrumb :items="breadcrumbItems" />
       </motion.div>
       <motion.h1
         id="top"
@@ -205,14 +182,14 @@ defineOgImageComponent('Article', {
         :initial="{ opacity: 0, y: 20 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.5, delay: 0.2 }" class="flex items-center gap-2">
-        <Badge
+        <UBadge
           v-for="tag in page?.tags"
           :key="tag"
           class="cursor-pointer"
           variant="outline"
           @click="navigateTo(`/blog?tag=${encodeURIComponent(tag)}`)">
           {{ tag }}
-        </Badge>
+        </UBadge>
       </motion.div>
       <motion.div
         :initial="{ opacity: 0, y: 20 }"

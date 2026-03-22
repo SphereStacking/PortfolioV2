@@ -1,15 +1,16 @@
 <script setup>
 const { credit, links } = useMyProfile()
+const NuxtLinkComponent = resolveComponent('NuxtLink')
 
 const pages = {
   Links: links.map(link => ({
-    component: 'NuxtLink',
+    component: NuxtLinkComponent,
     url: link.url,
     label: link.name,
     target: '_blank',
   })),
   Legal: [
-    { component: 'NuxtLink', url: '/legal/privacy-policy', label: 'プライバシーポリシー', target: '_self' },
+    { component: NuxtLinkComponent, url: '/legal/privacy-policy', label: 'プライバシーポリシー', target: '_self' },
   ],
 }
 </script>
@@ -38,6 +39,3 @@ const pages = {
     <p>{{ credit }}</p>
   </footer>
 </template>
-
-<style scoped>
-</style>

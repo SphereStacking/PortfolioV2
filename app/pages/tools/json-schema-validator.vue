@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -327,12 +324,12 @@ const performValidation = () => {
       errors,
     }
 
-    toast({
+    toast.add({
       title: validationResult.value.valid ? '検証成功' : '検証失敗',
       description: validationResult.value.valid
         ? 'JSONデータはスキーマに適合しています'
         : `${errors.length}個のエラーが見つかりました`,
-      variant: validationResult.value.valid ? 'default' : 'destructive',
+      color: validationResult.value.valid ? undefined : 'error',
     })
   }
   catch (e) {
@@ -358,7 +355,7 @@ const performSchemaGeneration = () => {
     }
 
     schemaData.value = JSON.stringify(schema, null, 2)
-    toast({
+    toast.add({
       description: 'JSON Schemaを生成しました',
     })
   }
@@ -442,24 +439,8 @@ const getErrorSeverity = (error: ValidationError): 'error' | 'warning' => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // SEO設定
 useSeoMeta({
@@ -480,231 +461,224 @@ useSeoMeta({
     </div>
 
     <!-- モード選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>モード選択</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex gap-2 mb-4">
-          <Button
-            :variant="mode === 'validate' ? 'default' : 'outline'"
-            @click="mode = 'validate'">
-            <Icon name="heroicons:check-circle" class="w-4 h-4 mr-2" />
-            検証モード
-          </Button>
-          <Button
-            :variant="mode === 'generate' ? 'default' : 'outline'"
-            @click="mode = 'generate'">
-            <Icon name="heroicons:sparkles" class="w-4 h-4 mr-2" />
-            スキーマ生成モード
-          </Button>
-        </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          モード選択
+        </h3>
+      </template>
+      <div class="flex gap-2 mb-4">
+        <UButton
+          :variant="mode === 'validate' ? 'default' : 'outline'"
+          @click="mode = 'validate'">
+          <Icon name="heroicons:check-circle" class="w-4 h-4 mr-2" />
+          検証モード
+        </UButton>
+        <UButton
+          :variant="mode === 'generate' ? 'default' : 'outline'"
+          @click="mode = 'generate'">
+          <Icon name="heroicons:sparkles" class="w-4 h-4 mr-2" />
+          スキーマ生成モード
+        </UButton>
+      </div>
 
-        <div class="flex gap-2">
-          <Button
-            v-for="(sample, key) in samples"
-            :key="key"
-            variant="outline"
-            size="sm"
-            @click="loadSample(key)">
-            {{ sample.name }}サンプル
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <div class="flex gap-2">
+        <UButton
+          v-for="(sample, key) in samples"
+          :key="key"
+          variant="outline"
+          size="sm"
+          @click="loadSample(key)">
+          {{ sample.name }}サンプル
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- JSON入力 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>JSON データ</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="jsonData"
-            placeholder="{&#10;  &quot;name&quot;: &quot;田中太郎&quot;,&#10;  &quot;age&quot;: 28,&#10;  &quot;email&quot;: &quot;tanaka@example.com&quot;&#10;}"
-            class="w-full h-80 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
-        </CardContent>
-      </Card>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            JSON データ
+          </h3>
+        </template>
+        <textarea
+          v-model="jsonData"
+          placeholder="{&#10;  &quot;name&quot;: &quot;田中太郎&quot;,&#10;  &quot;age&quot;: 28,&#10;  &quot;email&quot;: &quot;tanaka@example.com&quot;&#10;}"
+          class="w-full h-80 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
+      </UCard>
 
       <!-- Schema入力/表示 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>JSON Schema</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              JSON Schema
+            </h3>
+            <UButton
               v-if="schemaData"
               size="sm"
               variant="ghost"
               @click="copyToClipboard(schemaData)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="schemaData"
-            :readonly="mode === 'generate'"
-            placeholder="{&#10;  &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,&#10;  &quot;type&quot;: &quot;object&quot;,&#10;  &quot;properties&quot;: {&#10;    &quot;name&quot;: { &quot;type&quot;: &quot;string&quot; }&#10;  }&#10;}"
-            class="w-full h-80 p-3 font-mono text-sm border rounded-md resize-none"
-            :class="mode === 'generate' ? 'bg-muted' : 'bg-background'"
-            spellcheck="false"></textarea>
-        </CardContent>
-      </Card>
+        </template>
+        <textarea
+          v-model="schemaData"
+          :readonly="mode === 'generate'"
+          placeholder="{&#10;  &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,&#10;  &quot;type&quot;: &quot;object&quot;,&#10;  &quot;properties&quot;: {&#10;    &quot;name&quot;: { &quot;type&quot;: &quot;string&quot; }&#10;  }&#10;}"
+          class="w-full h-80 p-3 font-mono text-sm border rounded-md resize-none"
+          :class="mode === 'generate' ? 'bg-muted' : 'bg-background'"
+          spellcheck="false"></textarea>
+      </UCard>
     </div>
 
     <!-- アクション -->
-    <Card>
-      <CardContent class="p-6">
-        <div class="space-y-4">
-          <Alert v-if="error" variant="destructive">
-            <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
+    <UCard>
+      <div class="space-y-4">
+        <UAlert
+          v-if="error" color="error" icon="heroicons:exclamation-circle"
+          :description="error" />
 
-          <div class="flex gap-2">
-            <Button
-              v-if="mode === 'validate'"
-              class="flex-1"
-              :disabled="!jsonData.trim() || !schemaData.trim()"
-              @click="performValidation">
-              <Icon name="heroicons:check-circle" class="w-4 h-4 mr-2" />
-              JSONを検証
-            </Button>
+        <div class="flex gap-2">
+          <UButton
+            v-if="mode === 'validate'"
+            class="flex-1"
+            :disabled="!jsonData.trim() || !schemaData.trim()"
+            @click="performValidation">
+            <Icon name="heroicons:check-circle" class="w-4 h-4 mr-2" />
+            JSONを検証
+          </UButton>
 
-            <Button
-              v-if="mode === 'generate'"
-              class="flex-1"
-              :disabled="!jsonData.trim()"
-              @click="performSchemaGeneration">
-              <Icon name="heroicons:sparkles" class="w-4 h-4 mr-2" />
-              スキーマを生成
-            </Button>
-          </div>
+          <UButton
+            v-if="mode === 'generate'"
+            class="flex-1"
+            :disabled="!jsonData.trim()"
+            @click="performSchemaGeneration">
+            <Icon name="heroicons:sparkles" class="w-4 h-4 mr-2" />
+            スキーマを生成
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 検証結果 -->
-    <Card v-if="validationResult">
-      <CardHeader>
+    <UCard v-if="validationResult">
+      <template #header>
         <div class="flex items-center gap-2">
           <Icon
             :name="validationResult.valid ? 'heroicons:check-circle' : 'heroicons:x-circle'"
             :class="validationResult.valid ? 'text-green-500' : 'text-red-500'"
             class="w-5 h-5" />
-          <CardTitle>
+          <h3 class="font-semibold">
             {{ validationResult.valid ? '検証成功' : '検証失敗' }}
-          </CardTitle>
+          </h3>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="validationResult.valid" class="text-green-600">
-          <p>JSONデータはスキーマに適合しています。</p>
-        </div>
+      </template>
+      <div v-if="validationResult.valid" class="text-green-600">
+        <p>JSONデータはスキーマに適合しています。</p>
+      </div>
 
-        <div v-else class="space-y-3">
-          <p class="text-red-600 font-medium">
-            {{ validationResult.errors.length }}個のエラーが見つかりました：
-          </p>
+      <div v-else class="space-y-3">
+        <p class="text-red-600 font-medium">
+          {{ validationResult.errors.length }}個のエラーが見つかりました：
+        </p>
 
-          <div class="space-y-2">
-            <Alert
-              v-for="(validationError, index) in validationResult.errors"
-              :key="index"
-              :variant="getErrorSeverity(validationError) === 'error' ? 'destructive' : 'default'">
-              <Icon
-                :name="getErrorSeverity(validationError) === 'error' ? 'heroicons:x-circle' : 'heroicons:exclamation-triangle'"
-                class="w-4 h-4" />
-              <AlertTitle>{{ validationError.path }}</AlertTitle>
-              <AlertDescription>
-                {{ validationError.message }}
-                <span v-if="validationError.value !== undefined" class="block mt-1 font-mono text-xs">
-                  値: {{ JSON.stringify(validationError.value) }}
-                </span>
-              </AlertDescription>
-            </Alert>
-          </div>
+        <div class="space-y-2">
+          <UAlert
+            v-for="(validationError, index) in validationResult.errors"
+            :key="index"
+            :color="getErrorSeverity(validationError) === 'error' ? 'error' : 'neutral'"
+            :icon="getErrorSeverity(validationError) === 'error' ? 'heroicons:x-circle' : 'heroicons:exclamation-triangle'"
+            :title="validationError.path">
+            <template #description>
+              {{ validationError.message }}
+              <span v-if="validationError.value !== undefined" class="block mt-1 font-mono text-xs">
+                値: {{ JSON.stringify(validationError.value) }}
+              </span>
+            </template>
+          </UAlert>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>JSON Schema について</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              主要なスキーマプロパティ
-            </h3>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <code class="bg-muted px-1 rounded">type</code>
-                <p>データ型の指定</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">required</code>
-                <p>必須プロパティ</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">properties</code>
-                <p>オブジェクトのプロパティ</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">minimum/maximum</code>
-                <p>数値の範囲</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">minLength/maxLength</code>
-                <p>文字列の長さ</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">pattern</code>
-                <p>正規表現パターン</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">format</code>
-                <p>フォーマット検証</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">enum</code>
-                <p>許可値の列挙</p>
-              </div>
-              <div>
-                <code class="bg-muted px-1 rounded">items</code>
-                <p>配列要素のスキーマ</p>
-              </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          JSON Schema について
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            主要なスキーマプロパティ
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <code class="bg-muted px-1 rounded">type</code>
+              <p>データ型の指定</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">required</code>
+              <p>必須プロパティ</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">properties</code>
+              <p>オブジェクトのプロパティ</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">minimum/maximum</code>
+              <p>数値の範囲</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">minLength/maxLength</code>
+              <p>文字列の長さ</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">pattern</code>
+              <p>正規表現パターン</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">format</code>
+              <p>フォーマット検証</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">enum</code>
+              <p>許可値の列挙</p>
+            </div>
+            <div>
+              <code class="bg-muted px-1 rounded">items</code>
+              <p>配列要素のスキーマ</p>
             </div>
           </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              対応フォーマット
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><code>email</code> - メールアドレス形式</li>
-              <li><code>uri</code> - URI形式</li>
-              <li><code>date</code> - 日付形式 (YYYY-MM-DD)</li>
-              <li><code>time</code> - 時刻形式 (HH:MM:SS)</li>
-              <li><code>date-time</code> - 日時形式 (ISO 8601)</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              用途例
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>API仕様の定義と検証</li>
-              <li>設定ファイルの形式チェック</li>
-              <li>フォーム入力値の検証</li>
-              <li>データ移行時の整合性確認</li>
-            </ul>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            対応フォーマット
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><code>email</code> - メールアドレス形式</li>
+            <li><code>uri</code> - URI形式</li>
+            <li><code>date</code> - 日付形式 (YYYY-MM-DD)</li>
+            <li><code>time</code> - 時刻形式 (HH:MM:SS)</li>
+            <li><code>date-time</code> - 日時形式 (ISO 8601)</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            用途例
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>API仕様の定義と検証</li>
+            <li>設定ファイルの形式チェック</li>
+            <li>フォーム入力値の検証</li>
+            <li>データ移行時の整合性確認</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

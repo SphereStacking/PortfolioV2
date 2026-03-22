@@ -1,38 +1,39 @@
-import { inject, type Ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 
-interface SidebarContext {
-  open: Ref<boolean>
-  setOpen: (value: boolean) => void
-  openMobile: Ref<boolean>
-  setOpenMobile: (value: boolean) => void
-  toggleSidebar: () => void
-}
+const SIDEBAR_COOKIE_NAME = 'sidebar:state'
+const SIDEBAR_WIDTH = '16rem'
+const SIDEBAR_WIDTH_ICON = '3rem'
 
 export const useSidebar = () => {
-  const context = inject<SidebarContext>('sidebar')
+  const cookie = useCookie(SIDEBAR_COOKIE_NAME, { default: () => 'true', maxAge: 60 * 60 * 24 * 7 })
+  const open = useState('sidebar-open', () => cookie.value !== 'false')
+  const openMobile = useState('sidebar-open-mobile', () => false)
+  const isMobile = useMediaQuery('(max-width: 768px)')
 
-  if (!context) {
-    throw new Error('useSidebar must be used within SidebarProvider')
+  const state = computed(() => open.value ? 'expanded' : 'collapsed')
+
+  function setOpen(value: boolean) {
+    open.value = value
+    cookie.value = String(value)
   }
 
-  return context
-}
-
-export const useIsMobile = () => {
-  const isMobile = ref(false)
-
-  onMounted(() => {
-    const checkMobile = () => {
-      isMobile.value = window.innerWidth < 1024
+  function toggleSidebar() {
+    if (isMobile.value) {
+      openMobile.value = !openMobile.value
     }
+    else {
+      setOpen(!open.value)
+    }
+  }
 
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-
-    onUnmounted(() => {
-      window.removeEventListener('resize', checkMobile)
-    })
-  })
-
-  return { isMobile }
+  return {
+    open,
+    openMobile,
+    isMobile,
+    state,
+    setOpen,
+    toggleSidebar,
+    SIDEBAR_WIDTH,
+    SIDEBAR_WIDTH_ICON,
+  }
 }

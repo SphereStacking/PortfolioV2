@@ -10,19 +10,18 @@
         </p>
 
         <div class="max-w-2xl mx-auto relative z-10">
-          <Input
+          <UInput
             v-model="searchQuery"
             placeholder="タイトル、説明、タグで検索..."
-            variant="outline"
             size="lg" />
           <div class="flex items-center absolute right-2 top-1/2 -translate-y-1/2">
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
-            <Button
+            <UButton
               v-if="searchQuery"
-              variant="outline" size="sm" rounded="full"
+              variant="outline" size="sm" class="rounded-full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
-            </Button>
+            </UButton>
           </div>
         </div>
       </template>
@@ -57,51 +56,50 @@
         <p class="mb-8 max-w-md mx-auto">
           検索条件を変更してみてください。
         </p>
-        <Button variant="default" color="primary" @click="resetFilters">
+        <UButton variant="solid" color="primary" @click="resetFilters">
           フィルターをリセット
-        </Button>
+        </UButton>
       </div>
 
       <!-- Shader detail dialog/modal -->
-      <Dialog v-model:open="isDialogOpen">
-        <DialogContent class="!w-[90vw] !max-w-5xl overflow-y-auto">
-          <div v-if="selectedShader" class="flex flex-col gap-4 mt-4">
-            <!-- Player section -->
-            <div class="w-full aspect-video">
-              <ClientOnly>
-                <ShaderViewer
-                  :shader="selectedShader"
-                  :autoplay="true"
-                  :show-fps="true" />
-                <template #fallback>
-                  <div class="flex h-full items-center justify-center bg-zinc-900 rounded">
-                    <Icon name="lucide:loader-2" class="h-8 w-8 animate-spin text-muted-foreground" />
-                  </div>
-                </template>
-              </ClientOnly>
+      <UModal v-model:open="isDialogOpen" :ui="{ width: 'sm:max-w-5xl' }">
+        <div v-if="selectedShader" class="flex flex-col gap-4 mt-4">
+          <!-- Player section -->
+          <div class="w-full aspect-video">
+            <ClientOnly>
+              <ShaderViewer
+                :shader="selectedShader"
+                :autoplay="true"
+                :show-fps="true" />
+              <template #fallback>
+                <div class="flex h-full items-center justify-center bg-zinc-900 rounded">
+                  <Icon name="lucide:loader-2" class="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              </template>
+            </ClientOnly>
+          </div>
+
+          <!-- Title and description below player -->
+          <div class="px-2">
+            <h2 class="text-2xl font-bold mb-2">
+              {{ selectedShader?.title }}
+            </h2>
+            <p class="text-muted-foreground mb-2">
+              {{ selectedShader?.description }}
+            </p>
+
+            <!-- Tags and metadata -->
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="tag in selectedShader?.tags" :key="tag"
+                class="px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground">
+                {{ tag }}
+              </span>
             </div>
+          </div>
 
-            <!-- Title and description below player -->
-            <div class="px-2">
-              <h2 class="text-2xl font-bold mb-2">
-                {{ selectedShader?.title }}
-              </h2>
-              <p class="text-muted-foreground mb-2">
-                {{ selectedShader?.description }}
-              </p>
-
-              <!-- Tags and metadata -->
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="tag in selectedShader?.tags" :key="tag"
-                  class="px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground">
-                  {{ tag }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Code tabs -->
-            <!-- <Tabs default-value="vertex" class="flex-1">
+          <!-- Code tabs -->
+          <!-- <Tabs default-value="vertex" class="flex-1">
               <div class="flex items-center justify-between">
                 <TabsList>
                   <TabsTrigger value="vertex">
@@ -111,13 +109,13 @@
                     Fragment Shader
                   </TabsTrigger>
                 </TabsList>
-                <Button
+                <UButton
                   size="sm"
                   variant="ghost"
                   @click="copyShaderCode(codeTab)">
                   <Icon name="lucide:copy" class="h-4 w-4" />
                   コピー
-                </Button>
+                </UButton>
               </div>
 
               <TabsContent value="vertex" class="mt-2 grow">
@@ -157,9 +155,8 @@
                 </ClientOnly>
               </TabsContent>
             </Tabs> -->
-          </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </UModal>
     </div>
   </div>
 </template>
@@ -170,12 +167,6 @@ import type { ShaderMetadata } from '~/composables/useShaderSources'
 import { shaders } from '~/composables/useShaderSources'
 import ShaderThumbnail from '~/components/content/ShaderThumbnail.vue'
 import ShaderViewer from '~/components/content/ShaderViewer.vue'
-import {
-  Dialog,
-  DialogContent,
-} from '~/components/ui/dialog'
-import { Input } from '~/components/ui/input'
-import { Button } from '~/components/ui/button'
 
 // SEO
 useSeoMeta({

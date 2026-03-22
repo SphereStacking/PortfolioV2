@@ -64,8 +64,8 @@ useSeoMeta({
             :key="tool.id"
             :to="tool.route"
             class="group">
-            <Card class="h-full transition-all hover:shadow-lg hover:border-primary/50">
-              <CardHeader>
+            <UCard class="h-full transition-all hover:shadow-lg hover:border-primary/50">
+              <template #header>
                 <div class="flex items-start justify-between">
                   <div class="flex items-center gap-3">
                     <div class="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -74,25 +74,23 @@ useSeoMeta({
                         class="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <CardTitle class="text-lg group-hover:text-primary transition-colors">
+                      <h3 class="text-lg font-semibold group-hover:text-primary transition-colors">
                         {{ tool.name }}
-                      </CardTitle>
+                      </h3>
                     </div>
                   </div>
-                  <Badge
+                  <UBadge
                     v-if="tool.badge"
-                    variant="secondary"
+                    color="neutral" variant="subtle"
                     class="ml-2">
                     {{ tool.badge }}
-                  </Badge>
+                  </UBadge>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  {{ tool.description }}
-                </CardDescription>
-              </CardContent>
-            </Card>
+              </template>
+              <p class="text-sm text-(--ui-text-muted)">
+                {{ tool.description }}
+              </p>
+            </UCard>
           </NuxtLink>
         </div>
       </div>

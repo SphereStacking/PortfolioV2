@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -45,10 +43,10 @@ const handleDrop = (event: DragEvent) => {
       results.value = []
     }
     else {
-      toast({
+      toast.add({
         title: 'エラー',
         description: '画像ファイルを選択してください',
-        variant: 'destructive',
+        color: 'error',
       })
     }
   }
@@ -145,10 +143,10 @@ const convertImage = async (file: File): Promise<ConversionResult> => {
 // 一括変換処理
 const convertAll = async () => {
   if (files.value.length === 0) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: '画像ファイルを選択してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -172,16 +170,16 @@ const convertAll = async () => {
   const errorCount = conversionResults.filter(r => r.error).length
 
   if (successCount > 0) {
-    toast({
+    toast.add({
       title: '変換完了',
       description: `${successCount}個のファイルを${format.value.toUpperCase()}に変換しました${errorCount > 0 ? ` (${errorCount}個失敗)` : ''}`,
     })
   }
   else {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'すべての変換に失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -223,10 +221,10 @@ const downloadAll = async () => {
   const validResults = results.value.filter(r => r.convertedBlob && r.url)
 
   if (validResults.length === 0) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'ダウンロード可能なファイルがありません',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -272,7 +270,7 @@ const clearFiles = () => {
 }
 
 // トースト通知
-const { toast } = useToast()
+const toast = useToast()
 
 // SEO設定
 useSeoMeta({
@@ -293,10 +291,12 @@ useSeoMeta({
     </div>
 
     <!-- ブラウザサポート警告 -->
-    <Alert v-if="!browserSupport.webp || !browserSupport.avif" variant="destructive">
-      <Icon name="heroicons:exclamation-triangle" class="w-4 h-4" />
-      <AlertTitle>ブラウザサポート警告</AlertTitle>
-      <AlertDescription>
+    <UAlert
+      v-if="!browserSupport.webp || !browserSupport.avif"
+      color="error"
+      icon="heroicons:exclamation-triangle"
+      title="ブラウザサポート警告">
+      <template #description>
         <div class="space-y-1">
           <p v-if="!browserSupport.webp">
             WebP形式はこのブラウザではサポートされていません。
@@ -308,235 +308,226 @@ useSeoMeta({
             最新のChrome、Firefox、またはSafariの使用を推奨します。
           </p>
         </div>
-      </AlertDescription>
-    </Alert>
+      </template>
+    </UAlert>
 
     <!-- 設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>変換設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">出力形式</label>
-            <div class="flex gap-2">
-              <Button
-                :variant="format === 'webp' ? 'default' : 'outline'"
-                size="sm"
-                :disabled="!browserSupport.webp"
-                @click="format = 'webp'">
-                WebP
-              </Button>
-              <Button
-                :variant="format === 'avif' ? 'default' : 'outline'"
-                size="sm"
-                :disabled="!browserSupport.avif"
-                @click="format = 'avif'">
-                AVIF
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              品質: {{ quality[0] }}%
-            </label>
-            <Slider
-              :model-value="quality"
-              :min="1"
-              :max="100"
-              :step="1"
-              class="max-w-md"
-              @update:model-value="quality = $event" />
-            <p class="text-xs text-muted-foreground mt-1">
-              低い値 = 小さいファイルサイズ、高い値 = 高品質
-            </p>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          変換設定
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">出力形式</label>
+          <div class="flex gap-2">
+            <UButton
+              :variant="format === 'webp' ? 'default' : 'outline'"
+              size="sm"
+              :disabled="!browserSupport.webp"
+              @click="format = 'webp'">
+              WebP
+            </UButton>
+            <UButton
+              :variant="format === 'avif' ? 'default' : 'outline'"
+              size="sm"
+              :disabled="!browserSupport.avif"
+              @click="format = 'avif'">
+              AVIF
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            品質: {{ quality[0] }}%
+          </label>
+          <Slider
+            :model-value="quality"
+            :min="1"
+            :max="100"
+            :step="1"
+            class="max-w-md"
+            @update:model-value="quality = $event" />
+          <p class="text-xs text-muted-foreground mt-1">
+            低い値 = 小さいファイルサイズ、高い値 = 高品質
+          </p>
+        </div>
+      </div>
+    </UCard>
 
     <!-- ファイル選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>画像ファイル選択</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div
-          class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
-          :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
-          @drop="handleDrop"
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave">
-          <Icon name="heroicons:arrow-up-tray" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <p class="text-muted-foreground mb-2">
-            ドラッグ&ドロップまたはクリックして画像を選択
-          </p>
-          <p class="text-xs text-muted-foreground mb-4">
-            JPEG, PNG, GIF, BMP, TIFF形式に対応
-          </p>
-          <label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              class="hidden"
-              @change="handleFileSelect">
-            <Button variant="outline" as="span">
-              ファイルを選択
-            </Button>
-          </label>
-        </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          画像ファイル選択
+        </h3>
+      </template>
+      <div
+        class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
+        :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
+        @drop="handleDrop"
+        @dragover="handleDragOver"
+        @dragleave="handleDragLeave">
+        <Icon name="heroicons:arrow-up-tray" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <p class="text-muted-foreground mb-2">
+          ドラッグ&ドロップまたはクリックして画像を選択
+        </p>
+        <p class="text-xs text-muted-foreground mb-4">
+          JPEG, PNG, GIF, BMP, TIFF形式に対応
+        </p>
+        <label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            class="hidden"
+            @change="handleFileSelect">
+          <UButton variant="outline" as="span">
+            ファイルを選択
+          </UButton>
+        </label>
+      </div>
 
-        <div v-if="files.length > 0" class="mt-4">
-          <div class="flex items-center justify-between mb-2">
-            <p class="text-sm font-medium">
-              選択中: {{ files.length }}個のファイル
-            </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              @click="clearFiles">
-              クリア
-            </Button>
-          </div>
-          <div class="space-y-2 max-h-40 overflow-y-auto">
-            <div
-              v-for="(file, index) in files"
-              :key="index"
-              class="flex items-center justify-between p-2 bg-muted rounded text-sm">
-              <span class="truncate flex-1">{{ file.name }}</span>
-              <span class="text-muted-foreground ml-2">{{ formatFileSize(file.size) }}</span>
-            </div>
+      <div v-if="files.length > 0" class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium">
+            選択中: {{ files.length }}個のファイル
+          </p>
+          <UButton
+            variant="ghost"
+            size="sm"
+            @click="clearFiles">
+            クリア
+          </UButton>
+        </div>
+        <div class="space-y-2 max-h-40 overflow-y-auto">
+          <div
+            v-for="(file, index) in files"
+            :key="index"
+            class="flex items-center justify-between p-2 bg-muted rounded text-sm">
+            <span class="truncate flex-1">{{ file.name }}</span>
+            <span class="text-muted-foreground ml-2">{{ formatFileSize(file.size) }}</span>
           </div>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button
+      </div>
+      <template #footer>
+        <UButton
           class="w-full"
           :disabled="files.length === 0 || processing"
           @click="convertAll">
           <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
           {{ processing ? '変換中...' : '変換開始' }}
-        </Button>
-      </CardFooter>
-    </Card>
+        </UButton>
+      </template>
+    </UCard>
 
     <!-- 進捗表示 -->
-    <Card v-if="processing">
-      <CardHeader>
-        <CardTitle>変換進捗</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2">
-          <div class="flex justify-between text-sm">
-            <span>処理中...</span>
-            <span>{{ Math.round(progress) }}%</span>
-          </div>
-          <div class="w-full bg-secondary rounded-full h-2">
-            <div
-              class="bg-primary h-2 rounded-full transition-all"
-              :style="{ width: `${progress}%` }"></div>
-          </div>
+    <UCard v-if="processing">
+      <template #header>
+        <h3 class="font-semibold">
+          変換進捗
+        </h3>
+      </template>
+      <div class="space-y-2">
+        <div class="flex justify-between text-sm">
+          <span>処理中...</span>
+          <span>{{ Math.round(progress) }}%</span>
         </div>
-      </CardContent>
-    </Card>
+        <div class="w-full bg-secondary rounded-full h-2">
+          <div
+            class="bg-primary h-2 rounded-full transition-all"
+            :style="{ width: `${progress}%` }"></div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 変換結果 -->
-    <Card v-if="results.length > 0">
-      <CardHeader>
+    <UCard v-if="results.length > 0">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>変換結果</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            変換結果
+          </h3>
+          <UButton
             v-if="results.some(r => r.convertedBlob)"
             size="sm"
             @click="downloadAll">
             <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
             すべてダウンロード
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-3">
-          <div
-            v-for="(result, index) in results"
-            :key="index"
-            class="border rounded-lg p-4">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <p class="font-medium text-sm">
-                  {{ result.originalFile.name }}
+      </template>
+      <div class="space-y-3">
+        <div
+          v-for="(result, index) in results"
+          :key="index"
+          class="border rounded-lg p-4">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="font-medium text-sm">
+                {{ result.originalFile.name }}
+              </p>
+              <div v-if="result.convertedBlob" class="mt-2 space-y-1 text-sm">
+                <p class="text-muted-foreground">
+                  元のサイズ: {{ formatFileSize(result.originalFile.size) }}
                 </p>
-                <div v-if="result.convertedBlob" class="mt-2 space-y-1 text-sm">
-                  <p class="text-muted-foreground">
-                    元のサイズ: {{ formatFileSize(result.originalFile.size) }}
-                  </p>
-                  <p class="text-muted-foreground">
-                    変換後: {{ formatFileSize(result.convertedSize) }}
-                    <span :class="result.convertedSize < result.originalFile.size ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
-                      ({{ getCompressionRatio(result.originalFile.size, result.convertedSize) }})
-                    </span>
-                  </p>
-                </div>
-                <Alert v-else variant="destructive" class="mt-2">
-                  <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-                  <AlertDescription>
-                    {{ result.error || '変換に失敗しました' }}
-                  </AlertDescription>
-                </Alert>
+                <p class="text-muted-foreground">
+                  変換後: {{ formatFileSize(result.convertedSize) }}
+                  <span :class="result.convertedSize < result.originalFile.size ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                    ({{ getCompressionRatio(result.originalFile.size, result.convertedSize) }})
+                  </span>
+                </p>
               </div>
-              <Button
-                v-if="result.convertedBlob"
-                size="sm"
-                variant="outline"
-                @click="downloadFile(result)">
-                <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-              </Button>
+              <UAlert
+                v-else class="mt-2" color="error"
+                icon="heroicons:exclamation-circle" :description="result.error || '変換に失敗しました'" />
             </div>
+            <UButton
+              v-if="result.convertedBlob"
+              size="sm"
+              variant="outline"
+              @click="downloadFile(result)">
+              <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>次世代画像フォーマットについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              WebP
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>Googleが開発した画像フォーマット</li>
-              <li>JPEGより25-35%小さいファイルサイズ</li>
-              <li>透過（アルファチャンネル）対応</li>
-              <li>主要ブラウザでサポート済み</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              AVIF
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>AV1ビデオコーデックベースの画像フォーマット</li>
-              <li>WebPよりさらに高圧縮（最大50%削減）</li>
-              <li>HDR、広色域対応</li>
-              <li>最新ブラウザで対応拡大中</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              本ツールはブラウザのネイティブサポートに依存しています。
-              より高度な変換オプションが必要な場合は、サーバーサイドツールの使用を推奨します。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          次世代画像フォーマットについて
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            WebP
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Googleが開発した画像フォーマット</li>
+            <li>JPEGより25-35%小さいファイルサイズ</li>
+            <li>透過（アルファチャンネル）対応</li>
+            <li>主要ブラウザでサポート済み</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            AVIF
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>AV1ビデオコーデックベースの画像フォーマット</li>
+            <li>WebPよりさらに高圧縮（最大50%削減）</li>
+            <li>HDR、広色域対応</li>
+            <li>最新ブラウザで対応拡大中</li>
+          </ul>
+        </div>
+        <UAlert icon="heroicons:information-circle" description="本ツールはブラウザのネイティブサポートに依存しています。 より高度な変換オプションが必要な場合は、サーバーサイドツールの使用を推奨します。" />
+      </div>
+    </UCard>
   </div>
 </template>

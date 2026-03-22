@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -235,17 +233,17 @@ const checkText = () => {
     // エラーをソート（位置順）
     errors.value.sort((a, b) => a.start - b.start)
 
-    toast({
+    toast.add({
       title: '校正完了',
       description: `${errors.value.length}件の指摘事項が見つかりました`,
     })
   }
   catch (err) {
     console.error('Proofreading error:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: '校正処理中にエラーが発生しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -402,7 +400,7 @@ const clearAll = () => {
 }
 
 // Toast
-const { toast } = useToast()
+const toast = useToast()
 
 // SEO設定
 useSeoMeta({
@@ -423,203 +421,203 @@ useSeoMeta({
     </div>
 
     <!-- 校正オプション -->
-    <Card>
-      <CardHeader>
-        <CardTitle>校正設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <label
-            v-for="(label, key) in errorTypeNames"
-            :key="key"
-            class="flex items-center gap-2">
-            <input
-              v-model="checkOptions[key]"
-              type="checkbox"
-              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-            <span class="text-sm">{{ label }}</span>
-          </label>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          校正設定
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <label
+          v-for="(label, key) in errorTypeNames"
+          :key="key"
+          class="flex items-center gap-2">
+          <input
+            v-model="checkOptions[key]"
+            type="checkbox"
+            class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+          <span class="text-sm">{{ label }}</span>
+        </label>
+      </div>
+    </UCard>
 
     <!-- サンプルテキスト -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルテキスト</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleTexts"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="inputText = sample.text">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルテキスト
+        </h3>
+      </template>
+
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleTexts"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="inputText = sample.text">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 入力エリア -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>入力テキスト</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              入力テキスト
+            </h3>
+            <UButton
               v-if="inputText"
               size="sm"
               variant="ghost"
               @click="clearAll">
               <Icon name="heroicons:x-mark" class="w-4 h-4" />
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <textarea
-            v-model="inputText"
-            placeholder="校正したい文章を入力してください"
-            class="w-full h-96 p-3 text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
+        </template>
 
-          <div class="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-            <span>{{ inputText.length }} 文字</span>
-            <Button
-              size="sm"
-              :disabled="!inputText || processing"
-              @click="checkText">
-              <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-              校正実行
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <textarea
+          v-model="inputText"
+          placeholder="校正したい文章を入力してください"
+          class="w-full h-96 p-3 text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
+
+        <div class="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+          <span>{{ inputText.length }} 文字</span>
+          <UButton
+            size="sm"
+            :disabled="!inputText || processing"
+            @click="checkText">
+            <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+            校正実行
+          </UButton>
+        </div>
+      </UCard>
 
       <!-- 校正結果 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>校正結果</CardTitle>
-            <Button
+            <h3 class="font-semibold">
+              校正結果
+            </h3>
+            <UButton
               v-if="errors.length > 0"
               size="sm"
               variant="outline"
               @click="fixAllErrors">
               <Icon name="heroicons:wrench" class="w-4 h-4 mr-2" />
               全て修正
-            </Button>
+            </UButton>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div
-            class="prose-content h-96 p-3 text-sm border rounded-md bg-background overflow-auto"
-            v-html="highlightedText"></div>
+        </template>
 
-          <div class="mt-4">
-            <p class="text-sm font-medium mb-2">
-              統計情報
-            </p>
-            <div class="flex flex-wrap gap-4 text-sm">
-              <div>
-                <span class="text-muted-foreground">合計:</span>
-                <span class="ml-1 font-medium">{{ statistics.total }}件</span>
-              </div>
-              <div v-for="(count, severity) in statistics.bySeverity" :key="severity">
-                <Icon :name="severityIcons[severity]" :class="`w-4 h-4 inline ${severityColors[severity]}`" />
-                <span class="ml-1">{{ count }}件</span>
-              </div>
+        <div
+          class="prose-content h-96 p-3 text-sm border rounded-md bg-background overflow-auto"
+          v-html="highlightedText"></div>
+
+        <div class="mt-4">
+          <p class="text-sm font-medium mb-2">
+            統計情報
+          </p>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <div>
+              <span class="text-muted-foreground">合計:</span>
+              <span class="ml-1 font-medium">{{ statistics.total }}件</span>
+            </div>
+            <div v-for="(count, severity) in statistics.bySeverity" :key="severity">
+              <Icon :name="severityIcons[severity]" :class="`w-4 h-4 inline ${severityColors[severity]}`" />
+              <span class="ml-1">{{ count }}件</span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- エラー詳細 -->
-    <Card v-if="errors.length > 0">
-      <CardHeader>
-        <CardTitle>指摘事項一覧</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2 max-h-96 overflow-y-auto">
-          <div
-            v-for="(error, index) in errors"
-            :key="error.id"
-            class="p-3 border rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
-            :class="{ 'bg-muted': index === activeErrorIndex }"
-            @click="activeErrorIndex = index">
-            <div class="flex items-start gap-3">
-              <Icon
-                :name="severityIcons[error.severity]"
-                :class="`w-5 h-5 mt-0.5 flex-shrink-0 ${severityColors[error.severity]}`" />
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                  <Badge variant="outline" class="text-xs">
-                    {{ errorTypeNames[error.type] }}
-                  </Badge>
-                  <span class="text-xs text-muted-foreground">
-                    位置: {{ error.start }}
-                  </span>
-                </div>
-                <p class="text-sm mb-1">
-                  {{ error.message }}
-                </p>
-                <div class="flex items-center gap-2">
-                  <code class="text-xs bg-muted px-1 py-0.5 rounded">
-                    {{ inputText.slice(error.start, error.end) }}
-                  </code>
-                  <Icon v-if="error.suggestion" name="heroicons:arrow-right" class="w-3 h-3 text-muted-foreground" />
-                  <code v-if="error.suggestion" class="text-xs bg-primary/10 text-primary px-1 py-0.5 rounded">
-                    {{ error.suggestion }}
-                  </code>
-                </div>
-                <Button
-                  v-if="error.suggestion"
-                  size="sm"
-                  variant="ghost"
-                  class="mt-2"
-                  @click.stop="fixError(error)">
-                  <Icon name="heroicons:check" class="w-3 h-3 mr-1" />
-                  修正
-                </Button>
+    <UCard v-if="errors.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          指摘事項一覧
+        </h3>
+      </template>
+
+      <div class="space-y-2 max-h-96 overflow-y-auto">
+        <div
+          v-for="(error, index) in errors"
+          :key="error.id"
+          class="p-3 border rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
+          :class="{ 'bg-muted': index === activeErrorIndex }"
+          @click="activeErrorIndex = index">
+          <div class="flex items-start gap-3">
+            <Icon
+              :name="severityIcons[error.severity]"
+              :class="`w-5 h-5 mt-0.5 flex-shrink-0 ${severityColors[error.severity]}`" />
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <UBadge variant="outline" class="text-xs">
+                  {{ errorTypeNames[error.type] }}
+                </UBadge>
+                <span class="text-xs text-muted-foreground">
+                  位置: {{ error.start }}
+                </span>
               </div>
+              <p class="text-sm mb-1">
+                {{ error.message }}
+              </p>
+              <div class="flex items-center gap-2">
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">
+                  {{ inputText.slice(error.start, error.end) }}
+                </code>
+                <Icon v-if="error.suggestion" name="heroicons:arrow-right" class="w-3 h-3 text-muted-foreground" />
+                <code v-if="error.suggestion" class="text-xs bg-primary/10 text-primary px-1 py-0.5 rounded">
+                  {{ error.suggestion }}
+                </code>
+              </div>
+              <UButton
+                v-if="error.suggestion"
+                size="sm"
+                variant="ghost"
+                class="mt-2"
+                @click.stop="fixError(error)">
+                <Icon name="heroicons:check" class="w-3 h-3 mr-1" />
+                修正
+              </UButton>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>校正ルールについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              チェック項目
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>誤字脱字:</strong> よくある誤字や不適切な漢字使用</li>
-              <li><strong>表記ゆれ:</strong> 同じ意味の言葉の表記統一</li>
-              <li><strong>句読点:</strong> 句読点の重複や誤用</li>
-              <li><strong>スペース:</strong> 不要なスペースや全角スペース</li>
-              <li><strong>重複表現:</strong> 意味が重複する冗長な表現</li>
-              <li><strong>文体統一:</strong> です・ます調とだ・である調の混在</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              このツールは基本的なルールベースの校正のみ行います。
-              文脈を考慮した高度な校正には対応していません。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          校正ルールについて
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            チェック項目
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>誤字脱字:</strong> よくある誤字や不適切な漢字使用</li>
+            <li><strong>表記ゆれ:</strong> 同じ意味の言葉の表記統一</li>
+            <li><strong>句読点:</strong> 句読点の重複や誤用</li>
+            <li><strong>スペース:</strong> 不要なスペースや全角スペース</li>
+            <li><strong>重複表現:</strong> 意味が重複する冗長な表現</li>
+            <li><strong>文体統一:</strong> です・ます調とだ・である調の混在</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <UAlert icon="heroicons:information-circle" description="このツールは基本的なルールベースの校正のみ行います。 文脈を考慮した高度な校正には対応していません。" />
+      </div>
+    </UCard>
   </div>
 </template>
 

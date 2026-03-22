@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -150,7 +147,7 @@ const tokenStatus = computed(() => {
   const now = Math.floor(Date.now() / 1000)
 
   if (payload.value.exp && payload.value.exp < now) {
-    return { status: 'expired', message: '期限切れ', variant: 'destructive' }
+    return { status: 'expired', message: '期限切れ', color: 'error' }
   }
 
   if (payload.value.nbf && payload.value.nbf > now) {
@@ -180,26 +177,7 @@ const formatJSON = (obj: unknown) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string, name: string) => {
-  try {
-    await copy(text)
-    toast({
-      title: 'コピーしました',
-      description: `${name}をクリップボードにコピーしました`,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプルJWT
 const sampleJWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5MTYyMzkwMjIsImF1ZCI6WyJhcGkxIiwiYXBpMiJdLCJpc3MiOiJodHRwczovL2V4YW1wbGUuY29tIn0.5mhBHqs5_DTLdINd9p5m7ZJ6XD0Xc55kIaCRY5r6HRA'
@@ -227,212 +205,204 @@ useSeoMeta({
     </div>
 
     <!-- JWT入力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>JWTトークン</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            JWTトークン
+          </h3>
+          <UButton
             size="sm"
             variant="outline"
             @click="loadSample">
             <Icon name="heroicons:document-text" class="w-4 h-4 mr-1" />
             サンプル
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="jwtInput"
-          placeholder="JWTトークンを貼り付けてください..."
-          class="w-full h-32 p-3 text-sm font-mono border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-          spellcheck="false">
+      </template>
+      <textarea
+        v-model="jwtInput"
+        placeholder="JWTトークンを貼り付けてください..."
+        class="w-full h-32 p-3 text-sm font-mono border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+        spellcheck="false">
         </textarea>
-        <div v-if="error" class="mt-2 text-sm text-destructive">
-          <Icon name="heroicons:exclamation-circle" class="w-4 h-4 inline mr-1" />
-          {{ error }}
-        </div>
-      </CardContent>
-    </Card>
+      <div v-if="error" class="mt-2 text-sm text-destructive">
+        <Icon name="heroicons:exclamation-circle" class="w-4 h-4 inline mr-1" />
+        {{ error }}
+      </div>
+    </UCard>
 
     <!-- 解析結果 -->
     <div v-if="isValid" class="space-y-6">
       <!-- ステータス -->
-      <Card v-if="tokenStatus">
-        <CardContent class="py-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <Icon
-                :name="tokenStatus.status === 'valid' ? 'CheckCircle' : tokenStatus.status === 'expired' ? 'XCircle' : 'AlertCircle'"
-                :class="[
-                  'w-5 h-5',
-                  tokenStatus.status === 'valid' ? 'text-green-600' : tokenStatus.status === 'expired' ? 'text-destructive' : 'text-yellow-600',
-                ]" />
-              <span class="font-medium">トークンステータス: {{ tokenStatus.message }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="prettyPrint"
-                  type="checkbox"
-                  class="rounded">
-                <span>整形表示</span>
-              </label>
-              <label class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="showRawBase64"
-                  type="checkbox"
-                  class="rounded">
-                <span>Base64表示</span>
-              </label>
-            </div>
+      <UCard v-if="tokenStatus">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <Icon
+              :name="tokenStatus.status === 'valid' ? 'i-heroicons-check-circle' : tokenStatus.status === 'expired' ? 'i-heroicons-x-circle' : 'i-heroicons-exclamation-circle'"
+              :class="[
+                'w-5 h-5',
+                tokenStatus.status === 'valid' ? 'text-green-600' : tokenStatus.status === 'expired' ? 'text-destructive' : 'text-yellow-600',
+              ]" />
+            <span class="font-medium">トークンステータス: {{ tokenStatus.message }}</span>
           </div>
-        </CardContent>
-      </Card>
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                v-model="prettyPrint"
+                type="checkbox"
+                class="rounded">
+              <span>整形表示</span>
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                v-model="showRawBase64"
+                type="checkbox"
+                class="rounded">
+              <span>Base64表示</span>
+            </label>
+          </div>
+        </div>
+      </UCard>
 
       <div class="grid lg:grid-cols-3 gap-6">
         <!-- ヘッダー -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle class="text-lg">
+              <h3 class="font-semibold text-lg">
                 ヘッダー
-              </CardTitle>
-              <Button
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(formatJSON(header), 'ヘッダー')">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded text-sm overflow-x-auto"><code>{{ formatJSON(header) }}</code></pre>
-            <div v-if="header && showRawBase64" class="mt-3">
-              <div class="text-xs text-muted-foreground mb-1">
-                Base64URL:
-              </div>
-              <code class="text-xs break-all">{{ jwtInput.split('.')[0] }}</code>
+          </template>
+          <pre class="p-3 bg-muted rounded text-sm overflow-x-auto"><code>{{ formatJSON(header) }}</code></pre>
+          <div v-if="header && showRawBase64" class="mt-3">
+            <div class="text-xs text-muted-foreground mb-1">
+              Base64URL:
             </div>
-          </CardContent>
-        </Card>
+            <code class="text-xs break-all">{{ jwtInput.split('.')[0] }}</code>
+          </div>
+        </UCard>
 
         <!-- ペイロード -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle class="text-lg">
+              <h3 class="font-semibold text-lg">
                 ペイロード
-              </CardTitle>
-              <Button
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(formatJSON(payload), 'ペイロード')">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded text-sm overflow-x-auto"><code>{{ formatJSON(payload) }}</code></pre>
-            <div v-if="payload && showRawBase64" class="mt-3">
-              <div class="text-xs text-muted-foreground mb-1">
-                Base64URL:
-              </div>
-              <code class="text-xs break-all">{{ jwtInput.split('.')[1] }}</code>
+          </template>
+          <pre class="p-3 bg-muted rounded text-sm overflow-x-auto"><code>{{ formatJSON(payload) }}</code></pre>
+          <div v-if="payload && showRawBase64" class="mt-3">
+            <div class="text-xs text-muted-foreground mb-1">
+              Base64URL:
             </div>
-          </CardContent>
-        </Card>
+            <code class="text-xs break-all">{{ jwtInput.split('.')[1] }}</code>
+          </div>
+        </UCard>
 
         <!-- 署名 -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="text-lg">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold text-lg">
               署名
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="p-3 bg-muted rounded">
-              <code class="text-sm break-all">{{ signature }}</code>
-            </div>
-            <div class="mt-3 text-sm text-muted-foreground">
-              <Icon name="heroicons:information-circle" class="w-4 h-4 inline mr-1" />
-              署名の検証にはシークレットキーが必要です
-            </div>
-          </CardContent>
-        </Card>
+            </h3>
+          </template>
+          <div class="p-3 bg-muted rounded">
+            <code class="text-sm break-all">{{ signature }}</code>
+          </div>
+          <div class="mt-3 text-sm text-muted-foreground">
+            <Icon name="heroicons:information-circle" class="w-4 h-4 inline mr-1" />
+            署名の検証にはシークレットキーが必要です
+          </div>
+        </UCard>
       </div>
 
       <!-- クレーム詳細 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>クレーム詳細</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
-            <!-- 標準クレーム -->
-            <div>
-              <h4 class="font-medium mb-3">
-                標準クレーム
-              </h4>
-              <div class="grid md:grid-cols-2 gap-3">
-                <div
-                  v-for="(description, claim) in knownClaims"
-                  v-show="payload && payload[claim] !== undefined"
-                  :key="claim"
-                  class="p-3 bg-muted rounded">
-                  <div class="text-sm text-muted-foreground mb-1">
-                    {{ description }}
-                  </div>
-                  <div class="font-medium">
-                    <!-- タイムスタンプの特別処理 -->
-                    <template v-if="['exp', 'nbf', 'iat'].includes(claim) && typeof payload[claim] === 'number'">
-                      <div>{{ formatTimestamp(payload[claim]).local }}</div>
-                      <div class="text-sm text-muted-foreground">
-                        {{ formatTimestamp(payload[claim]).relative }}
-                      </div>
-                    </template>
-                    <!-- 配列の処理 -->
-                    <template v-else-if="Array.isArray(payload[claim])">
-                      <div v-for="(item, index) in payload[claim]" :key="index">
-                        {{ item }}
-                      </div>
-                    </template>
-                    <!-- その他 -->
-                    <template v-else>
-                      {{ payload[claim] }}
-                    </template>
-                  </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            クレーム詳細
+          </h3>
+        </template>
+        <div class="space-y-4">
+          <!-- 標準クレーム -->
+          <div>
+            <h4 class="font-medium mb-3">
+              標準クレーム
+            </h4>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div
+                v-for="(description, claim) in knownClaims"
+                v-show="payload && payload[claim] !== undefined"
+                :key="claim"
+                class="p-3 bg-muted rounded">
+                <div class="text-sm text-muted-foreground mb-1">
+                  {{ description }}
                 </div>
-              </div>
-            </div>
-
-            <!-- カスタムクレーム -->
-            <div v-if="payload">
-              <h4 class="font-medium mb-3">
-                カスタムクレーム
-              </h4>
-              <div class="grid md:grid-cols-2 gap-3">
-                <div
-                  v-for="(value, key) in payload"
-                  v-show="!Object.keys(knownClaims).includes(key)"
-                  :key="key"
-                  class="p-3 bg-muted rounded">
-                  <div class="text-sm text-muted-foreground mb-1">
-                    {{ key }}
-                  </div>
-                  <div class="font-medium">
-                    <template v-if="typeof value === 'object'">
-                      <pre class="text-sm">{{ JSON.stringify(value, null, 2) }}</pre>
-                    </template>
-                    <template v-else>
-                      {{ value }}
-                    </template>
-                  </div>
+                <div class="font-medium">
+                  <!-- タイムスタンプの特別処理 -->
+                  <template v-if="['exp', 'nbf', 'iat'].includes(claim) && typeof payload[claim] === 'number'">
+                    <div>{{ formatTimestamp(payload[claim]).local }}</div>
+                    <div class="text-sm text-muted-foreground">
+                      {{ formatTimestamp(payload[claim]).relative }}
+                    </div>
+                  </template>
+                  <!-- 配列の処理 -->
+                  <template v-else-if="Array.isArray(payload[claim])">
+                    <div v-for="(item, index) in payload[claim]" :key="index">
+                      {{ item }}
+                    </div>
+                  </template>
+                  <!-- その他 -->
+                  <template v-else>
+                    {{ payload[claim] }}
+                  </template>
                 </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <!-- カスタムクレーム -->
+          <div v-if="payload">
+            <h4 class="font-medium mb-3">
+              カスタムクレーム
+            </h4>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div
+                v-for="(value, key) in payload"
+                v-show="!Object.keys(knownClaims).includes(key)"
+                :key="key"
+                class="p-3 bg-muted rounded">
+                <div class="text-sm text-muted-foreground mb-1">
+                  {{ key }}
+                </div>
+                <div class="font-medium">
+                  <template v-if="typeof value === 'object'">
+                    <pre class="text-sm">{{ JSON.stringify(value, null, 2) }}</pre>
+                  </template>
+                  <template v-else>
+                    {{ value }}
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- 初期状態 -->
@@ -443,34 +413,34 @@ useSeoMeta({
       </p>
     </div>
     <!-- JWT仕様 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>JWT仕様について</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
-        <p>
-          JWT (JSON Web Token) は、2つのパーティ間で情報を安全に転送するためのコンパクトで自己完結的な方法です。
-        </p>
-        <div>
-          <h5 class="font-medium text-foreground mb-2">
-            構造:
-          </h5>
-          <ul class="list-disc list-inside space-y-1">
-            <li><strong>ヘッダー:</strong> トークンのタイプと使用されている署名アルゴリズム</li>
-            <li><strong>ペイロード:</strong> エンティティ（通常はユーザー）と追加データに関するステートメント</li>
-            <li><strong>署名:</strong> トークンが改ざんされていないことを確認するために使用</li>
-          </ul>
-        </div>
-        <div>
-          <h5 class="font-medium text-foreground mb-2">
-            一般的な使用例:
-          </h5>
-          <ul class="list-disc list-inside space-y-1">
-            <li>認証: ユーザーがログインした後、各リクエストにJWTを含める</li>
-            <li>情報交換: 署名により送信者の身元を確認し、内容が改ざんされていないことを検証</li>
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          JWT仕様について
+        </h3>
+      </template>
+      <p>
+        JWT (JSON Web Token) は、2つのパーティ間で情報を安全に転送するためのコンパクトで自己完結的な方法です。
+      </p>
+      <div>
+        <h5 class="font-medium text-foreground mb-2">
+          構造:
+        </h5>
+        <ul class="list-disc list-inside space-y-1">
+          <li><strong>ヘッダー:</strong> トークンのタイプと使用されている署名アルゴリズム</li>
+          <li><strong>ペイロード:</strong> エンティティ（通常はユーザー）と追加データに関するステートメント</li>
+          <li><strong>署名:</strong> トークンが改ざんされていないことを確認するために使用</li>
+        </ul>
+      </div>
+      <div>
+        <h5 class="font-medium text-foreground mb-2">
+          一般的な使用例:
+        </h5>
+        <ul class="list-disc list-inside space-y-1">
+          <li>認証: ユーザーがログインした後、各リクエストにJWTを含める</li>
+          <li>情報交換: 署名により送信者の身元を確認し、内容が改ざんされていないことを検証</li>
+        </ul>
+      </div>
+    </UCard>
   </div>
 </template>

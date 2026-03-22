@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -285,10 +282,10 @@ const formatResult = (result: unknown): string => {
 // 結果のエクスポート
 const exportResults = () => {
   if (results.value.length === 0) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'エクスポートする結果がありません',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -318,24 +315,8 @@ const _jsonWithLineNumbers = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // SEO設定
 useSeoMeta({
@@ -356,75 +337,74 @@ useSeoMeta({
     </div>
 
     <!-- サンプルデータ -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルデータ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleData"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルデータ
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleData"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- JSONPathパターン -->
-    <Card>
-      <CardHeader>
-        <CardTitle>よく使うパターン</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <Button
-            v-for="pattern in commonPatterns"
-            :key="pattern.path"
-            variant="outline"
-            size="sm"
-            class="justify-start"
-            @click="jsonPath = pattern.path">
-            <span class="font-mono text-xs mr-2">{{ pattern.path }}</span>
-            <span class="text-muted-foreground">{{ pattern.label }}</span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          よく使うパターン
+        </h3>
+      </template>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <UButton
+          v-for="pattern in commonPatterns"
+          :key="pattern.path"
+          variant="outline"
+          size="sm"
+          class="justify-start"
+          @click="jsonPath = pattern.path">
+          <span class="font-mono text-xs mr-2">{{ pattern.path }}</span>
+          <span class="text-muted-foreground">{{ pattern.label }}</span>
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- JSON入力 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>JSON入力</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <textarea
-              v-model="jsonInput"
-              placeholder="{&quot;key&quot;: &quot;value&quot;}"
-              class="w-full h-96 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-              :class="{ 'border-destructive': syntaxError }"
-              spellcheck="false"></textarea>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            JSON入力
+          </h3>
+        </template>
+        <div class="space-y-2">
+          <textarea
+            v-model="jsonInput"
+            placeholder="{&quot;key&quot;: &quot;value&quot;}"
+            class="w-full h-96 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+            :class="{ 'border-destructive': syntaxError }"
+            spellcheck="false"></textarea>
 
-            <Alert v-if="syntaxError" variant="destructive">
-              <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-              <AlertDescription>
-                {{ syntaxError }}
-              </AlertDescription>
-            </Alert>
-          </div>
-        </CardContent>
-      </Card>
+          <UAlert
+            v-if="syntaxError" color="error" icon="heroicons:exclamation-circle"
+            :description="syntaxError" />
+        </div>
+      </UCard>
 
       <!-- 結果 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>抽出結果</CardTitle>
+            <h3 class="font-semibold">
+              抽出結果
+            </h3>
             <div class="flex gap-2">
               <label class="flex items-center gap-2 text-sm">
                 <input
@@ -433,161 +413,171 @@ useSeoMeta({
                   class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
                 整形
               </label>
-              <Button
+              <UButton
                 v-if="results.length > 0"
                 size="sm"
                 variant="outline"
                 @click="exportResults">
                 <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <div v-if="error" class="text-destructive text-sm">
-              {{ error }}
-            </div>
+        </template>
+        <div class="space-y-2">
+          <div v-if="error" class="text-destructive text-sm">
+            {{ error }}
+          </div>
 
-            <div v-else-if="results.length > 0" class="space-y-2">
-              <p class="text-sm text-muted-foreground">
-                {{ results.length }}件の結果
-              </p>
+          <div v-else-if="results.length > 0" class="space-y-2">
+            <p class="text-sm text-muted-foreground">
+              {{ results.length }}件の結果
+            </p>
 
-              <div class="max-h-96 overflow-y-auto space-y-2">
-                <div
-                  v-for="(result, index) in results"
-                  :key="index"
-                  class="relative">
-                  <div class="absolute top-2 right-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      @click="copyToClipboard(formatResult(result))">
-                      <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm">{{ formatResult(result) }}</pre>
+            <div class="max-h-96 overflow-y-auto space-y-2">
+              <div
+                v-for="(result, index) in results"
+                :key="index"
+                class="relative">
+                <div class="absolute top-2 right-2">
+                  <UButton
+                    size="sm"
+                    variant="ghost"
+                    @click="copyToClipboard(formatResult(result))">
+                    <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+                  </UButton>
                 </div>
+                <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm">{{ formatResult(result) }}</pre>
               </div>
             </div>
-
-            <div v-else class="text-muted-foreground text-sm">
-              JSONとJSONPathを入力してください
-            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <div v-else class="text-muted-foreground text-sm">
+            JSONとJSONPathを入力してください
+          </div>
+        </div>
+      </UCard>
     </div>
 
     <!-- JSONPath入力 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>JSONPath式</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <Input
-            v-model="jsonPath"
-            placeholder="$.store.book[*].title"
-            class="font-mono"
-            @keyup.enter="evaluatePath" />
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          JSONPath式
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <UInput
+          v-model="jsonPath"
+          placeholder="$.store.book[*].title"
+          class="font-mono"
+          @keyup.enter="evaluatePath" />
 
-          <Button class="w-full" @click="evaluatePath">
-            <Icon name="heroicons:magnifying-glass" class="w-4 h-4 mr-2" />
-            評価実行
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        <UButton class="w-full" @click="evaluatePath">
+          <Icon name="heroicons:magnifying-glass" class="w-4 h-4 mr-2" />
+          評価実行
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- リファレンス -->
-    <Card>
-      <CardHeader>
-        <CardTitle>JSONPath構文リファレンス</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              基本構文
-            </h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>式</TableHead>
-                  <TableHead>説明</TableHead>
-                  <TableHead>例</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell class="font-mono">
-                    $
-                  </TableCell>
-                  <TableCell>ルート要素</TableCell>
-                  <TableCell class="font-mono text-xs">
-                    $
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell class="font-mono">
-                    .
-                  </TableCell>
-                  <TableCell>子要素</TableCell>
-                  <TableCell class="font-mono text-xs">
-                    $.store
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell class="font-mono">
-                    ..
-                  </TableCell>
-                  <TableCell>再帰的降下</TableCell>
-                  <TableCell class="font-mono text-xs">
-                    $..author
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell class="font-mono">
-                    *
-                  </TableCell>
-                  <TableCell>ワイルドカード</TableCell>
-                  <TableCell class="font-mono text-xs">
-                    $.store.*
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell class="font-mono">
-                    []
-                  </TableCell>
-                  <TableCell>配列アクセス</TableCell>
-                  <TableCell class="font-mono text-xs">
-                    $.book[0]
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell class="font-mono">
-                    [*]
-                  </TableCell>
-                  <TableCell>全配列要素</TableCell>
-                  <TableCell class="font-mono text-xs">
-                    $.book[*]
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              このツールは基本的なJSONPath機能のみサポートしています。
-              フィルター式（[?(@.price &lt; 10)]）などの高度な機能は実装されていません。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          JSONPath構文リファレンス
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            基本構文
+          </h3>
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  式
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  説明
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  例
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
+                  $
+                </td>
+                <td class="p-2 align-middle">
+                  ルート要素
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
+                  $
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
+                  .
+                </td>
+                <td class="p-2 align-middle">
+                  子要素
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
+                  $.store
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
+                  ..
+                </td>
+                <td class="p-2 align-middle">
+                  再帰的降下
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
+                  $..author
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
+                  *
+                </td>
+                <td class="p-2 align-middle">
+                  ワイルドカード
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
+                  $.store.*
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
+                  []
+                </td>
+                <td class="p-2 align-middle">
+                  配列アクセス
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
+                  $.book[0]
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
+                  [*]
+                </td>
+                <td class="p-2 align-middle">
+                  全配列要素
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
+                  $.book[*]
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </CardContent>
-    </Card>
+
+        <UAlert icon="heroicons:information-circle" description="このツールは基本的なJSONPath機能のみサポートしています。 フィルター式（[?(@.price &lt; 10)]）などの高度な機能は実装されていません。" />
+      </div>
+    </UCard>
   </div>
 </template>

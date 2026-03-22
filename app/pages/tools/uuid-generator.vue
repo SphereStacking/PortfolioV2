@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -123,26 +120,7 @@ const generateSingle = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      title: 'コピーしました',
-      description: 'IDをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const copyAll = () => {
   copyToClipboard(generatedIds.value.join('\n'))
@@ -268,138 +246,146 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-3 gap-2">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            size="sm"
-            variant="outline"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-3 gap-2">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          size="sm"
+          variant="outline"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 設定パネル -->
     <div class="space-y-6">
       <!-- IDタイプ選択 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>IDタイプ</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            <div
-              v-for="(desc, type) in idTypeDescriptions"
-              :key="type"
-              class="flex items-start gap-3">
-              <input
-                :id="type"
-                v-model="idType"
-                :value="type"
-                type="radio"
-                class="mt-1">
-              <label :for="type" class="flex-1 cursor-pointer">
-                <div class="font-medium">{{ type.toUpperCase() }}</div>
-                <div class="text-sm text-muted-foreground">{{ desc }}</div>
-              </label>
-            </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            IDタイプ
+          </h3>
+        </template>
+        <div class="space-y-3">
+          <div
+            v-for="(desc, type) in idTypeDescriptions"
+            :key="type"
+            class="flex items-start gap-3">
+            <input
+              :id="type"
+              v-model="idType"
+              :value="type"
+              type="radio"
+              class="mt-1">
+            <label :for="type" class="flex-1 cursor-pointer">
+              <div class="font-medium">{{ type.toUpperCase() }}</div>
+              <div class="text-sm text-muted-foreground">{{ desc }}</div>
+            </label>
           </div>
-        </CardContent>
+        </div>
+      </UCard>
 
-        <!-- タイプ別オプション -->
-        <template v-if="idType === 'nanoid'">
-          <CardHeader>
-            <CardTitle>Nano ID設定</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                長さ: {{ nanoIdSize }}文字
-              </label>
-              <Slider
-                :model-value="[nanoIdSize]"
-                :min="6"
-                :max="36"
-                :step="1"
-                class="w-full"
-                @update:model-value="nanoIdSize = $event[0]" />
-            </div>
-          </CardContent>
+      <!-- タイプ別オプション -->
+      <UCard v-if="idType === 'nanoid'">
+        <template #header>
+          <h3 class="font-semibold">
+            Nano ID設定
+          </h3>
         </template>
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            長さ: {{ nanoIdSize }}文字
+          </label>
+          <Slider
+            :model-value="[nanoIdSize]"
+            :min="6"
+            :max="36"
+            :step="1"
+            class="w-full"
+            @update:model-value="nanoIdSize = $event[0]" />
+        </div>
+      </UCard>
 
-        <template v-if="idType === 'random'">
-          <CardHeader>
-            <CardTitle>カスタムランダム設定</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                長さ: {{ randomLength }}文字
-              </label>
-              <Slider
-                :model-value="[randomLength]"
-                :min="4"
-                :max="64"
-                :step="1"
-                class="w-full"
-                @update:model-value="randomLength = $event[0]" />
-            </div>
-
-            <div class="space-y-2">
-              <label class="text-sm font-medium block">文字セット</label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="randomCharset.uppercase"
-                  type="checkbox"
-                  class="rounded">
-                <span class="text-sm">大文字 (A-Z)</span>
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="randomCharset.lowercase"
-                  type="checkbox"
-                  class="rounded">
-                <span class="text-sm">小文字 (a-z)</span>
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="randomCharset.numbers"
-                  type="checkbox"
-                  class="rounded">
-                <span class="text-sm">数字 (0-9)</span>
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  v-model="randomCharset.symbols"
-                  type="checkbox"
-                  class="rounded">
-                <span class="text-sm">記号</span>
-              </label>
-            </div>
-
-            <div v-if="randomCharset.symbols">
-              <label class="text-sm font-medium mb-2 block">使用する記号</label>
-              <Input
-                v-model="customSymbols"
-                placeholder="-_!@#$%^&*()"
-                class="font-mono" />
-            </div>
-          </CardContent>
+      <UCard v-if="idType === 'random'">
+        <template #header>
+          <h3 class="font-semibold">
+            カスタムランダム設定
+          </h3>
         </template>
-        <CardHeader>
-          <CardTitle>オプション</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              長さ: {{ randomLength }}文字
+            </label>
+            <Slider
+              :model-value="[randomLength]"
+              :min="4"
+              :max="64"
+              :step="1"
+              class="w-full"
+              @update:model-value="randomLength = $event[0]" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium block">文字セット</label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="randomCharset.uppercase"
+                type="checkbox"
+                class="rounded">
+              <span class="text-sm">大文字 (A-Z)</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="randomCharset.lowercase"
+                type="checkbox"
+                class="rounded">
+              <span class="text-sm">小文字 (a-z)</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="randomCharset.numbers"
+                type="checkbox"
+                class="rounded">
+              <span class="text-sm">数字 (0-9)</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                v-model="randomCharset.symbols"
+                type="checkbox"
+                class="rounded">
+              <span class="text-sm">記号</span>
+            </label>
+          </div>
+
+          <div v-if="randomCharset.symbols">
+            <label class="text-sm font-medium mb-2 block">使用する記号</label>
+            <UInput
+              v-model="customSymbols"
+              placeholder="-_!@#$%^&*()"
+              class="font-mono" />
+          </div>
+        </div>
+      </UCard>
+
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            オプション
+          </h3>
+        </template>
+        <div class="space-y-4">
           <div>
             <label class="text-sm font-medium mb-2 block">生成数</label>
-            <Input
+            <UInput
               v-model.number="count"
               type="number"
               min="1"
@@ -409,13 +395,13 @@ useSeoMeta({
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="text-sm font-medium mb-2 block">プレフィックス</label>
-              <Input
+              <UInput
                 v-model="prefix"
                 placeholder="user_" />
             </div>
             <div>
               <label class="text-sm font-medium mb-2 block">サフィックス</label>
-              <Input
+              <UInput
                 v-model="suffix"
                 placeholder="_2024" />
             </div>
@@ -424,13 +410,13 @@ useSeoMeta({
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="text-sm font-medium mb-2 block">セパレーター</label>
-              <Input
+              <UInput
                 v-model="separator"
                 placeholder="-" />
             </div>
             <div>
               <label class="text-sm font-medium mb-2 block">間隔</label>
-              <Input
+              <UInput
                 v-model.number="separatorPosition"
                 type="number"
                 min="0"
@@ -454,70 +440,71 @@ useSeoMeta({
               </option>
             </select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
-      <Button
+      <UButton
         class="w-full"
         @click="generateMultiple">
         <Icon name="heroicons:bolt" class="w-4 h-4 mr-2" />
         生成
-      </Button>
+      </UButton>
     </div>
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>
+          <h3 class="font-semibold">
             生成されたID
-            <Badge class="ml-2">
+            <UBadge class="ml-2">
               {{ generatedIds.length }}個
-            </Badge>
-          </CardTitle>
+            </UBadge>
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               :disabled="generatedIds.length === 0"
               @click="copyAll">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
               すべてコピー
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               :disabled="generatedIds.length === 0"
               @click="downloadIds">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
               ダウンロード
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-2 max-h-[600px] overflow-y-auto">
-          <div
-            v-for="(id, index) in generatedIds"
-            :key="index"
-            class="group flex items-center justify-between p-3 bg-muted rounded-md hover:bg-muted/80 transition-colors">
-            <code class="font-mono text-sm break-all">{{ id }}</code>
-            <Button
-              size="sm"
-              variant="ghost"
-              class="opacity-0 group-hover:opacity-100 transition-opacity"
-              @click="copyToClipboard(id)">
-              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-            </Button>
-          </div>
+      </template>
+
+      <div class="space-y-2 max-h-[600px] overflow-y-auto">
+        <div
+          v-for="(id, index) in generatedIds"
+          :key="index"
+          class="group flex items-center justify-between p-3 bg-muted rounded-md hover:bg-muted/80 transition-colors">
+          <code class="font-mono text-sm break-all">{{ id }}</code>
+          <UButton
+            size="sm"
+            variant="ghost"
+            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="copyToClipboard(id)">
+            <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- ID形式の説明 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>ID形式について</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4 text-sm">
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          ID形式について
+        </h3>
+      </template>
+      <div class="space-y-4 text-sm">
         <div>
           <h4 class="font-medium mb-1">
             UUID v4
@@ -554,7 +541,7 @@ useSeoMeta({
             同時生成で衝突の可能性があるため、単体での使用は推奨されない。
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
   </div>
 </template>

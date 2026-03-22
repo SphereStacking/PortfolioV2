@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -287,7 +286,7 @@ const isInCustomDictionary = computed(() => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const copyReport = async () => {
   const report = `パスワード強度分析レポート
@@ -308,15 +307,15 @@ ${suggestions.value.map(s => '- ' + s).join('\n')}`
 
   try {
     await copy(report)
-    toast({
+    toast.add({
       description: 'レポートをコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -340,289 +339,285 @@ useSeoMeta({
     </div>
 
     <!-- パスワード入力 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>パスワード評価</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">パスワード</label>
-            <div class="relative">
-              <Input
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="評価するパスワードを入力"
-                class="pr-10" />
-              <button
-                type="button"
-                class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
-                @click="showPassword = !showPassword">
-                <Icon
-                  :name="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
-                  class="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium mb-2 block">サンプル</label>
-            <div class="flex flex-wrap gap-2">
-              <Button
-                v-for="sample in samplePasswords"
-                :key="sample.label"
-                variant="outline"
-                size="sm"
-                @click="loadSample(sample.password)">
-                {{ sample.label }}
-              </Button>
-            </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          パスワード評価
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">パスワード</label>
+          <div class="relative">
+            <UInput
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="評価するパスワードを入力"
+              class="pr-10" />
+            <button
+              type="button"
+              class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
+              @click="showPassword = !showPassword">
+              <Icon
+                :name="showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'"
+                class="w-5 h-5" />
+            </button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">サンプル</label>
+          <div class="flex flex-wrap gap-2">
+            <UButton
+              v-for="sample in samplePasswords"
+              :key="sample.label"
+              variant="outline"
+              size="sm"
+              @click="loadSample(sample.password)">
+              {{ sample.label }}
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 強度メーター -->
-    <Card v-if="password">
-      <CardHeader>
+    <UCard v-if="password">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>強度評価</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            強度評価
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="copyReport">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-6">
-          <!-- 強度バー -->
+      </template>
+      <div class="space-y-6">
+        <!-- 強度バー -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-2xl font-bold">{{ strengthLevel.label }}</span>
+            <span class="text-sm text-muted-foreground">{{ entropy.toFixed(2) }} ビット</span>
+          </div>
+          <div class="w-full h-4 bg-muted rounded-full overflow-hidden">
+            <div
+              class="h-full transition-all duration-300"
+              :class="strengthLevel.color"
+              :style="{ width: `${Math.min(100, (entropy / 100) * 100)}%` }">
+            </div>
+          </div>
+          <div class="flex justify-between mt-1 text-xs text-muted-foreground">
+            <span>0</span>
+            <span>20</span>
+            <span>40</span>
+            <span>60</span>
+            <span>80</span>
+            <span>100+</span>
+          </div>
+        </div>
+
+        <!-- 推定解読時間 -->
+        <div class="p-4 bg-muted rounded-md">
+          <div class="text-sm text-muted-foreground mb-1">
+            推定解読時間（10億回/秒）
+          </div>
+          <div class="text-2xl font-bold">
+            {{ crackTime.formatted }}
+          </div>
+        </div>
+
+        <!-- 詳細分析 -->
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-2xl font-bold">{{ strengthLevel.label }}</span>
-              <span class="text-sm text-muted-foreground">{{ entropy.toFixed(2) }} ビット</span>
-            </div>
-            <div class="w-full h-4 bg-muted rounded-full overflow-hidden">
-              <div
-                class="h-full transition-all duration-300"
-                :class="strengthLevel.color"
-                :style="{ width: `${Math.min(100, (entropy / 100) * 100)}%` }">
+            <h4 class="font-medium mb-2">
+              文字構成
+            </h4>
+            <div class="space-y-1 text-sm">
+              <div class="flex items-center justify-between">
+                <span>長さ</span>
+                <span class="font-mono">{{ analysis.length }}文字</span>
               </div>
-            </div>
-            <div class="flex justify-between mt-1 text-xs text-muted-foreground">
-              <span>0</span>
-              <span>20</span>
-              <span>40</span>
-              <span>60</span>
-              <span>80</span>
-              <span>100+</span>
+              <div class="flex items-center justify-between">
+                <span>ユニーク文字</span>
+                <span class="font-mono">{{ analysis.uniqueChars }}種類</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>小文字</span>
+                <span :class="analysis.hasLowercase ? 'text-green-600' : 'text-red-600'">
+                  {{ analysis.hasLowercase ? '○' : '×' }} {{ analysis.lowercaseCount }}文字
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>大文字</span>
+                <span :class="analysis.hasUppercase ? 'text-green-600' : 'text-red-600'">
+                  {{ analysis.hasUppercase ? '○' : '×' }} {{ analysis.uppercaseCount }}文字
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>数字</span>
+                <span :class="analysis.hasDigits ? 'text-green-600' : 'text-red-600'">
+                  {{ analysis.hasDigits ? '○' : '×' }} {{ analysis.digitCount }}文字
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>記号</span>
+                <span :class="analysis.hasSymbols ? 'text-green-600' : 'text-red-600'">
+                  {{ analysis.hasSymbols ? '○' : '×' }} {{ analysis.symbolCount }}文字
+                </span>
+              </div>
             </div>
           </div>
 
-          <!-- 推定解読時間 -->
-          <div class="p-4 bg-muted rounded-md">
-            <div class="text-sm text-muted-foreground mb-1">
-              推定解読時間（10億回/秒）
-            </div>
-            <div class="text-2xl font-bold">
-              {{ crackTime.formatted }}
-            </div>
-          </div>
-
-          <!-- 詳細分析 -->
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <h4 class="font-medium mb-2">
-                文字構成
-              </h4>
-              <div class="space-y-1 text-sm">
-                <div class="flex items-center justify-between">
-                  <span>長さ</span>
-                  <span class="font-mono">{{ analysis.length }}文字</span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>ユニーク文字</span>
-                  <span class="font-mono">{{ analysis.uniqueChars }}種類</span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>小文字</span>
-                  <span :class="analysis.hasLowercase ? 'text-green-600' : 'text-red-600'">
-                    {{ analysis.hasLowercase ? '○' : '×' }} {{ analysis.lowercaseCount }}文字
-                  </span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>大文字</span>
-                  <span :class="analysis.hasUppercase ? 'text-green-600' : 'text-red-600'">
-                    {{ analysis.hasUppercase ? '○' : '×' }} {{ analysis.uppercaseCount }}文字
-                  </span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>数字</span>
-                  <span :class="analysis.hasDigits ? 'text-green-600' : 'text-red-600'">
-                    {{ analysis.hasDigits ? '○' : '×' }} {{ analysis.digitCount }}文字
-                  </span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>記号</span>
-                  <span :class="analysis.hasSymbols ? 'text-green-600' : 'text-red-600'">
-                    {{ analysis.hasSymbols ? '○' : '×' }} {{ analysis.symbolCount }}文字
-                  </span>
-                </div>
+          <div>
+            <h4 class="font-medium mb-2">
+              パターン分析
+            </h4>
+            <div class="space-y-1 text-sm">
+              <div class="flex items-center justify-between">
+                <span>繰り返し文字</span>
+                <span :class="analysis.repeatingChars > 0 ? 'text-orange-600' : 'text-green-600'">
+                  {{ analysis.repeatingChars }}文字
+                </span>
               </div>
-            </div>
-
-            <div>
-              <h4 class="font-medium mb-2">
-                パターン分析
-              </h4>
-              <div class="space-y-1 text-sm">
-                <div class="flex items-center justify-between">
-                  <span>繰り返し文字</span>
-                  <span :class="analysis.repeatingChars > 0 ? 'text-orange-600' : 'text-green-600'">
-                    {{ analysis.repeatingChars }}文字
-                  </span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>連続文字</span>
-                  <span :class="analysis.consecutiveChars > 2 ? 'text-orange-600' : 'text-green-600'">
-                    {{ analysis.consecutiveChars > 0 ? `最大${analysis.consecutiveChars}文字` : 'なし' }}
-                  </span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span>連続パターン</span>
-                  <span :class="analysis.sequentialChars > 0 ? 'text-orange-600' : 'text-green-600'">
-                    {{ analysis.sequentialChars }}個
-                  </span>
-                </div>
-                <div v-if="analysis.commonPatterns.length > 0" class="mt-2">
-                  <div class="text-xs text-orange-600">
-                    検出されたパターン:
-                    <div class="mt-1">
-                      {{ analysis.commonPatterns.join('、') }}
-                    </div>
+              <div class="flex items-center justify-between">
+                <span>連続文字</span>
+                <span :class="analysis.consecutiveChars > 2 ? 'text-orange-600' : 'text-green-600'">
+                  {{ analysis.consecutiveChars > 0 ? `最大${analysis.consecutiveChars}文字` : 'なし' }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>連続パターン</span>
+                <span :class="analysis.sequentialChars > 0 ? 'text-orange-600' : 'text-green-600'">
+                  {{ analysis.sequentialChars }}個
+                </span>
+              </div>
+              <div v-if="analysis.commonPatterns.length > 0" class="mt-2">
+                <div class="text-xs text-orange-600">
+                  検出されたパターン:
+                  <div class="mt-1">
+                    {{ analysis.commonPatterns.join('、') }}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 改善提案 -->
-    <Card v-if="password && suggestions.length > 0">
-      <CardHeader>
-        <CardTitle>改善提案</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Alert>
-          <Icon name="heroicons:light-bulb" class="w-4 h-4" />
-          <AlertDescription>
-            <ul class="list-disc list-inside space-y-1">
-              <li v-for="(tip, index) in suggestions" :key="index">
-                {{ tip }}
-              </li>
-            </ul>
-          </AlertDescription>
-        </Alert>
-      </CardContent>
-    </Card>
+    <UCard v-if="password && suggestions.length > 0">
+      <template #header>
+        <h3 class="font-semibold">
+          改善提案
+        </h3>
+      </template>
+      <UAlert icon="heroicons:light-bulb">
+        <template #description>
+          <ul class="list-disc list-inside space-y-1">
+            <li v-for="(tip, index) in suggestions" :key="index">
+              {{ tip }}
+            </li>
+          </ul>
+        </template>
+      </UAlert>
+    </UCard>
 
     <!-- カスタム辞書 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>カスタム辞書チェック</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <label class="flex items-center gap-2">
-            <input
-              v-model="useCustomDictionary"
-              type="checkbox"
-              class="w-4 h-4 rounded border-zinc-300 text-primary">
-            カスタム辞書を使用する
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          カスタム辞書チェック
+        </h3>
+      </template>
+      <div class="space-y-4">
+        <label class="flex items-center gap-2">
+          <input
+            v-model="useCustomDictionary"
+            type="checkbox"
+            class="w-4 h-4 rounded border-zinc-300 text-primary">
+          カスタム辞書を使用する
+        </label>
+
+        <div v-if="useCustomDictionary">
+          <label class="text-sm font-medium mb-2 block">
+            禁止ワードリスト（改行またはカンマ区切り）
           </label>
+          <textarea
+            v-model="customDictionary"
+            placeholder="company\nproduct\nservice\n2024"
+            class="w-full h-32 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+            spellcheck="false"></textarea>
 
-          <div v-if="useCustomDictionary">
-            <label class="text-sm font-medium mb-2 block">
-              禁止ワードリスト（改行またはカンマ区切り）
-            </label>
-            <textarea
-              v-model="customDictionary"
-              placeholder="company\nproduct\nservice\n2024"
-              class="w-full h-32 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-              spellcheck="false"></textarea>
-
-            <Alert v-if="isInCustomDictionary" variant="destructive" class="mt-2">
-              <Icon name="heroicons:exclamation-triangle" class="w-4 h-4" />
-              <AlertDescription>
-                パスワードに辞書内の単語が含まれています
-              </AlertDescription>
-            </Alert>
-          </div>
+          <UAlert
+            v-if="isInCustomDictionary" color="error" class="mt-2"
+            icon="heroicons:exclamation-triangle" description="パスワードに辞書内の単語が含まれています" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>エントロピーと強度について</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              エントロピーとは
-            </h3>
-            <p>
-              パスワードの予測困難性を表す指標です。使用可能な文字の種類と長さから計算され、
-              ビット単位で表されます。エントロピーが高いほど、総当たり攻撃に対して強力です。
-            </p>
-          </div>
-
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              強度レベルの目安
-            </h3>
-            <ul class="space-y-1">
-              <li><strong class="text-red-600">非常に弱い（&lt; 20ビット）:</strong> 数秒で解読可能</li>
-              <li><strong class="text-orange-600">弱い（20-40ビット）:</strong> 数時間〜数日で解読可能</li>
-              <li><strong class="text-yellow-600">普通（40-60ビット）:</strong> 数ヶ月〜数年で解読可能</li>
-              <li><strong class="text-green-600">強い（60-80ビット）:</strong> 数十年〜数世紀必要</li>
-              <li><strong class="text-green-700">非常に強い（> 80ビット）:</strong> 現実的に解読不可能</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              強力なパスワードの作り方
-            </h3>
-            <ol class="list-decimal list-inside space-y-1">
-              <li>最低12文字以上の長さ</li>
-              <li>大文字・小文字・数字・記号を混在</li>
-              <li>辞書に載っている単語を避ける</li>
-              <li>個人情報（誕生日、名前など）を使わない</li>
-              <li>キーボードの配列パターンを避ける</li>
-              <li>パスフレーズの使用を検討する</li>
-            </ol>
-          </div>
-
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              計算方法
-            </h3>
-            <p>
-              基本エントロピー = log₂(文字セットサイズ) × パスワード長
-            </p>
-            <p class="mt-2">
-              ただし、繰り返しパターン、連続文字、よくある単語などがある場合は
-              ペナルティを適用して実効エントロピーを減少させています。
-            </p>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          エントロピーと強度について
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            エントロピーとは
+          </h3>
+          <p>
+            パスワードの予測困難性を表す指標です。使用可能な文字の種類と長さから計算され、
+            ビット単位で表されます。エントロピーが高いほど、総当たり攻撃に対して強力です。
+          </p>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            強度レベルの目安
+          </h3>
+          <ul class="space-y-1">
+            <li><strong class="text-red-600">非常に弱い（&lt; 20ビット）:</strong> 数秒で解読可能</li>
+            <li><strong class="text-orange-600">弱い（20-40ビット）:</strong> 数時間〜数日で解読可能</li>
+            <li><strong class="text-yellow-600">普通（40-60ビット）:</strong> 数ヶ月〜数年で解読可能</li>
+            <li><strong class="text-green-600">強い（60-80ビット）:</strong> 数十年〜数世紀必要</li>
+            <li><strong class="text-green-700">非常に強い（> 80ビット）:</strong> 現実的に解読不可能</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            強力なパスワードの作り方
+          </h3>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>最低12文字以上の長さ</li>
+            <li>大文字・小文字・数字・記号を混在</li>
+            <li>辞書に載っている単語を避ける</li>
+            <li>個人情報（誕生日、名前など）を使わない</li>
+            <li>キーボードの配列パターンを避ける</li>
+            <li>パスフレーズの使用を検討する</li>
+          </ol>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            計算方法
+          </h3>
+          <p>
+            基本エントロピー = log₂(文字セットサイズ) × パスワード長
+          </p>
+          <p class="mt-2">
+            ただし、繰り返しパターン、連続文字、よくある単語などがある場合は
+            ペナルティを適用して実効エントロピーを減少させています。
+          </p>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

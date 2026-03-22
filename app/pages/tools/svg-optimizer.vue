@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -288,10 +285,10 @@ const processSvgFiles = async () => {
   }
   catch (error) {
     console.error('Error processing SVG:', error)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'SVGファイルの処理に失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -302,10 +299,10 @@ const processSvgFiles = async () => {
 // テキスト入力からの最適化
 const optimizeFromText = () => {
   if (!inputSvg.value.trim()) {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'SVGコードを入力してください',
-      variant: 'destructive',
+      color: 'error',
     })
     return
   }
@@ -314,17 +311,17 @@ const optimizeFromText = () => {
 
   try {
     outputSvg.value = optimizeSvg(inputSvg.value)
-    toast({
+    toast.add({
       title: '最適化完了',
       description: `${compressionRatio.value}のサイズ削減を達成しました`,
     })
   }
   catch (error) {
     console.error('Error optimizing SVG:', error)
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'SVGの最適化に失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -335,7 +332,7 @@ const optimizeFromText = () => {
 // プリセット適用
 const applyPreset = (preset: typeof presets[0]) => {
   optimizationOptions.value = { ...preset.options }
-  toast({
+  toast.add({
     title: 'プリセット適用',
     description: `${preset.name}プリセットを適用しました`,
   })
@@ -375,24 +372,9 @@ const downloadSvg = () => {
 }
 
 // クリップボード
-const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプルSVG
 const sampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100" viewBox="0 0 100 100">
@@ -433,197 +415,197 @@ useSeoMeta({
     </div>
 
     <!-- 最適化設定 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>最適化設定</CardTitle>
+          <h3 class="font-semibold">
+            最適化設定
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               v-for="preset in presets"
               :key="preset.name"
               size="sm"
               variant="outline"
               @click="applyPreset(preset)">
               {{ preset.name }}
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <label
-            v-for="(value, key) in optimizationOptions"
-            :key="key"
-            class="flex items-center gap-2 text-sm">
-            <input
-              v-model="optimizationOptions[key]"
-              type="checkbox"
-              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-            <span>{{ key.replace(/([A-Z])/g, ' $1').trim() }}</span>
-          </label>
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <label
+          v-for="(value, key) in optimizationOptions"
+          :key="key"
+          class="flex items-center gap-2 text-sm">
+          <input
+            v-model="optimizationOptions[key]"
+            type="checkbox"
+            class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+          <span>{{ key.replace(/([A-Z])/g, ' $1').trim() }}</span>
+        </label>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 入力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>入力SVG</CardTitle>
+            <h3 class="font-semibold">
+              入力SVG
+            </h3>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 size="sm"
                 variant="outline"
                 @click="loadSample">
                 サンプル
-              </Button>
+              </UButton>
               <label>
                 <input
                   type="file"
                   accept=".svg"
                   class="hidden"
                   @change="handleFileSelect">
-                <Button size="sm" variant="outline" as="span">
+                <UButton size="sm" variant="outline" as="span">
                   <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
                   ファイル選択
-                </Button>
+                </UButton>
               </label>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <textarea
-              v-model="inputSvg"
-              placeholder="SVGコードを貼り付けるか、ファイルを選択してください"
-              class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-              spellcheck="false"></textarea>
-            <div v-if="inputSvg" class="text-sm text-muted-foreground">
-              サイズ: {{ formatFileSize(originalSize) }}
-            </div>
+        </template>
+
+        <div class="space-y-2">
+          <textarea
+            v-model="inputSvg"
+            placeholder="SVGコードを貼り付けるか、ファイルを選択してください"
+            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+            spellcheck="false"></textarea>
+          <div v-if="inputSvg" class="text-sm text-muted-foreground">
+            サイズ: {{ formatFileSize(originalSize) }}
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button
+        </div>
+
+        <template #footer>
+          <UButton
             class="w-full"
             :disabled="!inputSvg || processing"
             @click="optimizeFromText">
             <Icon v-if="processing" name="heroicons:arrow-path" class="w-4 h-4 mr-2 animate-spin" />
             最適化実行
-          </Button>
-        </CardFooter>
-      </Card>
+          </UButton>
+        </template>
+      </UCard>
 
       <!-- 出力 -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>最適化後のSVG</CardTitle>
+            <h3 class="font-semibold">
+              最適化後のSVG
+            </h3>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 v-if="outputSvg"
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(outputSvg)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 v-if="outputSvg"
                 size="sm"
                 variant="outline"
                 @click="downloadSvg">
                 <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <textarea
-              v-model="outputSvg"
-              readonly
-              placeholder="最適化されたSVGがここに表示されます"
-              class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-              spellcheck="false"></textarea>
-            <div v-if="outputSvg" class="space-y-1">
-              <p class="text-sm text-muted-foreground">
-                サイズ: {{ formatFileSize(optimizedSize) }}
-                <span :class="optimizedSize < originalSize ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
-                  ({{ compressionRatio }} 削減)
-                </span>
-              </p>
-            </div>
+        </template>
+
+        <div class="space-y-2">
+          <textarea
+            v-model="outputSvg"
+            readonly
+            placeholder="最適化されたSVGがここに表示されます"
+            class="w-full h-64 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+            spellcheck="false"></textarea>
+          <div v-if="outputSvg" class="space-y-1">
+            <p class="text-sm text-muted-foreground">
+              サイズ: {{ formatFileSize(optimizedSize) }}
+              <span :class="optimizedSize < originalSize ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                ({{ compressionRatio }} 削減)
+              </span>
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- ビジュアル比較 -->
-    <Card v-if="inputSvg && outputSvg">
-      <CardHeader>
-        <CardTitle>ビジュアル比較</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 class="font-medium mb-2">
-              元のSVG
-            </h3>
-            <div
-              class="border rounded-md p-4 bg-background"
-              v-html="inputSvg"></div>
-          </div>
-          <div>
-            <h3 class="font-medium mb-2">
-              最適化後
-            </h3>
-            <div
-              class="border rounded-md p-4 bg-background"
-              v-html="outputSvg"></div>
-          </div>
+    <UCard v-if="inputSvg && outputSvg">
+      <template #header>
+        <h3 class="font-semibold">
+          ビジュアル比較
+        </h3>
+      </template>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h3 class="font-medium mb-2">
+            元のSVG
+          </h3>
+          <div
+            class="border rounded-md p-4 bg-background"
+            v-html="inputSvg"></div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-medium mb-2">
+            最適化後
+          </h3>
+          <div
+            class="border rounded-md p-4 bg-background"
+            v-html="outputSvg"></div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>最適化オプションの説明</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              主要な最適化
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>コメント削除:</strong> <!-- --> 形式のコメントを削除</li>
-              <li><strong>メタデータ削除:</strong> 編集ソフトが追加した不要な情報を削除</li>
-              <li><strong>数値最適化:</strong> 0.5→.5、1.000→1 など数値を簡潔に</li>
-              <li><strong>色変換:</strong> rgb(255,255,255)→#fff など色表記を最適化</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              高度な最適化
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>パス最適化:</strong> パスデータを効率的な形式に変換</li>
-              <li><strong>変換統合:</strong> 複数の変換を1つにまとめる</li>
-              <li><strong>グループ最適化:</strong> 不要なグループを削除・統合</li>
-              <li><strong>ID短縮:</strong> 長いIDを短い文字列に置換</li>
-            </ul>
-          </div>
-          <Alert>
-            <Icon name="heroicons:information-circle" class="w-4 h-4" />
-            <AlertDescription>
-              この最適化ツールは基本的な最適化のみ実装しています。
-              より高度な最適化が必要な場合は、SVGOなどの専門ツールの使用を推奨します。
-            </AlertDescription>
-          </Alert>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          最適化オプションの説明
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            主要な最適化
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>コメント削除:</strong> <!-- --> 形式のコメントを削除</li>
+            <li><strong>メタデータ削除:</strong> 編集ソフトが追加した不要な情報を削除</li>
+            <li><strong>数値最適化:</strong> 0.5→.5、1.000→1 など数値を簡潔に</li>
+            <li><strong>色変換:</strong> rgb(255,255,255)→#fff など色表記を最適化</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            高度な最適化
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>パス最適化:</strong> パスデータを効率的な形式に変換</li>
+            <li><strong>変換統合:</strong> 複数の変換を1つにまとめる</li>
+            <li><strong>グループ最適化:</strong> 不要なグループを削除・統合</li>
+            <li><strong>ID短縮:</strong> 長いIDを短い文字列に置換</li>
+          </ul>
+        </div>
+        <UAlert icon="heroicons:information-circle" description="この最適化ツールは基本的な最適化のみ実装しています。 より高度な最適化が必要な場合は、SVGOなどの専門ツールの使用を推奨します。" />
+      </div>
+    </UCard>
   </div>
 </template>

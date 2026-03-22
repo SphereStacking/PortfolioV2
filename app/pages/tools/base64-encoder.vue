@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -149,24 +146,7 @@ const loadFile = (event: Event) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const pasteFromClipboard = async () => {
   try {
@@ -231,144 +211,139 @@ useSeoMeta({
     </div>
 
     <!-- サンプル -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプル</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid gap-2 grid-cols-5">
-          <Button
-            v-for="sample in samples"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          サンプル
+        </h3>
+      </template>
+      <div class="grid gap-2 grid-cols-5">
+        <UButton
+          v-for="sample in samples"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 入力エリア -->
-    <Card class="col-span-1">
-      <CardHeader>
+    <UCard class="col-span-1">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>入力</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            入力
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="inputText = ''; outputText = ''">
             <Icon name="heroicons:x-mark" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          v-model="inputText"
-          :placeholder="mode === 'encode' ? 'エンコードするテキストを入力...' : 'デコードするBase64文字列を入力...'"
-          class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-          spellcheck="false"
-          @input="process"></textarea>
-        <div class="mt-2 text-sm text-muted-foreground">
-          サイズ: {{ (stats.inputSize / 1024).toFixed(2) }} KB
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+      <textarea
+        v-model="inputText"
+        :placeholder="mode === 'encode' ? 'エンコードするテキストを入力...' : 'デコードするBase64文字列を入力...'"
+        class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+        spellcheck="false"
+        @input="process"></textarea>
+      <div class="mt-2 text-sm text-muted-foreground">
+        サイズ: {{ (stats.inputSize / 1024).toFixed(2) }} KB
+      </div>
+    </UCard>
 
     <!-- 出力エリア -->
-    <Card class="col-span-1">
-      <CardHeader>
+    <UCard class="col-span-1">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>出力</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            出力
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             :disabled="!outputText"
             @click="copyToClipboard(outputText)">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div v-if="error" class="mb-4">
-          <Alert variant="destructive">
-            <Icon name="heroicons:exclamation-circle" class="h-4 w-4" />
-            <AlertDescription>
-              {{ error }}
-            </AlertDescription>
-          </Alert>
-        </div>
-        <textarea
-          v-model="outputText"
-          readonly
-          :placeholder="mode === 'encode' ? 'エンコード結果がここに表示されます...' : 'デコード結果がここに表示されます...'"
-          class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-          spellcheck="false"></textarea>
-        <div class="mt-2 flex justify-between text-sm text-muted-foreground">
-          <span>サイズ: {{ (stats.outputSize / 1024).toFixed(2) }} KB</span>
-          <span v-if="stats.compressionRatio !== 0">
-            比率: {{ stats.compressionRatio }}%
-          </span>
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div v-if="error" class="mb-4">
+        <UAlert color="error" icon="heroicons:exclamation-circle" :description="error" />
+      </div>
+      <textarea
+        v-model="outputText"
+        readonly
+        :placeholder="mode === 'encode' ? 'エンコード結果がここに表示されます...' : 'デコード結果がここに表示されます...'"
+        class="w-full h-[400px] p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+        spellcheck="false"></textarea>
+      <div class="mt-2 flex justify-between text-sm text-muted-foreground">
+        <span>サイズ: {{ (stats.outputSize / 1024).toFixed(2) }} KB</span>
+        <span v-if="stats.compressionRatio !== 0">
+          比率: {{ stats.compressionRatio }}%
+        </span>
+      </div>
+    </UCard>
     <!-- コントロールパネル -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>コントロールパネル</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap items-center gap-4">
-          <!-- モード選択 -->
-          <div class="flex gap-2">
-            <Button
-              v-for="m in ['encode', 'decode'] as const"
-              :key="m"
-              :variant="mode === m ? 'default' : 'outline'"
-              @click="mode = m; process()">
-              {{ m === 'encode' ? 'エンコード' : 'デコード' }}
-            </Button>
-          </div>
-
-          <!-- オプション -->
-          <div class="flex items-center gap-4">
-            <label class="flex items-center gap-2 text-sm">
-              <input
-                v-model="urlSafe"
-                type="checkbox"
-                class="rounded"
-                @change="process">
-              URLセーフ
-            </label>
-          </div>
-
-          <!-- アクション -->
-          <div class="flex gap-2 ml-auto">
-            <Button
-              variant="outline"
-              @click="swapInputOutput">
-              <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
-              入れ替え
-            </Button>
-            <Button
-              variant="outline"
-              @click="pasteFromClipboard">
-              <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
-              貼り付け
-            </Button>
-            <label>
-              <input
-                type="file"
-                class="hidden"
-                @change="loadFile">
-              <Button variant="outline" as="span">
-                <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
-                ファイル
-              </Button>
-            </label>
-          </div>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          コントロールパネル
+        </h3>
+      </template>
+      <div class="flex flex-wrap items-center gap-4">
+        <!-- モード選択 -->
+        <div class="flex gap-2">
+          <UButton
+            v-for="m in ['encode', 'decode'] as const"
+            :key="m"
+            :variant="mode === m ? 'default' : 'outline'"
+            @click="mode = m; process()">
+            {{ m === 'encode' ? 'エンコード' : 'デコード' }}
+          </UButton>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- オプション -->
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              v-model="urlSafe"
+              type="checkbox"
+              class="rounded"
+              @change="process">
+            URLセーフ
+          </label>
+        </div>
+
+        <!-- アクション -->
+        <div class="flex gap-2 ml-auto">
+          <UButton
+            variant="outline"
+            @click="swapInputOutput">
+            <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
+            入れ替え
+          </UButton>
+          <UButton
+            variant="outline"
+            @click="pasteFromClipboard">
+            <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
+            貼り付け
+          </UButton>
+          <label>
+            <input
+              type="file"
+              class="hidden"
+              @change="loadFile">
+            <UButton variant="outline" as="span">
+              <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
+              ファイル
+            </UButton>
+          </label>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

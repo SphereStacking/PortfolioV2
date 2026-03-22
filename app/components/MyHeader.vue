@@ -1,28 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import MyNavigation from './project/MyNavigation.vue'
-import ColorModeDropdown from './modules/colorMode/ColorModeDropdown.vue'
-import ProfileLinksDropdown from './ProfileLinksDropdown.vue'
-import { useNavigation } from '~/composables/useNavigation'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
-
-// モバイルメニューの開閉状態
 const isOpen = ref(false)
-
-// コンポーザブルからナビゲーション設定を取得
 const { navigationCategories } = useNavigation()
 </script>
 
 <template>
   <header class="relative backdrop-blur-xs z-50">
     <!-- ヘッダー -->
-    <div class="h-16 sticky top-0 border-b border-zinc-800 dark:border-gray-200">
+    <div class="h-16 sticky top-0 border-b border-border">
       <div class="container h-full md:mx-auto px-2">
         <div class="flex items-center justify-between gap-3 h-full">
           <!-- 左側 -->
@@ -30,30 +14,27 @@ const { navigationCategories } = useNavigation()
             <AppMark />
           </div>
 
-          <!-- デスクトップナビゲーション（sm以上で表示） -->
-          <div class="hidden sm:flex items-center gap-3">
-            <MyNavigation />
-            <ColorModeDropdown />
+          <!-- デスクトップナビゲーション（lg以上で表示） -->
+          <div class="hidden lg:flex items-center gap-3">
+            <ProjectMyNavigation />
+            <ModulesColorModeDropdown />
             <ProfileLinksDropdown />
           </div>
 
-          <!-- モバイルメニュー（sm未満で表示） -->
-          <div class="sm:hidden">
-            <Sheet v-model:open="isOpen">
-              <SheetTrigger as-child>
-                <Button variant="ghost" size="icon">
-                  <Icon name="heroicons:bars-3" class="w-6 h-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="top" class="h-[100dvh] overflow-y-auto">
-                <SheetHeader>
-                  <div class="flex items-center justify-between">
-                    <SheetTitle class="flex items-center gap-2">
-                      <AppMark />
-                    </SheetTitle>
-                  </div>
-                </SheetHeader>
+          <!-- モバイルメニュー（lg未満で表示） -->
+          <div class="lg:hidden">
+            <USlideover v-model:open="isOpen" side="top" title="メニュー">
+              <UButton
+                variant="ghost" icon="i-heroicons-bars-3" size="md"
+                square />
 
+              <template #header>
+                <div class="flex items-center gap-2">
+                  <AppMark />
+                </div>
+              </template>
+
+              <template #body>
                 <!-- モバイルナビゲーション -->
                 <nav class="px-2">
                   <div v-for="category in navigationCategories" :key="category.name">
@@ -80,7 +61,7 @@ const { navigationCategories } = useNavigation()
                   <!-- カラーモード切り替え -->
                   <div class="flex items-center justify-between px-4">
                     <span class="text-sm font-medium">カラーモード</span>
-                    <ColorModeDropdown />
+                    <ModulesColorModeDropdown />
                   </div>
 
                   <!-- プロフィールリンク -->
@@ -89,8 +70,8 @@ const { navigationCategories } = useNavigation()
                     <ProfileLinksDropdown />
                   </div>
                 </div>
-              </SheetContent>
-            </Sheet>
+              </template>
+            </USlideover>
           </div>
         </div>
       </div>
@@ -98,6 +79,3 @@ const { navigationCategories } = useNavigation()
     <slot name="tools-footer"></slot>
   </header>
 </template>
-
-<style scoped>
-</style>

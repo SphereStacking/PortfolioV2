@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -33,10 +31,10 @@ const handleFileSelect = (event: Event) => {
 
   Array.from(files).forEach((file) => {
     if (!file.type.startsWith('image/')) {
-      toast({
+      toast.add({
         title: 'エラー',
         description: `${file.name}は画像ファイルではありません`,
-        variant: 'destructive',
+        color: 'error',
       })
       return
     }
@@ -257,7 +255,7 @@ const formatSize = (bytes: number) => {
 }
 
 // トースト通知
-const { toast } = useToast()
+const toast = useToast()
 
 // SEO設定
 useSeoMeta({
@@ -277,11 +275,13 @@ useSeoMeta({
       </p>
     </div>
     <div class="space-y-6 col-span-1">
-      <Card>
-        <CardHeader>
-          <CardTitle>圧縮設定</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            圧縮設定
+          </h3>
+        </template>
+        <div class="space-y-4">
           <!-- 品質 -->
           <div>
             <label class="text-sm font-medium mb-2 block">
@@ -304,7 +304,7 @@ useSeoMeta({
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="text-sm font-medium mb-2 block">最大幅</label>
-              <Input
+              <UInput
                 v-model.number="maxWidth"
                 type="number"
                 min="100"
@@ -313,7 +313,7 @@ useSeoMeta({
             </div>
             <div>
               <label class="text-sm font-medium mb-2 block">最大高さ</label>
-              <Input
+              <UInput
                 v-model.number="maxHeight"
                 type="number"
                 min="100"
@@ -350,15 +350,17 @@ useSeoMeta({
               </option>
             </select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- 統計情報 -->
-      <Card v-if="stats.totalImages > 0">
-        <CardHeader>
-          <CardTitle>統計情報</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-3">
+      <UCard v-if="stats.totalImages > 0">
+        <template #header>
+          <h3 class="font-semibold">
+            統計情報
+          </h3>
+        </template>
+        <div class="space-y-3">
           <div class="flex justify-between">
             <span class="text-sm text-muted-foreground">処理済み</span>
             <span class="text-sm font-medium">
@@ -379,34 +381,34 @@ useSeoMeta({
               -{{ formatSize(stats.savedBytes) }} ({{ stats.savedPercent.toFixed(1) }}%)
             </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- アクション -->
       <div class="space-y-2">
-        <Button
+        <UButton
           :disabled="images.length === 0 || isProcessing"
           class="w-full"
           @click="compressAll">
           <Icon name="heroicons:bolt" class="w-4 h-4 mr-2" />
           {{ isProcessing ? '処理中...' : 'すべて圧縮' }}
-        </Button>
-        <Button
+        </UButton>
+        <UButton
           :disabled="stats.completedImages === 0"
           variant="outline"
           class="w-full"
           @click="downloadAll">
           <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
           すべてダウンロード
-        </Button>
-        <Button
+        </UButton>
+        <UButton
           :disabled="images.length === 0"
           variant="outline"
           class="w-full"
           @click="clearAll">
           <Icon name="heroicons:x-mark" class="w-4 h-4 mr-2" />
           クリア
-        </Button>
+        </UButton>
       </div>
     </div>
 
@@ -435,9 +437,9 @@ useSeoMeta({
             accept="image/*"
             class="hidden"
             @change="handleFileSelect">
-          <Button as="span" variant="outline">
+          <UButton as="span" variant="outline">
             ファイルを選択
-          </Button>
+          </UButton>
         </label>
       </div>
 
@@ -489,25 +491,25 @@ useSeoMeta({
 
             <!-- アクション -->
             <div class="flex items-center gap-2">
-              <Button
+              <UButton
                 v-if="image.status === 'pending'"
                 size="sm"
                 @click="compressImage(image)">
                 圧縮
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 v-if="image.status === 'completed'"
                 size="sm"
                 variant="outline"
                 @click="downloadImage(image)">
                 <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="removeImage(image.id)">
                 <Icon name="heroicons:x-mark" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
           </div>
 

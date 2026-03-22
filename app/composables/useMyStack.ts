@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { refDebounced } from '@vueuse/core'
 import technologies from '~~/content/me/stack/technologies.json'
 import categories from '~~/content/me/stack/categories.json'
 import tags from '~~/content/me/stack/tags.json'
@@ -33,13 +33,10 @@ export const useMyStack = () => {
   const isLoading = ref(false)
 
   // 検索入力時の遅延処理
-  const debouncedSearch = ref(searchQuery.value)
-  watch(searchQuery, (newValue) => {
-    isLoading.value = true
-    setTimeout(() => {
-      debouncedSearch.value = newValue
-      isLoading.value = false
-    }, 300)
+  const debouncedSearch = refDebounced(searchQuery, 300)
+  const isDebouncing = computed(() => searchQuery.value !== debouncedSearch.value)
+  watch(isDebouncing, (value) => {
+    isLoading.value = value
   })
 
   // データ取得関数

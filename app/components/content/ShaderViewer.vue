@@ -66,7 +66,7 @@
               <Icon name="lucide:volume-2" class="h-6 w-6" />
             </button>
             <div class="w-0 group-hover/volume:w-20 overflow-hidden transition-all duration-200">
-              <Slider
+              <USlider
                 v-model="volumeValue"
                 :max="100"
                 :step="1"
@@ -83,62 +83,53 @@
         <!-- Right controls -->
         <div class="flex items-center gap-2">
           <!-- Settings -->
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <button class="text-white hover:text-white/80 transition-colors">
-                <Icon name="lucide:settings" class="h-6 w-6" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-48">
-              <DropdownMenuLabel>再生速度</DropdownMenuLabel>
-              <DropdownMenuRadioGroup v-model="playbackSpeed">
-                <DropdownMenuRadioItem value="0.25">
-                  0.25x
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="0.5">
-                  0.5x
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="1">
-                  標準
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="1.5">
-                  1.5x
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="2">
-                  2x
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>画質</DropdownMenuLabel>
-              <DropdownMenuRadioGroup v-model="quality">
-                <DropdownMenuRadioItem value="low">
-                  低画質 (360p)
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="medium">
-                  中画質 (720p)
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="high">
-                  高画質 (1080p)
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="auto">
-                  自動
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>FPS制限</DropdownMenuLabel>
-              <DropdownMenuRadioGroup v-model="targetFps">
-                <DropdownMenuRadioItem value="30">
-                  30 FPS
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="60">
-                  60 FPS
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="120">
-                  120 FPS
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UPopover>
+            <button class="text-white hover:text-white/80 transition-colors">
+              <Icon name="lucide:settings" class="h-6 w-6" />
+            </button>
+            <template #content>
+              <div class="w-48 p-3 space-y-3">
+                <div>
+                  <p class="text-xs font-semibold text-muted-foreground mb-1">
+                    再生速度
+                  </p>
+                  <URadioGroup
+                    v-model="playbackSpeed" :items="[
+                      { label: '0.25x', value: '0.25' },
+                      { label: '0.5x', value: '0.5' },
+                      { label: '標準', value: '1' },
+                      { label: '1.5x', value: '1.5' },
+                      { label: '2x', value: '2' },
+                    ]" />
+                </div>
+                <USeparator />
+                <div>
+                  <p class="text-xs font-semibold text-muted-foreground mb-1">
+                    画質
+                  </p>
+                  <URadioGroup
+                    v-model="quality" :items="[
+                      { label: '低画質 (360p)', value: 'low' },
+                      { label: '中画質 (720p)', value: 'medium' },
+                      { label: '高画質 (1080p)', value: 'high' },
+                      { label: '自動', value: 'auto' },
+                    ]" />
+                </div>
+                <USeparator />
+                <div>
+                  <p class="text-xs font-semibold text-muted-foreground mb-1">
+                    FPS制限
+                  </p>
+                  <URadioGroup
+                    v-model="targetFps" :items="[
+                      { label: '30 FPS', value: '30' },
+                      { label: '60 FPS', value: '60' },
+                      { label: '120 FPS', value: '120' },
+                    ]" />
+                </div>
+              </div>
+            </template>
+          </UPopover>
 
           <!-- Fullscreen -->
           <button
@@ -172,16 +163,6 @@
 
 <script setup lang="ts">
 import type { ShaderMetadata } from '~/data/shaderMetadata'
-import { Slider } from '~/components/ui/slider'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu'
 
 interface Props {
   shader: ShaderMetadata
@@ -1064,6 +1045,11 @@ function multiply(a: Float32Array, b: Float32Array): Float32Array {
   return result
 }
 
+// Fullscreen change handler (named function for proper cleanup)
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+}
+
 // Lifecycle
 onMounted(() => {
   initWebGL()
@@ -1071,17 +1057,13 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
 
   // Listen for fullscreen changes
-  document.addEventListener('fullscreenchange', () => {
-    isFullscreen.value = !!document.fullscreenElement
-  })
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
 })
 
 onUnmounted(() => {
   stopRenderLoop()
   window.removeEventListener('resize', handleResize)
-  document.removeEventListener('fullscreenchange', () => {
-    isFullscreen.value = !!document.fullscreenElement
-  })
+  document.removeEventListener('fullscreenchange', handleFullscreenChange)
 
   if (gl && program) {
     gl.deleteProgram(program)

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -137,7 +136,7 @@ const parseLogs = () => {
     parsedLogs.value = entries
     calculateStats(entries)
 
-    toast({
+    toast.add({
       description: `${entries.length}件のログエントリーを解析しました`,
     })
   }
@@ -319,20 +318,20 @@ const formatDate = (date: Date): string => {
 
 // クリップボード操作
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const _copyToClipboard = async (text: string) => {
   try {
     await copy(text)
-    toast({
+    toast.add({
       description: 'クリップボードにコピーしました',
     })
   }
   catch (err) {
     console.error('Failed to copy:', err)
-    toast({
+    toast.add({
       description: 'コピーに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -356,354 +355,373 @@ useSeoMeta({
     </div>
 
     <!-- ログフォーマット選択 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>ログフォーマット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-          <Button
-            v-for="(format, key) in logFormats"
-            :key="key"
-            :variant="logFormat === key ? 'default' : 'outline'"
-            size="sm"
-            @click="logFormat = key">
-            {{ format.name }}
-          </Button>
-        </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          ログフォーマット
+        </h3>
+      </template>
 
-        <div class="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            @click="loadSample('combined')">
-            Combinedサンプル
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            @click="loadSample('apache')">
-            Apacheサンプル
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+        <UButton
+          v-for="(format, key) in logFormats"
+          :key="key"
+          :variant="logFormat === key ? 'default' : 'outline'"
+          size="sm"
+          @click="logFormat = key">
+          {{ format.name }}
+        </UButton>
+      </div>
+
+      <div class="flex gap-2">
+        <UButton
+          variant="outline"
+          size="sm"
+          @click="loadSample('combined')">
+          Combinedサンプル
+        </UButton>
+        <UButton
+          variant="outline"
+          size="sm"
+          @click="loadSample('apache')">
+          Apacheサンプル
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- ログ入力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>ログデータ</CardTitle>
+          <h3 class="font-semibold">
+            ログデータ
+          </h3>
           <label>
             <input
               type="file"
               accept=".log,.txt"
               class="hidden"
               @change="handleFileUpload">
-            <Button variant="outline" size="sm" as="span">
+            <UButton variant="outline" size="sm" as="span">
               <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
               ファイル選択
-            </Button>
+            </UButton>
           </label>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <textarea
-            v-model="logData"
-            placeholder="ログデータを貼り付けるか、ファイルを選択してください&#10;例：&#10;192.168.1.1 - - [25/Dec/2023:10:00:23 +0000] &quot;GET /index.html HTTP/1.1&quot; 200 1043"
-            class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
-            spellcheck="false"></textarea>
+      </template>
 
-          <Alert v-if="error" variant="destructive">
-            <Icon name="heroicons:exclamation-circle" class="w-4 h-4" />
-            <AlertDescription>{{ error }}</AlertDescription>
-          </Alert>
+      <div class="space-y-4">
+        <textarea
+          v-model="logData"
+          placeholder="ログデータを貼り付けるか、ファイルを選択してください&#10;例：&#10;192.168.1.1 - - [25/Dec/2023:10:00:23 +0000] &quot;GET /index.html HTTP/1.1&quot; 200 1043"
+          class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-background resize-none"
+          spellcheck="false"></textarea>
 
-          <Button
-            class="w-full"
-            :disabled="!logData.trim()"
-            @click="parseLogs">
-            <Icon name="heroicons:chart-bar" class="w-4 h-4 mr-2" />
-            ログを解析
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        <UAlert
+          v-if="error" color="error" icon="heroicons:exclamation-circle"
+          :description="error" />
+
+        <UButton
+          class="w-full"
+          :disabled="!logData.trim()"
+          @click="parseLogs">
+          <Icon name="heroicons:chart-bar" class="w-4 h-4 mr-2" />
+          ログを解析
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- 統計情報 -->
     <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardContent class="p-6">
+      <UCard>
+        <div class="p-6">
           <div class="text-2xl font-bold">
             {{ stats.totalRequests.toLocaleString() }}
           </div>
           <p class="text-muted-foreground">
             総リクエスト数
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
-      <Card>
-        <CardContent class="p-6">
+      <UCard>
+        <div class="p-6">
           <div class="text-2xl font-bold">
             {{ stats.uniqueIPs.toLocaleString() }}
           </div>
           <p class="text-muted-foreground">
             ユニークIP数
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
-      <Card>
-        <CardContent class="p-6">
+      <UCard>
+        <div class="p-6">
           <div class="text-2xl font-bold">
             {{ stats.errors.length.toLocaleString() }}
           </div>
           <p class="text-muted-foreground">
             エラー数
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
-      <Card>
-        <CardContent class="p-6">
+      <UCard>
+        <div class="p-6">
           <div class="text-2xl font-bold">
             {{ (stats.avgResponseSize / 1024).toFixed(1) }}KB
           </div>
           <p class="text-muted-foreground">
             平均レスポンスサイズ
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <div v-if="stats" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- ステータスコード分析 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>ステータスコード分析</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            <div v-for="(count, status) in stats.statusCodes" :key="status" class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <Badge
-                  :variant="parseInt(status) >= 400 ? 'destructive' : parseInt(status) >= 300 ? 'secondary' : 'default'"
-                  class="w-12 justify-center">
-                  {{ status }}
-                </Badge>
-                <span class="text-sm">{{ getStatusDescription(parseInt(status)) }}</span>
-              </div>
-              <div class="text-sm font-medium">
-                {{ count.toLocaleString() }}
-                <span class="text-muted-foreground ml-1">
-                  ({{ ((count / stats.totalRequests) * 100).toFixed(1) }}%)
-                </span>
-              </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            ステータスコード分析
+          </h3>
+        </template>
+
+        <div class="space-y-3">
+          <div v-for="(count, status) in stats.statusCodes" :key="status" class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <UBadge
+                :variant="parseInt(status) >= 400 ? 'destructive' : parseInt(status) >= 300 ? 'secondary' : 'default'"
+                class="w-12 justify-center">
+                {{ status }}
+              </UBadge>
+              <span class="text-sm">{{ getStatusDescription(parseInt(status)) }}</span>
+            </div>
+            <div class="text-sm font-medium">
+              {{ count.toLocaleString() }}
+              <span class="text-muted-foreground ml-1">
+                ({{ ((count / stats.totalRequests) * 100).toFixed(1) }}%)
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- HTTPメソッド分析 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>HTTPメソッド分析</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            <div v-for="(count, method) in stats.methods" :key="method" class="flex items-center justify-between">
-              <Badge variant="outline" class="w-16 justify-center">
-                {{ method }}
-              </Badge>
-              <div class="text-sm font-medium">
-                {{ count.toLocaleString() }}
-                <span class="text-muted-foreground ml-1">
-                  ({{ ((count / stats.totalRequests) * 100).toFixed(1) }}%)
-                </span>
-              </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            HTTPメソッド分析
+          </h3>
+        </template>
+
+        <div class="space-y-3">
+          <div v-for="(count, method) in stats.methods" :key="method" class="flex items-center justify-between">
+            <UBadge variant="outline" class="w-16 justify-center">
+              {{ method }}
+            </UBadge>
+            <div class="text-sm font-medium">
+              {{ count.toLocaleString() }}
+              <span class="text-muted-foreground ml-1">
+                ({{ ((count / stats.totalRequests) * 100).toFixed(1) }}%)
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- 人気ページ -->
-      <Card>
-        <CardHeader>
-          <CardTitle>アクセス上位ページ</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <div v-for="(page, index) in stats.topPages" :key="page.url" class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
-                {{ index + 1 }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium truncate">
-                  {{ page.url }}
-                </p>
-                <p class="text-xs text-muted-foreground">
-                  {{ page.count.toLocaleString() }}回
-                </p>
-              </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            アクセス上位ページ
+          </h3>
+        </template>
+
+        <div class="space-y-2">
+          <div v-for="(page, index) in stats.topPages" :key="page.url" class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
+              {{ index + 1 }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">
+                {{ page.url }}
+              </p>
+              <p class="text-xs text-muted-foreground">
+                {{ page.count.toLocaleString() }}回
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- アクセス上位IP -->
-      <Card>
-        <CardHeader>
-          <CardTitle>アクセス上位IP</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-2">
-            <div v-for="(ip, index) in stats.topIPs" :key="ip.ip" class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
-                {{ index + 1 }}
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium font-mono">
-                  {{ ip.ip }}
-                </p>
-                <p class="text-xs text-muted-foreground">
-                  {{ ip.count.toLocaleString() }}回
-                </p>
-              </div>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            アクセス上位IP
+          </h3>
+        </template>
+
+        <div class="space-y-2">
+          <div v-for="(ip, index) in stats.topIPs" :key="ip.ip" class="flex items-center gap-3">
+            <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
+              {{ index + 1 }}
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium font-mono">
+                {{ ip.ip }}
+              </p>
+              <p class="text-xs text-muted-foreground">
+                {{ ip.count.toLocaleString() }}回
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- ログエントリー表示 -->
-    <Card v-if="parsedLogs.length > 0">
-      <CardHeader>
+    <UCard v-if="parsedLogs.length > 0">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>ログエントリー</CardTitle>
+          <h3 class="font-semibold">
+            ログエントリー
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               @click="exportStats">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-2" />
               統計エクスポート
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <!-- フィルター -->
-          <div class="flex flex-wrap gap-2">
-            <Button
-              v-for="filter in [
-                { key: 'all', label: '全て' },
-                { key: 'success', label: '成功のみ' },
-                { key: 'errors', label: 'エラーのみ' },
-              ]"
-              :key="filter.key"
-              :variant="filterBy === filter.key ? 'default' : 'outline'"
-              size="sm"
-              @click="filterBy = filter.key">
-              {{ filter.label }}
-            </Button>
+      </template>
 
-            <Input
-              v-model="searchTerm"
-              placeholder="IP、URL、メソッドで検索..."
-              class="w-64" />
-          </div>
+      <div class="space-y-4">
+        <!-- フィルター -->
+        <div class="flex flex-wrap gap-2">
+          <UButton
+            v-for="filter in [
+              { key: 'all', label: '全て' },
+              { key: 'success', label: '成功のみ' },
+              { key: 'errors', label: 'エラーのみ' },
+            ]"
+            :key="filter.key"
+            :variant="filterBy === filter.key ? 'default' : 'outline'"
+            size="sm"
+            @click="filterBy = filter.key">
+            {{ filter.label }}
+          </UButton>
 
-          <!-- ログテーブル -->
-          <div class="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>時刻</TableHead>
-                  <TableHead>IP</TableHead>
-                  <TableHead>メソッド</TableHead>
-                  <TableHead>URL</TableHead>
-                  <TableHead>ステータス</TableHead>
-                  <TableHead>サイズ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-for="(log, index) in filteredLogs" :key="index">
-                  <TableCell class="font-mono text-xs">
-                    {{ formatDate(log.timestamp) }}
-                  </TableCell>
-                  <TableCell class="font-mono text-sm">
-                    {{ log.ip }}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" size="sm">
-                      {{ log.method }}
-                    </Badge>
-                  </TableCell>
-                  <TableCell class="max-w-96 truncate">
-                    {{ log.url }}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      :variant="log.status >= 400 ? 'destructive' : log.status >= 300 ? 'secondary' : 'default'"
-                      size="sm">
-                      {{ log.status }}
-                    </Badge>
-                  </TableCell>
-                  <TableCell class="text-right">
-                    {{ log.size.toLocaleString() }}B
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-
-          <div v-if="filteredLogs.length === 1000" class="text-sm text-muted-foreground text-center">
-            表示は1000件までです。フィルターを使用して絞り込んでください。
-          </div>
+          <UInput
+            v-model="searchTerm"
+            placeholder="IP、URL、メソッドで検索..."
+            class="w-64" />
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- ログテーブル -->
+        <div class="overflow-x-auto">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  時刻
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  IP
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  メソッド
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  URL
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  ステータス
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  サイズ
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr v-for="(log, index) in filteredLogs" :key="index" class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono text-xs">
+                  {{ formatDate(log.timestamp) }}
+                </td>
+                <td class="p-2 align-middle font-mono text-sm">
+                  {{ log.ip }}
+                </td>
+                <td class="p-2 align-middle">
+                  <UBadge variant="outline" size="sm">
+                    {{ log.method }}
+                  </UBadge>
+                </td>
+                <td class="p-2 align-middle max-w-96 truncate">
+                  {{ log.url }}
+                </td>
+                <td class="p-2 align-middle">
+                  <UBadge
+                    :variant="log.status >= 400 ? 'destructive' : log.status >= 300 ? 'secondary' : 'default'"
+                    size="sm">
+                    {{ log.status }}
+                  </UBadge>
+                </td>
+                <td class="p-2 align-middle text-right">
+                  {{ log.size.toLocaleString() }}B
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="filteredLogs.length === 1000" class="text-sm text-muted-foreground text-center">
+          表示は1000件までです。フィルターを使用して絞り込んでください。
+        </div>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>対応ログフォーマット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Common Log Format
-            </h3>
-            <code class="text-xs bg-muted p-2 rounded block">
-              host ident authuser [date] "request" status size
-            </code>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Combined Log Format
-            </h3>
-            <code class="text-xs bg-muted p-2 rounded block">
-              host ident authuser [date] "request" status size "referer" "user-agent"
-            </code>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              機能
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>リクエスト数・ユニークIP数の集計</li>
-              <li>ステータスコード・HTTPメソッドの分析</li>
-              <li>人気ページ・アクセス元IPのランキング</li>
-              <li>エラーログの抽出</li>
-              <li>統計データのJSONエクスポート</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          対応ログフォーマット
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Common Log Format
+          </h3>
+          <code class="text-xs bg-muted p-2 rounded block">
+            host ident authuser [date] "request" status size
+          </code>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Combined Log Format
+          </h3>
+          <code class="text-xs bg-muted p-2 rounded block">
+            host ident authuser [date] "request" status size "referer" "user-agent"
+          </code>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            機能
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>リクエスト数・ユニークIP数の集計</li>
+            <li>ステータスコード・HTTPメソッドの分析</li>
+            <li>人気ページ・アクセス元IPのランキング</li>
+            <li>エラーログの抽出</li>
+            <li>統計データのJSONエクスポート</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

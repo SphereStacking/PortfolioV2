@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
 
 definePageMeta({
   layout: 'tools',
 })
 
 const { copy } = useClipboard()
-const { toast } = useToast()
+const toast = useToast()
 
 const jsonInput = ref('')
 const typeName = ref('MyInterface')
@@ -162,7 +159,7 @@ const copyOutput = async () => {
   if (!typeOutput.value) return
 
   await copy(typeOutput.value)
-  toast({
+  toast.add({
     title: 'コピーしました',
     description: 'TypeScript型定義をクリップボードにコピーしました',
   })
@@ -174,10 +171,10 @@ const formatJson = () => {
     jsonInput.value = JSON.stringify(parsed, null, 2)
   }
   catch {
-    toast({
+    toast.add({
       title: 'エラー',
       description: 'JSONのフォーマットに失敗しました',
-      variant: 'destructive',
+      color: 'error',
     })
   }
 }
@@ -286,33 +283,41 @@ useSeoMeta({
     </div>
 
     <!-- プリセットセクション -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>サンプルJSON</CardTitle>
-        <CardDescription>実際のユースケースに基づいたJSONサンプル</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="preset in jsonPresets"
-            :key="preset.label"
-            variant="outline"
-            size="sm"
-            @click="selectPreset(preset.value)">
-            {{ preset.label }}
-          </Button>
+    <UCard class="col-span-full">
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            サンプルJSON
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            実際のユースケースに基づいたJSONサンプル
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="preset in jsonPresets"
+          :key="preset.label"
+          variant="outline"
+          size="sm"
+          @click="selectPreset(preset.value)">
+          {{ preset.label }}
+        </UButton>
+      </div>
+    </UCard>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>JSON入力</CardTitle>
-        <CardDescription>
-          変換したいJSONデータを入力してください
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <UCard>
+      <template #header>
+        <div>
+          <h3 class="font-semibold">
+            JSON入力
+          </h3>
+          <p class="text-sm text-(--ui-text-muted)">
+            変換したいJSONデータを入力してください
+          </p>
+        </div>
+      </template>
+      <div class="space-y-4">
         <div class="space-y-2">
           <textarea
             v-model="jsonInput"
@@ -325,113 +330,115 @@ useSeoMeta({
         </div>
 
         <div class="flex gap-2">
-          <Button
+          <UButton
             variant="outline"
             size="sm"
             @click="formatJson">
             <Icon name="heroicons:code-bracket" class="w-4 h-4 mr-1" />
             整形
-          </Button>
-          <Button
+          </UButton>
+          <UButton
             variant="outline"
             size="sm"
             @click="clearAll">
             クリア
-          </Button>
+          </UButton>
         </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>オプション</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <div class="space-y-2">
-          <label class="text-sm font-medium">型名</label>
-          <Input
-            v-model="typeName"
-            placeholder="MyInterface"
-            @input="generateTypes" />
+      </div>
+      <template #footer>
+        <div class="space-y-4">
+          <h3 class="font-semibold">
+            オプション
+          </h3>
+          <div class="space-y-2">
+            <label class="text-sm font-medium">型名</label>
+            <UInput
+              v-model="typeName"
+              placeholder="MyInterface"
+              @input="generateTypes" />
+          </div>
+
+          <div class="space-y-3">
+            <label class="flex items-center gap-2">
+              <input
+                v-model="useInterface"
+                type="checkbox"
+                class="rounded"
+                @change="generateTypes">
+              <span class="text-sm">interface を使用（type の代わりに）</span>
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input
+                v-model="includeOptional"
+                type="checkbox"
+                class="rounded"
+                @change="generateTypes">
+              <span class="text-sm">配列内で欠けているプロパティをオプショナルにする</span>
+            </label>
+          </div>
         </div>
+      </template>
+    </UCard>
 
-        <div class="space-y-3">
-          <label class="flex items-center gap-2">
-            <input
-              v-model="useInterface"
-              type="checkbox"
-              class="rounded"
-              @change="generateTypes">
-            <span class="text-sm">interface を使用（type の代わりに）</span>
-          </label>
-
-          <label class="flex items-center gap-2">
-            <input
-              v-model="includeOptional"
-              type="checkbox"
-              class="rounded"
-              @change="generateTypes">
-            <span class="text-sm">配列内で欠けているプロパティをオプショナルにする</span>
-          </label>
-        </div>
-      </CardContent>
-    </Card>
-
-    <Card class="h-full">
-      <CardHeader>
+    <UCard class="h-full">
+      <template #header>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>TypeScript型定義</CardTitle>
-            <CardDescription>
+            <h3 class="font-semibold">
+              TypeScript型定義
+            </h3>
+            <p class="text-sm text-(--ui-text-muted)">
               生成された型定義
-            </CardDescription>
+            </p>
           </div>
-          <Button
+          <UButton
             v-if="typeOutput"
             size="sm"
             variant="outline"
             @click="copyOutput">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
             コピー
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <pre v-if="typeOutput" class="p-4 rounded-md bg-muted overflow-x-auto text-sm"><code>{{ typeOutput }}</code></pre>
-        <div v-else class="p-4 rounded-md bg-muted text-muted-foreground text-sm">
-          JSONを入力すると、ここにTypeScriptの型定義が表示されます
-        </div>
-      </CardContent>
-    </Card>
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>特徴</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ul class="grid md:grid-cols-2 gap-3 text-sm">
-          <li class="flex items-start gap-2">
-            <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
-            <span>ネストされたオブジェクトを個別のインターフェースに分割</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
-            <span>配列内のオブジェクトから共通の型を推論</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
-            <span>オプショナルプロパティの自動検出</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
-            <span>interface と type の切り替え可能</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
-            <span>export文を自動的に追加</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
-            <span>特殊なキー名（スペース含む）の適切な処理</span>
-          </li>
-        </ul>
-      </CardContent>
-    </Card>
+      </template>
+      <pre v-if="typeOutput" class="p-4 rounded-md bg-muted overflow-x-auto text-sm"><code>{{ typeOutput }}</code></pre>
+      <div v-else class="p-4 rounded-md bg-muted text-muted-foreground text-sm">
+        JSONを入力すると、ここにTypeScriptの型定義が表示されます
+      </div>
+    </UCard>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          特徴
+        </h3>
+      </template>
+      <ul class="grid md:grid-cols-2 gap-3 text-sm">
+        <li class="flex items-start gap-2">
+          <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
+          <span>ネストされたオブジェクトを個別のインターフェースに分割</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
+          <span>配列内のオブジェクトから共通の型を推論</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
+          <span>オプショナルプロパティの自動検出</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
+          <span>interface と type の切り替え可能</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
+          <span>export文を自動的に追加</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <Icon name="heroicons:check-circle" class="w-5 h-5 text-green-500 mt-0.5" />
+          <span>特殊なキー名（スペース含む）の適切な処理</span>
+        </li>
+      </ul>
+    </UCard>
   </div>
 </template>

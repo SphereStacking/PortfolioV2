@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
 import { useSeoMeta } from '#imports'
 
 definePageMeta({
@@ -153,7 +151,7 @@ const generateBlur = async () => {
     // 各形式で出力
     await generateOutputs()
 
-    toast({
+    toast.add({
       title: '生成完了',
       description: 'プレースホルダー画像を生成しました',
     })
@@ -161,10 +159,10 @@ const generateBlur = async () => {
   catch (err) {
     error.value = '画像の処理に失敗しました'
     console.error('Blur generation error:', err)
-    toast({
+    toast.add({
       title: 'エラー',
       description: error.value,
-      variant: 'destructive',
+      color: 'error',
     })
   }
   finally {
@@ -443,24 +441,8 @@ const loadSampleImage = async (url: string) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // ダウンロード
 const downloadImage = () => {
@@ -516,380 +498,378 @@ useSeoMeta({
     </div>
 
     <!-- 画像アップロード -->
-    <Card>
-      <CardHeader>
-        <CardTitle>画像選択</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div v-if="!originalImage">
-          <div
-            class="border-2 border-dashed rounded-lg p-8 text-center transition-colors mb-4"
-            :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
-            @drop="handleDrop"
-            @dragover="handleDragOver"
-            @dragleave="handleDragLeave">
-            <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p class="text-muted-foreground mb-2">
-              ドラッグ&ドロップまたはクリックして画像を選択
-            </p>
-            <p class="text-xs text-muted-foreground mb-4">
-              PNG、JPEG、WebP形式に対応
-            </p>
-            <label>
-              <input
-                type="file"
-                accept="image/*"
-                class="hidden"
-                @change="handleImageUpload">
-              <Button variant="outline" as="span">
-                画像を選択
-              </Button>
-            </label>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          画像選択
+        </h3>
+      </template>
 
-          <div class="flex gap-2">
-            <Button
-              v-for="sample in sampleImages"
-              :key="sample.name"
-              variant="outline"
-              size="sm"
-              @click="loadSampleImage(sample.url)">
-              {{ sample.name }}
-            </Button>
-          </div>
+      <div v-if="!originalImage">
+        <div
+          class="border-2 border-dashed rounded-lg p-8 text-center transition-colors mb-4"
+          :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
+          @drop="handleDrop"
+          @dragover="handleDragOver"
+          @dragleave="handleDragLeave">
+          <Icon name="heroicons:photo" class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p class="text-muted-foreground mb-2">
+            ドラッグ&ドロップまたはクリックして画像を選択
+          </p>
+          <p class="text-xs text-muted-foreground mb-4">
+            PNG、JPEG、WebP形式に対応
+          </p>
+          <label>
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleImageUpload">
+            <UButton variant="outline" as="span">
+              画像を選択
+            </UButton>
+          </label>
         </div>
 
-        <div v-else class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="text-sm text-muted-foreground">
-              <p>サイズ: {{ imageInfo.width }} × {{ imageInfo.height }}px</p>
-              <p>元のファイルサイズ: {{ formatFileSize(imageInfo.originalSize) }}</p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              @click="reset">
-              <Icon name="heroicons:x-mark" class="w-4 h-4 mr-2" />
-              クリア
-            </Button>
-          </div>
+        <div class="flex gap-2">
+          <UButton
+            v-for="sample in sampleImages"
+            :key="sample.name"
+            variant="outline"
+            size="sm"
+            @click="loadSampleImage(sample.url)">
+            {{ sample.name }}
+          </UButton>
+        </div>
+      </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="text-sm font-medium mb-2">
-                元画像
-              </p>
-              <img
-                :src="originalImage"
+      <div v-else class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-muted-foreground">
+            <p>サイズ: {{ imageInfo.width }} × {{ imageInfo.height }}px</p>
+            <p>元のファイルサイズ: {{ formatFileSize(imageInfo.originalSize) }}</p>
+          </div>
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="reset">
+            <Icon name="heroicons:x-mark" class="w-4 h-4 mr-2" />
+            クリア
+          </UButton>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm font-medium mb-2">
+              元画像
+            </p>
+            <img
+              :src="originalImage"
+              class="w-full h-auto rounded border"
+              alt="Original">
+          </div>
+          <div>
+            <p class="text-sm font-medium mb-2">
+              プレビュー
+            </p>
+            <div class="relative">
+              <canvas
+                ref="canvasRef"
                 class="w-full h-auto rounded border"
-                alt="Original">
-            </div>
-            <div>
-              <p class="text-sm font-medium mb-2">
-                プレビュー
-              </p>
-              <div class="relative">
-                <canvas
-                  ref="canvasRef"
-                  class="w-full h-auto rounded border"
-                  :style="{ maxWidth: '100%', height: 'auto' }"></canvas>
-                <div v-if="processing" class="absolute inset-0 flex items-center justify-center bg-background/80">
-                  <Icon name="heroicons:arrow-path" class="w-8 h-8 animate-spin" />
-                </div>
+                :style="{ maxWidth: '100%', height: 'auto' }"></canvas>
+              <div v-if="processing" class="absolute inset-0 flex items-center justify-center bg-background/80">
+                <Icon name="heroicons:arrow-path" class="w-8 h-8 animate-spin" />
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 設定 -->
-    <Card v-if="originalImage">
-      <CardHeader>
-        <CardTitle>ブラー設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-6">
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              ブラー強度: {{ blurRadius[0] }}px
-            </label>
-            <Slider
-              :model-value="blurRadius"
-              :min="0"
-              :max="50"
-              :step="1"
-              class="w-full"
-              @update:model-value="blurRadius = $event" />
-            <p class="text-xs text-muted-foreground mt-1">
-              値が大きいほどぼかしが強くなります
-            </p>
-          </div>
+    <UCard v-if="originalImage">
+      <template #header>
+        <h3 class="font-semibold">
+          ブラー設定
+        </h3>
+      </template>
 
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              画像サイズ: {{ imageScale[0] }}%
-            </label>
-            <Slider
-              :model-value="imageScale"
-              :min="1"
-              :max="50"
-              :step="1"
-              class="w-full"
-              @update:model-value="imageScale = $event" />
-            <p class="text-xs text-muted-foreground mt-1">
-              小さくするほどファイルサイズが削減されます
-            </p>
-          </div>
+      <div class="space-y-6">
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            ブラー強度: {{ blurRadius[0] }}px
+          </label>
+          <Slider
+            :model-value="blurRadius"
+            :min="0"
+            :max="50"
+            :step="1"
+            class="w-full"
+            @update:model-value="blurRadius = $event" />
+          <p class="text-xs text-muted-foreground mt-1">
+            値が大きいほどぼかしが強くなります
+          </p>
+        </div>
 
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            画像サイズ: {{ imageScale[0] }}%
+          </label>
+          <Slider
+            :model-value="imageScale"
+            :min="1"
+            :max="50"
+            :step="1"
+            class="w-full"
+            @update:model-value="imageScale = $event" />
+          <p class="text-xs text-muted-foreground mt-1">
+            小さくするほどファイルサイズが削減されます
+          </p>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            JPEG品質: {{ quality[0] }}%
+          </label>
+          <Slider
+            :model-value="quality"
+            :min="10"
+            :max="100"
+            :step="10"
+            class="w-full"
+            @update:model-value="quality = $event" />
+        </div>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">出力形式</label>
+          <div class="flex flex-wrap gap-2">
+            <UButton
+              v-for="format in [
+                { value: 'glassmorphism', label: 'Glass Morphism' },
+                { value: 'skeleton', label: 'Skeleton Screen' },
+                { value: 'base64', label: 'Base64画像' },
+                { value: 'css', label: 'CSS Blur' },
+                { value: 'blurhash', label: 'BlurHash' },
+              ]"
+              :key="format.value"
+              :variant="outputFormat === format.value ? 'default' : 'outline'"
+              size="sm"
+              @click="outputFormat = format.value">
+              {{ format.label }}
+            </UButton>
+          </div>
+        </div>
+
+        <!-- Glass Morphism専用設定 -->
+        <div v-if="outputFormat === 'glassmorphism'" class="space-y-4 pt-4 border-t">
           <div>
             <label class="text-sm font-medium mb-2 block">
-              JPEG品質: {{ quality[0] }}%
+              ガラスの透明度: {{ glassOpacity[0] }}%
             </label>
             <Slider
-              :model-value="quality"
+              :model-value="glassOpacity"
               :min="10"
-              :max="100"
+              :max="90"
               :step="10"
               class="w-full"
-              @update:model-value="quality = $event" />
+              @update:model-value="glassOpacity = $event" />
           </div>
-
           <div>
-            <label class="text-sm font-medium mb-2 block">出力形式</label>
-            <div class="flex flex-wrap gap-2">
-              <Button
-                v-for="format in [
-                  { value: 'glassmorphism', label: 'Glass Morphism' },
-                  { value: 'skeleton', label: 'Skeleton Screen' },
-                  { value: 'base64', label: 'Base64画像' },
-                  { value: 'css', label: 'CSS Blur' },
-                  { value: 'blurhash', label: 'BlurHash' },
-                ]"
-                :key="format.value"
-                :variant="outputFormat === format.value ? 'default' : 'outline'"
-                size="sm"
-                @click="outputFormat = format.value">
-                {{ format.label }}
-              </Button>
-            </div>
-          </div>
-
-          <!-- Glass Morphism専用設定 -->
-          <div v-if="outputFormat === 'glassmorphism'" class="space-y-4 pt-4 border-t">
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                ガラスの透明度: {{ glassOpacity[0] }}%
-              </label>
-              <Slider
-                :model-value="glassOpacity"
-                :min="10"
-                :max="90"
-                :step="10"
-                class="w-full"
-                @update:model-value="glassOpacity = $event" />
-            </div>
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                彩度: {{ glassSaturation[0] }}%
-              </label>
-              <Slider
-                :model-value="glassSaturation"
-                :min="50"
-                :max="200"
-                :step="10"
-                class="w-full"
-                @update:model-value="glassSaturation = $event" />
-            </div>
-          </div>
-
-          <!-- プレビューモード -->
-          <div class="pt-4 border-t">
-            <label class="text-sm font-medium mb-2 block">プレビューモード</label>
-            <div class="flex gap-2">
-              <Button
-                v-for="mode in [
-                  { value: 'overlay', label: 'オーバーレイ', icon: 'heroicons:squares-2x2' },
-                  { value: 'split', label: '分割表示', icon: 'heroicons:square-2-stack' },
-                  { value: 'separate', label: '個別表示', icon: 'heroicons:rectangle-group' },
-                ]"
-                :key="mode.value"
-                :variant="previewMode === mode.value ? 'default' : 'outline'"
-                size="sm"
-                @click="previewMode = mode.value">
-                <Icon :name="mode.icon" class="w-4 h-4 mr-2" />
-                {{ mode.label }}
-              </Button>
-            </div>
+            <label class="text-sm font-medium mb-2 block">
+              彩度: {{ glassSaturation[0] }}%
+            </label>
+            <Slider
+              :model-value="glassSaturation"
+              :min="50"
+              :max="200"
+              :step="10"
+              class="w-full"
+              @update:model-value="glassSaturation = $event" />
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <!-- プレビューモード -->
+        <div class="pt-4 border-t">
+          <label class="text-sm font-medium mb-2 block">プレビューモード</label>
+          <div class="flex gap-2">
+            <UButton
+              v-for="mode in [
+                { value: 'overlay', label: 'オーバーレイ', icon: 'heroicons:squares-2x2' },
+                { value: 'split', label: '分割表示', icon: 'heroicons:square-2-stack' },
+                { value: 'separate', label: '個別表示', icon: 'heroicons:rectangle-group' },
+              ]"
+              :key="mode.value"
+              :variant="previewMode === mode.value ? 'default' : 'outline'"
+              size="sm"
+              @click="previewMode = mode.value">
+              <Icon :name="mode.icon" class="w-4 h-4 mr-2" />
+              {{ mode.label }}
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </UCard>
 
     <!-- 出力結果 -->
-    <Card v-if="blurredImage && originalImage">
-      <CardHeader>
+    <UCard v-if="blurredImage && originalImage">
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>生成結果</CardTitle>
-          <Badge variant="outline">
+          <h3 class="font-semibold">
+            生成結果
+          </h3>
+          <UBadge variant="outline">
             {{ formatFileSize(outputSize) }}
-          </Badge>
+          </UBadge>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4">
-          <!-- Base64出力 -->
-          <div v-if="outputFormat === 'base64'" class="space-y-2">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium">
-                Base64 Data URL
-              </p>
-              <div class="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="copyToClipboard(blurredImage)">
-                  <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  @click="downloadImage">
-                  <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-            <textarea
-              :value="blurredImage"
-              readonly
-              class="w-full h-32 p-3 font-mono text-xs border rounded-md bg-muted resize-none"
-              spellcheck="false"></textarea>
-          </div>
+      </template>
 
-          <!-- BlurHash出力 -->
-          <div v-else-if="outputFormat === 'blurhash'" class="space-y-2">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium">
-                BlurHash文字列
-              </p>
-              <Button
+      <div class="space-y-4">
+        <!-- Base64出力 -->
+        <div v-if="outputFormat === 'base64'" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium">
+              Base64 Data URL
+            </p>
+            <div class="flex gap-2">
+              <UButton
                 size="sm"
                 variant="ghost"
-                @click="copyToClipboard(blurHash)">
+                @click="copyToClipboard(blurredImage)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
-            </div>
-            <Input
-              :value="blurHash"
-              readonly
-              class="font-mono" />
-            <Alert>
-              <Icon name="heroicons:information-circle" class="w-4 h-4" />
-              <AlertDescription>
-                BlurHashは実際のライブラリを使用して生成してください。
-                これはデモ用の固定値です。
-              </AlertDescription>
-            </Alert>
-          </div>
-
-          <!-- CSS出力 (Glass Morphism, Skeleton, CSS) -->
-          <div v-else-if="['css', 'glassmorphism', 'skeleton'].includes(outputFormat)" class="space-y-2">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium">
-                {{ outputFormat === 'glassmorphism' ? 'Glass Morphism CSS'
-                  : outputFormat === 'skeleton' ? 'Skeleton Screen CSS' : 'CSSコード' }}
-              </p>
-              <Button
+              </UButton>
+              <UButton
                 size="sm"
                 variant="ghost"
-                @click="copyToClipboard(cssCode)">
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+                @click="downloadImage">
+                <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
+              </UButton>
             </div>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssCode }}</code></pre>
+          </div>
+          <textarea
+            :value="blurredImage"
+            readonly
+            class="w-full h-32 p-3 font-mono text-xs border rounded-md bg-muted resize-none"
+            spellcheck="false"></textarea>
+        </div>
 
-            <!-- Glass Morphismのライブプレビュー -->
-            <div v-if="outputFormat === 'glassmorphism'" class="mt-4">
-              <p class="text-sm font-medium mb-2">
-                ライブプレビュー
-              </p>
+        <!-- BlurHash出力 -->
+        <div v-else-if="outputFormat === 'blurhash'" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium">
+              BlurHash文字列
+            </p>
+            <UButton
+              size="sm"
+              variant="ghost"
+              @click="copyToClipboard(blurHash)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
+          </div>
+          <UInput
+            :value="blurHash"
+            readonly
+            class="font-mono" />
+          <UAlert icon="heroicons:information-circle" description="BlurHashは実際のライブラリを使用して生成してください。 これはデモ用の固定値です。" />
+        </div>
+
+        <!-- CSS出力 (Glass Morphism, Skeleton, CSS) -->
+        <div v-else-if="['css', 'glassmorphism', 'skeleton'].includes(outputFormat)" class="space-y-2">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium">
+              {{ outputFormat === 'glassmorphism' ? 'Glass Morphism CSS'
+                : outputFormat === 'skeleton' ? 'Skeleton Screen CSS' : 'CSSコード' }}
+            </p>
+            <UButton
+              size="sm"
+              variant="ghost"
+              @click="copyToClipboard(cssCode)">
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+            </UButton>
+          </div>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ cssCode }}</code></pre>
+
+          <!-- Glass Morphismのライブプレビュー -->
+          <div v-if="outputFormat === 'glassmorphism'" class="mt-4">
+            <p class="text-sm font-medium mb-2">
+              ライブプレビュー
+            </p>
+            <div
+              class="relative h-64 rounded-lg overflow-hidden"
+              :style="{ backgroundImage: `url(${originalImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
               <div
-                class="relative h-64 rounded-lg overflow-hidden"
-                :style="{ backgroundImage: `url(${originalImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
-                <div
-                  class="absolute inset-4 p-4 rounded-lg"
-                  :style="{
-                    backdropFilter: `blur(${blurRadius[0]}px) saturate(${glassSaturation[0]}%)`,
-                    WebkitBackdropFilter: `blur(${blurRadius[0]}px) saturate(${glassSaturation[0]}%)`,
-                    backgroundColor: `rgba(255, 255, 255, ${glassOpacity[0] / 100})`,
-                    border: '1px solid rgba(255, 255, 255, 0.18)',
-                    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-                  }">
-                  <h3 class="text-lg font-semibold mb-2">
-                    Glass Morphism Card
-                  </h3>
-                  <p class="text-sm">
-                    この効果により、背景がぼやけて見えるモダンなUIを実現できます。
-                  </p>
-                </div>
+                class="absolute inset-4 p-4 rounded-lg"
+                :style="{
+                  backdropFilter: `blur(${blurRadius[0]}px) saturate(${glassSaturation[0]}%)`,
+                  WebkitBackdropFilter: `blur(${blurRadius[0]}px) saturate(${glassSaturation[0]}%)`,
+                  backgroundColor: `rgba(255, 255, 255, ${glassOpacity[0] / 100})`,
+                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                }">
+                <h3 class="text-lg font-semibold mb-2">
+                  Glass Morphism Card
+                </h3>
+                <p class="text-sm">
+                  この効果により、背景がぼやけて見えるモダンなUIを実現できます。
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </UCard>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>使い方ガイド</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Glass Morphism効果
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>モダンなUIデザインで人気のガラス効果</li>
-              <li>カード、モーダル、ナビゲーションに最適</li>
-              <li>backdrop-filterでパフォーマンスも優秀</li>
-              <li>iOS/macOSのようなUIを実現</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Skeleton Screen
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>コンテンツ読み込み中の表示に使用</li>
-              <li>実際のコンテンツレイアウトを模倣</li>
-              <li>ユーザーの待機体験を向上</li>
-              <li>パルスアニメーション付き</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              プレースホルダー画像
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>Base64:</strong> 小さな画像をHTMLに直接埋め込み</li>
-              <li><strong>BlurHash:</strong> 最小サイズ（数十バイト）で表現</li>
-              <li><strong>CSS Blur:</strong> 動的なブラー効果の適用</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              推奨設定
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>Glass Morphism:</strong> ブラー16-24px、透明度20-40%</li>
-              <li><strong>Skeleton:</strong> ブラー20-30px、画像サイズ10-20%</li>
-              <li><strong>プレースホルダー:</strong> 画像サイズ5-10%、品質60-80%</li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          使い方ガイド
+        </h3>
+      </template>
+
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Glass Morphism効果
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>モダンなUIデザインで人気のガラス効果</li>
+            <li>カード、モーダル、ナビゲーションに最適</li>
+            <li>backdrop-filterでパフォーマンスも優秀</li>
+            <li>iOS/macOSのようなUIを実現</li>
+          </ul>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Skeleton Screen
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>コンテンツ読み込み中の表示に使用</li>
+            <li>実際のコンテンツレイアウトを模倣</li>
+            <li>ユーザーの待機体験を向上</li>
+            <li>パルスアニメーション付き</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            プレースホルダー画像
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>Base64:</strong> 小さな画像をHTMLに直接埋め込み</li>
+            <li><strong>BlurHash:</strong> 最小サイズ（数十バイト）で表現</li>
+            <li><strong>CSS Blur:</strong> 動的なブラー効果の適用</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            推奨設定
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>Glass Morphism:</strong> ブラー16-24px、透明度20-40%</li>
+            <li><strong>Skeleton:</strong> ブラー20-30px、画像サイズ10-20%</li>
+            <li><strong>プレースホルダー:</strong> 画像サイズ5-10%、品質60-80%</li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

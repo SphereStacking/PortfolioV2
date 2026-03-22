@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -316,7 +313,7 @@ const escapeHtml = (text: string): string => {
 // プリセット適用
 const applyPreset = (preset: typeof presets[0]) => {
   Object.assign(ogData.value, preset.data)
-  toast({
+  toast.add({
     title: 'プリセット適用',
     description: `「${preset.name}」の設定を適用しました`,
   })
@@ -408,24 +405,8 @@ const loadSampleData = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // ダウンロード
 const downloadHtml = () => {
@@ -485,478 +466,473 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card>
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            variant="outline"
-            size="sm"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            @click="loadSampleData">
-            サンプルデータ
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            @click="reset">
-            リセット
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          variant="outline"
+          size="sm"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+        <UButton
+          variant="outline"
+          size="sm"
+          @click="loadSampleData">
+          サンプルデータ
+        </UButton>
+        <UButton
+          variant="ghost"
+          size="sm"
+          @click="reset">
+          リセット
+        </UButton>
+      </div>
+    </UCard>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- 入力フォーム -->
       <div class="space-y-6">
         <!-- 基本情報 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>基本情報</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              基本情報
+            </h3>
+          </template>
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              タイトル <span class="text-red-500">*</span>
+            </label>
+            <UInput
+              v-model="ogData.title"
+              placeholder="ページのタイトル"
+              maxlength="60" />
+            <p class="text-xs text-muted-foreground mt-1">
+              {{ ogData.title.length }}/60文字
+            </p>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">
+              説明文 <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              v-model="ogData.description"
+              placeholder="ページの説明文"
+              class="w-full min-h-[80px] p-3 text-sm border rounded-md bg-background resize-none"
+              maxlength="160"></textarea>
+            <p class="text-xs text-muted-foreground mt-1">
+              {{ ogData.description.length }}/160文字
+            </p>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">URL</label>
+            <UInput
+              v-model="ogData.url"
+              type="url"
+              placeholder="https://example.com/page" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">サイト名</label>
+            <UInput
+              v-model="ogData.siteName"
+              placeholder="サイトの名前" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="text-sm font-medium mb-2 block">
-                タイトル <span class="text-red-500">*</span>
-              </label>
-              <Input
-                v-model="ogData.title"
-                placeholder="ページのタイトル"
-                maxlength="60" />
-              <p class="text-xs text-muted-foreground mt-1">
-                {{ ogData.title.length }}/60文字
-              </p>
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">
-                説明文 <span class="text-red-500">*</span>
-              </label>
-              <textarea
-                v-model="ogData.description"
-                placeholder="ページの説明文"
-                class="w-full min-h-[80px] p-3 text-sm border rounded-md bg-background resize-none"
-                maxlength="160"></textarea>
-              <p class="text-xs text-muted-foreground mt-1">
-                {{ ogData.description.length }}/160文字
-              </p>
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">URL</label>
-              <Input
-                v-model="ogData.url"
-                type="url"
-                placeholder="https://example.com/page" />
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">サイト名</label>
-              <Input
-                v-model="ogData.siteName"
-                placeholder="サイトの名前" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-medium mb-2 block">タイプ</label>
-                <select
-                  v-model="ogData.type"
-                  class="w-full px-3 py-2 border rounded-md bg-background">
-                  <option v-for="type in ogTypes" :key="type.value" :value="type.value">
-                    {{ type.label }}
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">言語</label>
-                <select
-                  v-model="ogData.locale"
-                  class="w-full px-3 py-2 border rounded-md bg-background">
-                  <option v-for="locale in locales" :key="locale.value" :value="locale.value">
-                    {{ locale.label }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <!-- 画像設定 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>画像設定</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">画像URL</label>
-              <div class="space-y-2">
-                <Input
-                  v-model="ogData.image"
-                  placeholder="https://example.com/image.jpg" />
-                <label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handleImageUpload">
-                  <Button variant="outline" size="sm" as="span">
-                    <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
-                    画像をアップロード
-                  </Button>
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <label class="text-sm font-medium mb-2 block">画像の代替テキスト</label>
-              <Input
-                v-model="ogData.imageAlt"
-                placeholder="画像の説明" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-medium mb-2 block">幅 (px)</label>
-                <Input
-                  v-model="ogData.imageWidth"
-                  type="number"
-                  placeholder="1200" />
-              </div>
-              <div>
-                <label class="text-sm font-medium mb-2 block">高さ (px)</label>
-                <Input
-                  v-model="ogData.imageHeight"
-                  type="number"
-                  placeholder="630" />
-              </div>
-            </div>
-
-            <Alert>
-              <Icon name="heroicons:information-circle" class="w-4 h-4" />
-              <AlertDescription>
-                推奨サイズ: 1200×630px（1.91:1）
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-
-        <!-- Twitter Card -->
-        <Card>
-          <CardHeader>
-            <CardTitle>Twitter Card設定</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div>
-              <label class="text-sm font-medium mb-2 block">カードタイプ</label>
+              <label class="text-sm font-medium mb-2 block">タイプ</label>
               <select
-                v-model="ogData.twitterCard"
+                v-model="ogData.type"
                 class="w-full px-3 py-2 border rounded-md bg-background">
-                <option v-for="type in twitterCardTypes" :key="type.value" :value="type.value">
+                <option v-for="type in ogTypes" :key="type.value" :value="type.value">
                   {{ type.label }}
                 </option>
               </select>
             </div>
 
             <div>
-              <label class="text-sm font-medium mb-2 block">サイトのTwitterアカウント</label>
-              <Input
-                v-model="ogData.twitterSite"
-                placeholder="@username" />
+              <label class="text-sm font-medium mb-2 block">言語</label>
+              <select
+                v-model="ogData.locale"
+                class="w-full px-3 py-2 border rounded-md bg-background">
+                <option v-for="locale in locales" :key="locale.value" :value="locale.value">
+                  {{ locale.label }}
+                </option>
+              </select>
             </div>
+          </div>
+        </UCard>
 
-            <div>
-              <label class="text-sm font-medium mb-2 block">作者のTwitterアカウント</label>
-              <Input
-                v-model="ogData.twitterCreator"
-                placeholder="@username" />
+        <!-- 画像設定 -->
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              画像設定
+            </h3>
+          </template>
+          <div>
+            <label class="text-sm font-medium mb-2 block">画像URL</label>
+            <div class="space-y-2">
+              <UInput
+                v-model="ogData.image"
+                placeholder="https://example.com/image.jpg" />
+              <label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleImageUpload">
+                <UButton variant="outline" size="sm" as="span">
+                  <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
+                  画像をアップロード
+                </UButton>
+              </label>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">画像の代替テキスト</label>
+            <UInput
+              v-model="ogData.imageAlt"
+              placeholder="画像の説明" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium mb-2 block">幅 (px)</label>
+              <UInput
+                v-model="ogData.imageWidth"
+                type="number"
+                placeholder="1200" />
+            </div>
+            <div>
+              <label class="text-sm font-medium mb-2 block">高さ (px)</label>
+              <UInput
+                v-model="ogData.imageHeight"
+                type="number"
+                placeholder="630" />
+            </div>
+          </div>
+
+          <UAlert icon="heroicons:information-circle" description="推奨サイズ: 1200×630px（1.91:1）" />
+        </UCard>
+
+        <!-- Twitter Card -->
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              Twitter Card設定
+            </h3>
+          </template>
+          <div>
+            <label class="text-sm font-medium mb-2 block">カードタイプ</label>
+            <select
+              v-model="ogData.twitterCard"
+              class="w-full px-3 py-2 border rounded-md bg-background">
+              <option v-for="type in twitterCardTypes" :key="type.value" :value="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">サイトのTwitterアカウント</label>
+            <UInput
+              v-model="ogData.twitterSite"
+              placeholder="@username" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">作者のTwitterアカウント</label>
+            <UInput
+              v-model="ogData.twitterCreator"
+              placeholder="@username" />
+          </div>
+        </UCard>
 
         <!-- 追加設定 -->
-        <Card>
-          <CardHeader>
-            <CardTitle>追加設定</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              追加設定
+            </h3>
+          </template>
+          <div>
+            <label class="text-sm font-medium mb-2 block">作者名</label>
+            <UInput
+              v-model="ogData.author"
+              placeholder="記事の作者" />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">キーワード</label>
+            <UInput
+              v-model="ogData.keywords"
+              placeholder="キーワード1, キーワード2, ..." />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium mb-2 block">テーマカラー</label>
+            <div class="flex gap-2">
+              <input
+                v-model="ogData.themeColor"
+                type="color"
+                class="w-10 h-10 rounded cursor-pointer">
+              <UInput
+                v-model="ogData.themeColor"
+                type="text"
+                class="font-mono" />
+            </div>
+          </div>
+
+          <!-- Article固有の設定 -->
+          <template v-if="ogData.type === 'article'">
             <div>
-              <label class="text-sm font-medium mb-2 block">作者名</label>
-              <Input
-                v-model="ogData.author"
-                placeholder="記事の作者" />
+              <label class="text-sm font-medium mb-2 block">公開日時</label>
+              <UInput
+                v-model="ogData.publishedTime"
+                type="datetime-local" />
             </div>
 
             <div>
-              <label class="text-sm font-medium mb-2 block">キーワード</label>
-              <Input
-                v-model="ogData.keywords"
-                placeholder="キーワード1, キーワード2, ..." />
+              <label class="text-sm font-medium mb-2 block">更新日時</label>
+              <UInput
+                v-model="ogData.modifiedTime"
+                type="datetime-local" />
             </div>
 
             <div>
-              <label class="text-sm font-medium mb-2 block">テーマカラー</label>
-              <div class="flex gap-2">
-                <input
-                  v-model="ogData.themeColor"
-                  type="color"
-                  class="w-10 h-10 rounded cursor-pointer">
-                <Input
-                  v-model="ogData.themeColor"
-                  type="text"
-                  class="font-mono" />
-              </div>
+              <label class="text-sm font-medium mb-2 block">セクション</label>
+              <UInput
+                v-model="ogData.section"
+                placeholder="Technology" />
             </div>
 
-            <!-- Article固有の設定 -->
-            <template v-if="ogData.type === 'article'">
-              <div>
-                <label class="text-sm font-medium mb-2 block">公開日時</label>
-                <Input
-                  v-model="ogData.publishedTime"
-                  type="datetime-local" />
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">更新日時</label>
-                <Input
-                  v-model="ogData.modifiedTime"
-                  type="datetime-local" />
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">セクション</label>
-                <Input
-                  v-model="ogData.section"
-                  placeholder="Technology" />
-              </div>
-
-              <div>
-                <label class="text-sm font-medium mb-2 block">タグ（カンマ区切り）</label>
-                <Input
-                  v-model="ogData.tags"
-                  placeholder="タグ1, タグ2, ..." />
-              </div>
-            </template>
-          </CardContent>
-        </Card>
+            <div>
+              <label class="text-sm font-medium mb-2 block">タグ（カンマ区切り）</label>
+              <UInput
+                v-model="ogData.tags"
+                placeholder="タグ1, タグ2, ..." />
+            </div>
+          </template>
+        </UCard>
       </div>
 
       <!-- プレビューと出力 -->
       <div class="space-y-6">
         <!-- 検証結果 -->
-        <Alert v-if="validationWarnings.length > 0" variant="destructive">
-          <Icon name="heroicons:exclamation-triangle" class="w-4 h-4" />
-          <AlertTitle>検証結果</AlertTitle>
-          <AlertDescription>
+        <UAlert
+          v-if="validationWarnings.length > 0" color="error" icon="heroicons:exclamation-triangle"
+          title="検証結果">
+          <template #description>
             <ul class="list-disc list-inside mt-2">
               <li v-for="warning in validationWarnings" :key="warning">
                 {{ warning }}
               </li>
             </ul>
-          </AlertDescription>
-        </Alert>
+          </template>
+        </UAlert>
 
         <!-- プレビュー -->
-        <Card>
-          <CardHeader>
-            <CardTitle>プレビュー</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              <!-- OGプレビュー -->
-              <div>
-                <p class="text-sm font-medium mb-2">
-                  Facebook / 一般的なSNS
-                </p>
-                <div class="border rounded-md overflow-hidden max-w-md">
-                  <div
-                    v-if="ogData.image"
-                    class="aspect-video bg-muted flex items-center justify-center">
-                    <img
-                      :src="ogData.image"
-                      :alt="ogData.imageAlt"
-                      class="w-full h-full object-cover">
-                  </div>
-                  <div v-else class="aspect-video bg-muted flex items-center justify-center">
-                    <Icon name="heroicons:photo" class="w-12 h-12 text-muted-foreground" />
-                  </div>
-                  <div class="p-3 space-y-1">
-                    <p class="text-xs text-muted-foreground uppercase">
-                      {{ ogData.siteName || 'example.com' }}
-                    </p>
-                    <h3 class="font-semibold line-clamp-2">
-                      {{ ogData.title || 'ページタイトル' }}
-                    </h3>
-                    <p class="text-sm text-muted-foreground line-clamp-2">
-                      {{ ogData.description || 'ページの説明文がここに表示されます' }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Twitterプレビュー -->
-              <div>
-                <p class="text-sm font-medium mb-2">
-                  Twitter
-                </p>
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold">
+              プレビュー
+            </h3>
+          </template>
+          <div class="space-y-4">
+            <!-- OGプレビュー -->
+            <div>
+              <p class="text-sm font-medium mb-2">
+                Facebook / 一般的なSNS
+              </p>
+              <div class="border rounded-md overflow-hidden max-w-md">
                 <div
-                  class="border rounded-2xl overflow-hidden max-w-md"
-                  :class="{
-                    flex: ogData.twitterCard === 'summary',
-                  }">
-                  <div
-                    v-if="ogData.image"
-                    :class="{
-                      'aspect-video': ogData.twitterCard === 'summary_large_image',
-                      'w-32 h-32 flex-shrink-0': ogData.twitterCard === 'summary',
-                    }"
-                    class="bg-muted flex items-center justify-center">
-                    <img
-                      :src="ogData.image"
-                      :alt="ogData.imageAlt"
-                      class="w-full h-full object-cover">
-                  </div>
-                  <div
-                    v-else
-                    :class="{
-                      'aspect-video': ogData.twitterCard === 'summary_large_image',
-                      'w-32 h-32 flex-shrink-0': ogData.twitterCard === 'summary',
-                    }"
-                    class="bg-muted flex items-center justify-center">
-                    <Icon name="heroicons:photo" class="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <div class="p-3 space-y-1">
-                    <h3 class="font-semibold line-clamp-2">
-                      {{ ogData.title || 'ページタイトル' }}
-                    </h3>
-                    <p class="text-sm text-muted-foreground line-clamp-2">
-                      {{ ogData.description || 'ページの説明文' }}
-                    </p>
-                    <p class="text-xs text-muted-foreground">
-                      {{ ogData.url || 'example.com' }}
-                    </p>
-                  </div>
+                  v-if="ogData.image"
+                  class="aspect-video bg-muted flex items-center justify-center">
+                  <img
+                    :src="ogData.image"
+                    :alt="ogData.imageAlt"
+                    class="w-full h-full object-cover">
+                </div>
+                <div v-else class="aspect-video bg-muted flex items-center justify-center">
+                  <Icon name="heroicons:photo" class="w-12 h-12 text-muted-foreground" />
+                </div>
+                <div class="p-3 space-y-1">
+                  <p class="text-xs text-muted-foreground uppercase">
+                    {{ ogData.siteName || 'example.com' }}
+                  </p>
+                  <h3 class="font-semibold line-clamp-2">
+                    {{ ogData.title || 'ページタイトル' }}
+                  </h3>
+                  <p class="text-sm text-muted-foreground line-clamp-2">
+                    {{ ogData.description || 'ページの説明文がここに表示されます' }}
+                  </p>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <!-- Twitterプレビュー -->
+            <div>
+              <p class="text-sm font-medium mb-2">
+                Twitter
+              </p>
+              <div
+                class="border rounded-2xl overflow-hidden max-w-md"
+                :class="{
+                  flex: ogData.twitterCard === 'summary',
+                }">
+                <div
+                  v-if="ogData.image"
+                  :class="{
+                    'aspect-video': ogData.twitterCard === 'summary_large_image',
+                    'w-32 h-32 flex-shrink-0': ogData.twitterCard === 'summary',
+                  }"
+                  class="bg-muted flex items-center justify-center">
+                  <img
+                    :src="ogData.image"
+                    :alt="ogData.imageAlt"
+                    class="w-full h-full object-cover">
+                </div>
+                <div
+                  v-else
+                  :class="{
+                    'aspect-video': ogData.twitterCard === 'summary_large_image',
+                    'w-32 h-32 flex-shrink-0': ogData.twitterCard === 'summary',
+                  }"
+                  class="bg-muted flex items-center justify-center">
+                  <Icon name="heroicons:photo" class="w-8 h-8 text-muted-foreground" />
+                </div>
+                <div class="p-3 space-y-1">
+                  <h3 class="font-semibold line-clamp-2">
+                    {{ ogData.title || 'ページタイトル' }}
+                  </h3>
+                  <p class="text-sm text-muted-foreground line-clamp-2">
+                    {{ ogData.description || 'ページの説明文' }}
+                  </p>
+                  <p class="text-xs text-muted-foreground">
+                    {{ ogData.url || 'example.com' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
 
         <!-- 生成されたタグ -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>生成されたタグ</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                生成されたタグ
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(generatedTags.join('\n'))">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedTags.join('\n') }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ generatedTags.join('\n') }}</code></pre>
+        </UCard>
 
         <!-- 構造化データ -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>構造化データ (JSON-LD)</CardTitle>
-              <Button
+              <h3 class="font-semibold">
+                構造化データ (JSON-LD)
+              </h3>
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(structuredData)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ structuredData }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm"><code>{{ structuredData }}</code></pre>
+        </UCard>
 
         <!-- 完全なHTML -->
-        <Card>
-          <CardHeader>
+        <UCard>
+          <template #header>
             <div class="flex items-center justify-between">
-              <CardTitle>完全なHTML</CardTitle>
+              <h3 class="font-semibold">
+                完全なHTML
+              </h3>
               <div class="flex gap-2">
-                <Button
+                <UButton
                   size="sm"
                   variant="ghost"
                   @click="copyToClipboard(fullHtmlHead)">
                   <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                </Button>
-                <Button
+                </UButton>
+                <UButton
                   size="sm"
                   variant="ghost"
                   @click="downloadHtml">
                   <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-                </Button>
+                </UButton>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm max-h-96"><code>{{ fullHtmlHead }}</code></pre>
-          </CardContent>
-        </Card>
+          </template>
+          <pre class="p-3 bg-muted rounded-md overflow-x-auto text-sm max-h-96"><code>{{ fullHtmlHead }}</code></pre>
+        </UCard>
       </div>
     </div>
 
     <!-- 説明 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>OGタグについて</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-4 text-muted-foreground">
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              Open Graphとは
-            </h3>
-            <p>
-              Open Graph Protocol（OGP）は、ウェブページがSNSでシェアされた際の表示を制御するメタデータです。
-              Facebook、LinkedIn、Slackなど多くのサービスで利用されています。
-            </p>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              推奨事項
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li>画像は1200×630pxが最適（最小600×315px）</li>
-              <li>タイトルは60文字以内</li>
-              <li>説明文は160文字以内</li>
-              <li>画像ファイルサイズは8MB以下</li>
-              <li>HTTPSのURLを使用</li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="font-semibold text-foreground mb-2">
-              デバッグツール
-            </h3>
-            <ul class="list-disc list-inside space-y-1">
-              <li><a href="https://developers.facebook.com/tools/debug/" target="_blank" class="text-primary hover:underline">Facebook Sharing Debugger</a></li>
-              <li><a href="https://cards-dev.twitter.com/validator" target="_blank" class="text-primary hover:underline">Twitter Card Validator</a></li>
-              <li><a href="https://www.linkedin.com/post-inspector/" target="_blank" class="text-primary hover:underline">LinkedIn Post Inspector</a></li>
-            </ul>
-          </div>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          OGタグについて
+        </h3>
+      </template>
+      <div class="space-y-4 text-muted-foreground">
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            Open Graphとは
+          </h3>
+          <p>
+            Open Graph Protocol（OGP）は、ウェブページがSNSでシェアされた際の表示を制御するメタデータです。
+            Facebook、LinkedIn、Slackなど多くのサービスで利用されています。
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            推奨事項
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>画像は1200×630pxが最適（最小600×315px）</li>
+            <li>タイトルは60文字以内</li>
+            <li>説明文は160文字以内</li>
+            <li>画像ファイルサイズは8MB以下</li>
+            <li>HTTPSのURLを使用</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-foreground mb-2">
+            デバッグツール
+          </h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><a href="https://developers.facebook.com/tools/debug/" target="_blank" class="text-primary hover:underline">Facebook Sharing Debugger</a></li>
+            <li><a href="https://cards-dev.twitter.com/validator" target="_blank" class="text-primary hover:underline">Twitter Card Validator</a></li>
+            <li><a href="https://www.linkedin.com/post-inspector/" target="_blank" class="text-primary hover:underline">LinkedIn Post Inspector</a></li>
+          </ul>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>

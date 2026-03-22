@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -164,24 +161,7 @@ const loadFile = (event: Event) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプルテーブル
 const sampleTables = [
@@ -257,106 +237,108 @@ useSeoMeta({
     </div>
 
     <!-- サンプル -->
-    <Card>
-      <CardHeader>
-        <CardTitle>サンプルテーブル</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="sample in sampleTables"
-            :key="sample.name"
-            variant="outline"
-            size="sm"
-            @click="loadSample(sample)">
-            {{ sample.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          サンプルテーブル
+        </h3>
+      </template>
+      <div class="flex flex-wrap gap-2">
+        <UButton
+          v-for="sample in sampleTables"
+          :key="sample.name"
+          variant="outline"
+          size="sm"
+          @click="loadSample(sample)">
+          {{ sample.name }}
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- テーブル設定 -->
-    <Card>
-      <CardHeader>
-        <CardTitle>テーブル設定</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              行数: {{ rows }}
-            </label>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" @click="removeRow">
-                <Icon name="heroicons:minus" class="w-4 h-4" />
-              </Button>
-              <Slider
-                v-model="rowsArray"
-                :min="1"
-                :max="20"
-                :step="1"
-                class="flex-1" />
-              <Button size="sm" variant="outline" @click="addRow">
-                <Icon name="heroicons:plus" class="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium mb-2 block">
-              列数: {{ columns }}
-            </label>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" @click="removeColumn">
-                <Icon name="heroicons:minus" class="w-4 h-4" />
-              </Button>
-              <Slider
-                v-model="columnsArray"
-                :min="1"
-                :max="10"
-                :step="1"
-                class="flex-1" />
-              <Button size="sm" variant="outline" @click="addColumn">
-                <Icon name="heroicons:plus" class="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium mb-2 block">配置</label>
-            <div class="flex gap-1">
-              <Button
-                v-for="align in ['left', 'center', 'right'] as const"
-                :key="align"
-                size="sm"
-                :variant="alignment === align ? 'default' : 'outline'"
-                @click="alignment = align">
-                <Icon
-                  :name="`heroicons:bars-3-${align === 'left' ? 'bottom-left' : align === 'center' ? '' : 'bottom-right'}`"
-                  class="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-sm font-medium mb-2 block">オプション</label>
-            <label class="flex items-center gap-2 text-sm">
-              <input
-                v-model="hasHeader"
-                type="checkbox"
-                class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
-              ヘッダー行
-            </label>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          テーブル設定
+        </h3>
+      </template>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            行数: {{ rows }}
+          </label>
+          <div class="flex gap-2">
+            <UButton size="sm" variant="outline" @click="removeRow">
+              <Icon name="heroicons:minus" class="w-4 h-4" />
+            </UButton>
+            <Slider
+              v-model="rowsArray"
+              :min="1"
+              :max="20"
+              :step="1"
+              class="flex-1" />
+            <UButton size="sm" variant="outline" @click="addRow">
+              <Icon name="heroicons:plus" class="w-4 h-4" />
+            </UButton>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">
+            列数: {{ columns }}
+          </label>
+          <div class="flex gap-2">
+            <UButton size="sm" variant="outline" @click="removeColumn">
+              <Icon name="heroicons:minus" class="w-4 h-4" />
+            </UButton>
+            <Slider
+              v-model="columnsArray"
+              :min="1"
+              :max="10"
+              :step="1"
+              class="flex-1" />
+            <UButton size="sm" variant="outline" @click="addColumn">
+              <Icon name="heroicons:plus" class="w-4 h-4" />
+            </UButton>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">配置</label>
+          <div class="flex gap-1">
+            <UButton
+              v-for="align in ['left', 'center', 'right'] as const"
+              :key="align"
+              size="sm"
+              :variant="alignment === align ? 'default' : 'outline'"
+              @click="alignment = align">
+              <Icon
+                :name="`heroicons:bars-3-${align === 'left' ? 'bottom-left' : align === 'center' ? '' : 'bottom-right'}`"
+                class="w-4 h-4" />
+            </UButton>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium mb-2 block">オプション</label>
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              v-model="hasHeader"
+              type="checkbox"
+              class="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary focus:ring-offset-0">
+            ヘッダー行
+          </label>
+        </div>
+      </div>
+    </UCard>
 
     <!-- テーブルエディタ -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>テーブルエディタ</CardTitle>
+          <h3 class="font-semibold">
+            テーブルエディタ
+          </h3>
           <div class="flex gap-2">
             <label>
               <input
@@ -364,82 +346,80 @@ useSeoMeta({
                 accept=".csv"
                 class="hidden"
                 @change="loadFile">
-              <Button variant="outline" size="sm" as="span">
+              <UButton variant="outline" size="sm" as="span">
                 <Icon name="heroicons:arrow-up-tray" class="w-4 h-4 mr-2" />
                 CSVインポート
-              </Button>
+              </UButton>
             </label>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div class="overflow-x-auto">
-          <table class="w-full border-collapse">
-            <tbody>
-              <tr v-for="(row, rowIndex) in tableData" :key="rowIndex">
-                <td
-                  v-for="(cell, colIndex) in row"
-                  :key="colIndex"
-                  class="border p-1">
-                  <input
-                    v-model="tableData[rowIndex][colIndex]"
-                    type="text"
-                    class="w-full px-2 py-1 text-sm bg-transparent focus:outline-none focus:ring-1 focus:ring-primary"
-                    :class="{ 'font-semibold': hasHeader && rowIndex === 0 }"
-                    :placeholder="`${hasHeader && rowIndex === 0 ? 'ヘッダー' : 'セル'}${rowIndex}-${colIndex}`">
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+      </template>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <tbody>
+            <tr v-for="(row, rowIndex) in tableData" :key="rowIndex">
+              <td
+                v-for="(cell, colIndex) in row"
+                :key="colIndex"
+                class="border p-1">
+                <input
+                  v-model="tableData[rowIndex][colIndex]"
+                  type="text"
+                  class="w-full px-2 py-1 text-sm bg-transparent focus:outline-none focus:ring-1 focus:ring-primary"
+                  :class="{ 'font-semibold': hasHeader && rowIndex === 0 }"
+                  :placeholder="`${hasHeader && rowIndex === 0 ? 'ヘッダー' : 'セル'}${rowIndex}-${colIndex}`">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </UCard>
 
     <!-- Markdown出力 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>Markdown出力</CardTitle>
-          <Button
+          <h3 class="font-semibold">
+            Markdown出力
+          </h3>
+          <UButton
             size="sm"
             variant="ghost"
             @click="copyToClipboard(generateMarkdown)">
             <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-          </Button>
+          </UButton>
         </div>
-      </CardHeader>
-      <CardContent>
-        <textarea
-          :value="generateMarkdown"
-          readonly
-          class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
-          spellcheck="false"></textarea>
-      </CardContent>
-    </Card>
+      </template>
+      <textarea
+        :value="generateMarkdown"
+        readonly
+        class="w-full h-48 p-3 font-mono text-sm border rounded-md bg-muted resize-none"
+        spellcheck="false"></textarea>
+    </UCard>
 
     <!-- プレビュー -->
-    <Card>
-      <CardHeader>
-        <CardTitle>プレビュー</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader v-if="hasHeader">
-            <TableRow>
-              <TableHead v-for="(header, index) in previewHeaders" :key="index">
-                {{ header }}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="(row, rowIndex) in previewRows" :key="rowIndex">
-              <TableCell v-for="(cell, cellIndex) in row" :key="cellIndex">
-                {{ cell }}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <UCard>
+      <template #header>
+        <h3 class="font-semibold">
+          プレビュー
+        </h3>
+      </template>
+      <table class="w-full caption-bottom text-sm">
+        <thead v-if="hasHeader" class="[&_tr]:border-b">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <th v-for="(header, index) in previewHeaders" :key="index" class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              {{ header }}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr:last-child]:border-0">
+          <tr v-for="(row, rowIndex) in previewRows" :key="rowIndex" class="border-b border-border transition-colors hover:bg-muted/50">
+            <td v-for="(cell, cellIndex) in row" :key="cellIndex" class="p-2 align-middle">
+              {{ cell }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </UCard>
   </div>
 </template>

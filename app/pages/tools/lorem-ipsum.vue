@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -164,26 +161,7 @@ const generateText = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const { toast } = useToast()
-
-const copyToClipboard = async () => {
-  try {
-    await copy(generatedText.value)
-    toast({
-      title: 'コピーしました',
-      description: 'テキストをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // ダウンロード
 const downloadText = () => {
@@ -293,244 +271,244 @@ useSeoMeta({
     </div>
 
     <!-- プリセット -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-3 gap-2">
-          <Button
-            v-for="preset in presets"
-            :key="preset.name"
-            variant="outline"
-            size="sm"
-            @click="applyPreset(preset)">
-            {{ preset.name }}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+      <div class="grid grid-cols-3 gap-2">
+        <UButton
+          v-for="preset in presets"
+          :key="preset.name"
+          variant="outline"
+          size="sm"
+          @click="applyPreset(preset)">
+          {{ preset.name }}
+        </UButton>
+      </div>
+    </UCard>
     <!-- テキストタイプ -->
-    <Card>
-      <CardHeader class="flex items-center flex-row justify-between">
-        <CardTitle>テキストタイプ</CardTitle>
-        <Button
-          @click="generateText">
-          <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
-          生成
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div class="space-y-3">
-          <label class="flex items-center gap-3">
-            <input
-              v-model="textType"
-              value="lorem"
-              type="radio"
-              class="text-primary">
-            <div>
-              <div class="font-medium">Lorem Ipsum</div>
-              <div class="text-sm text-muted-foreground">標準的なラテン語のダミーテキスト</div>
-            </div>
-          </label>
-          <label class="flex items-center gap-3">
-            <input
-              v-model="textType"
-              value="japanese"
-              type="radio"
-              class="text-primary">
-            <div>
-              <div class="font-medium">日本語</div>
-              <div class="text-sm text-muted-foreground">ひらがな、カタカナ、漢字を含む</div>
-            </div>
-          </label>
-          <label class="flex items-center gap-3">
-            <input
-              v-model="textType"
-              value="business"
-              type="radio"
-              class="text-primary">
-            <div>
-              <div class="font-medium">ビジネス</div>
-              <div class="text-sm text-muted-foreground">ビジネス用語を使用</div>
-            </div>
-          </label>
-          <label class="flex items-center gap-3">
-            <input
-              v-model="textType"
-              value="tech"
-              type="radio"
-              class="text-primary">
-            <div>
-              <div class="font-medium">技術</div>
-              <div class="text-sm text-muted-foreground">プログラミング・IT用語を使用</div>
-            </div>
-          </label>
+    <UCard>
+      <template #header>
+        <div class="flex items-center flex-row justify-between">
+          <h3 class="font-semibold">
+            テキストタイプ
+          </h3>
+          <UButton
+            @click="generateText">
+            <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-2" />
+            生成
+          </UButton>
         </div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>生成設定</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <!-- 単位 -->
-        <div>
-          <label class="text-sm font-medium mb-2 block">単位</label>
-          <select
-            v-model="unitType"
-            class="w-full h-9 px-3 rounded-md border border-input bg-background text-sm">
-            <option value="words">
-              単語
-            </option>
-            <option value="sentences">
-              文
-            </option>
-            <option value="paragraphs">
-              段落
-            </option>
-          </select>
-        </div>
+      </template>
+      <div class="space-y-3">
+        <label class="flex items-center gap-3">
+          <input
+            v-model="textType"
+            value="lorem"
+            type="radio"
+            class="text-primary">
+          <div>
+            <div class="font-medium">Lorem Ipsum</div>
+            <div class="text-sm text-muted-foreground">標準的なラテン語のダミーテキスト</div>
+          </div>
+        </label>
+        <label class="flex items-center gap-3">
+          <input
+            v-model="textType"
+            value="japanese"
+            type="radio"
+            class="text-primary">
+          <div>
+            <div class="font-medium">日本語</div>
+            <div class="text-sm text-muted-foreground">ひらがな、カタカナ、漢字を含む</div>
+          </div>
+        </label>
+        <label class="flex items-center gap-3">
+          <input
+            v-model="textType"
+            value="business"
+            type="radio"
+            class="text-primary">
+          <div>
+            <div class="font-medium">ビジネス</div>
+            <div class="text-sm text-muted-foreground">ビジネス用語を使用</div>
+          </div>
+        </label>
+        <label class="flex items-center gap-3">
+          <input
+            v-model="textType"
+            value="tech"
+            type="radio"
+            class="text-primary">
+          <div>
+            <div class="font-medium">技術</div>
+            <div class="text-sm text-muted-foreground">プログラミング・IT用語を使用</div>
+          </div>
+        </label>
+      </div>
+      <h3 class="font-semibold mt-4 mb-2">
+        生成設定
+      </h3>
+      <!-- 単位 -->
+      <div>
+        <label class="text-sm font-medium mb-2 block">単位</label>
+        <select
+          v-model="unitType"
+          class="w-full h-9 px-3 rounded-md border border-input bg-background text-sm">
+          <option value="words">
+            単語
+          </option>
+          <option value="sentences">
+            文
+          </option>
+          <option value="paragraphs">
+            段落
+          </option>
+        </select>
+      </div>
 
-        <!-- 数量 -->
-        <div>
-          <label class="text-sm font-medium mb-2 block">
-            数量: {{ count }}{{ unitType === 'words' ? '単語' : unitType === 'sentences' ? '文' : '段落' }}
-          </label>
-          <Slider
-            :model-value="[count]"
-            :min="1"
-            :max="unitType === 'words' ? 200 : unitType === 'sentences' ? 50 : 10"
-            :step="1"
-            class="w-full"
-            @update:model-value="count = $event[0]" />
-        </div>
+      <!-- 数量 -->
+      <div>
+        <label class="text-sm font-medium mb-2 block">
+          数量: {{ count }}{{ unitType === 'words' ? '単語' : unitType === 'sentences' ? '文' : '段落' }}
+        </label>
+        <Slider
+          :model-value="[count]"
+          :min="1"
+          :max="unitType === 'words' ? 200 : unitType === 'sentences' ? 50 : 10"
+          :step="1"
+          class="w-full"
+          @update:model-value="count = $event[0]" />
+      </div>
 
-        <!-- オプション -->
-        <div class="space-y-2">
-          <label v-if="textType === 'lorem' && unitType === 'paragraphs'" class="flex items-center gap-2">
-            <input
-              v-model="startWithLorem"
-              type="checkbox"
-              class="rounded">
-            <span class="text-sm">"Lorem ipsum"で開始</span>
-          </label>
+      <!-- オプション -->
+      <div class="space-y-2">
+        <label v-if="textType === 'lorem' && unitType === 'paragraphs'" class="flex items-center gap-2">
+          <input
+            v-model="startWithLorem"
+            type="checkbox"
+            class="rounded">
+          <span class="text-sm">"Lorem ipsum"で開始</span>
+        </label>
 
-          <label v-if="unitType === 'paragraphs'" class="flex items-center gap-2">
-            <input
-              v-model="includeHTML"
-              type="checkbox"
-              class="rounded">
-            <span class="text-sm">HTMLタグを含める</span>
-          </label>
-        </div>
+        <label v-if="unitType === 'paragraphs'" class="flex items-center gap-2">
+          <input
+            v-model="includeHTML"
+            type="checkbox"
+            class="rounded">
+          <span class="text-sm">HTMLタグを含める</span>
+        </label>
+      </div>
 
-        <!-- HTMLタグ選択 -->
-        <div v-if="includeHTML && unitType === 'paragraphs'">
-          <label class="text-sm font-medium mb-2 block">HTMLタグ</label>
-          <select
-            v-model="htmlTag"
-            class="w-full h-9 px-3 rounded-md border border-input bg-background text-sm">
-            <option value="p">
-              &lt;p&gt;
-            </option>
-            <option value="div">
-              &lt;div&gt;
-            </option>
-            <option value="span">
-              &lt;span&gt;
-            </option>
-            <option value="h1">
-              &lt;h1&gt;
-            </option>
-            <option value="h2">
-              &lt;h2&gt;
-            </option>
-            <option value="h3">
-              &lt;h3&gt;
-            </option>
-            <option value="li">
-              &lt;li&gt;
-            </option>
-          </select>
-        </div>
-      </CardContent>
-    </Card>
+      <!-- HTMLタグ選択 -->
+      <div v-if="includeHTML && unitType === 'paragraphs'">
+        <label class="text-sm font-medium mb-2 block">HTMLタグ</label>
+        <select
+          v-model="htmlTag"
+          class="w-full h-9 px-3 rounded-md border border-input bg-background text-sm">
+          <option value="p">
+            &lt;p&gt;
+          </option>
+          <option value="div">
+            &lt;div&gt;
+          </option>
+          <option value="span">
+            &lt;span&gt;
+          </option>
+          <option value="h1">
+            &lt;h1&gt;
+          </option>
+          <option value="h2">
+            &lt;h2&gt;
+          </option>
+          <option value="h3">
+            &lt;h3&gt;
+          </option>
+          <option value="li">
+            &lt;li&gt;
+          </option>
+        </select>
+      </div>
+    </UCard>
 
     <!-- 生成結果 -->
-    <Card>
-      <CardHeader>
+    <UCard>
+      <template #header>
         <div class="flex items-center justify-between">
-          <CardTitle>生成されたテキスト</CardTitle>
+          <h3 class="font-semibold">
+            生成されたテキスト
+          </h3>
           <div class="flex gap-2">
-            <Button
+            <UButton
               size="sm"
               variant="outline"
               :disabled="!generatedText"
-              @click="copyToClipboard">
+              @click="copyToClipboard(generatedText)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
               コピー
-            </Button>
-            <Button
+            </UButton>
+            <UButton
               size="sm"
               variant="outline"
               :disabled="!generatedText"
               @click="downloadText">
               <Icon name="heroicons:arrow-down-tray" class="w-4 h-4 mr-1" />
               ダウンロード
-            </Button>
+            </UButton>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <!-- 統計情報 -->
-        <div class="mb-4 grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div class="text-2xl font-bold">
-              {{ generatedText.length }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              文字数
-            </div>
+      </template>
+      <!-- 統計情報 -->
+      <div class="mb-4 grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-bold">
+            {{ generatedText.length }}
           </div>
-          <div>
-            <div class="text-2xl font-bold">
-              {{ generatedText.split(/\s+/).filter(w => w).length }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              単語数
-            </div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold">
-              {{ byteSize }}
-            </div>
-            <div class="text-sm text-muted-foreground">
-              バイト数
-            </div>
+          <div class="text-sm text-muted-foreground">
+            文字数
           </div>
         </div>
-        <div class="min-h-[400px] p-4 bg-muted rounded-md">
-          <pre class="whitespace-pre-wrap font-sans text-sm">{{ generatedText }}</pre>
+        <div>
+          <div class="text-2xl font-bold">
+            {{ generatedText.split(/\s+/).filter(w => w).length }}
+          </div>
+          <div class="text-sm text-muted-foreground">
+            単語数
+          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <div class="text-2xl font-bold">
+            {{ byteSize }}
+          </div>
+          <div class="text-sm text-muted-foreground">
+            バイト数
+          </div>
+        </div>
+      </div>
+      <div class="min-h-[400px] p-4 bg-muted rounded-md">
+        <pre class="whitespace-pre-wrap font-sans text-sm">{{ generatedText }}</pre>
+      </div>
+    </UCard>
 
     <!-- 使い方 -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>使い方</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-3 text-sm text-muted-foreground">
-        <p>
-          Lorem Ipsumは、印刷やWebデザインでよく使われるダミーテキストです。
-          意味のないテキストを使用することで、デザインに集中できます。
-        </p>
-        <ul class="list-disc list-inside space-y-1">
-          <li>テキストタイプを選択して、用途に合ったダミーテキストを生成</li>
-          <li>単語、文、段落の単位で必要な量を指定</li>
-          <li>HTMLタグを含めることで、マークアップのテストにも使用可能</li>
-          <li>日本語のダミーテキストは、Webサイトやアプリの日本語表示テストに最適</li>
-        </ul>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          使い方
+        </h3>
+      </template>
+      <p>
+        Lorem Ipsumは、印刷やWebデザインでよく使われるダミーテキストです。
+        意味のないテキストを使用することで、デザインに集中できます。
+      </p>
+      <ul class="list-disc list-inside space-y-1">
+        <li>テキストタイプを選択して、用途に合ったダミーテキストを生成</li>
+        <li>単語、文、段落の単位で必要な量を指定</li>
+        <li>HTMLタグを含めることで、マークアップのテストにも使用可能</li>
+        <li>日本語のダミーテキストは、Webサイトやアプリの日本語表示テストに最適</li>
+      </ul>
+    </UCard>
   </div>
 </template>

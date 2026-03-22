@@ -13,7 +13,7 @@ tags:
   - "AI"
   - "開発効率"
 icons:
-  - " logos:claude-icon"
+  - "logos:claude-icon"
   - "codicon:terminal"
 ---
 

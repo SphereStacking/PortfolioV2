@@ -199,7 +199,7 @@ gl_FragColor = vec4(vec3(l), 1.0);  // 白い光の輪
 
 ## 🎨 データの流れ全体像
 
-<Mermaid>
+```mermaid
 graph TD
     A[JavaScript/CPU] -->|uniform変数| B[GPU]
     B -->|時間、解像度、マウス位置| C[頂点シェーダー]
@@ -213,7 +213,7 @@ graph TD
     style A fill:#e1f5fe
     style E fill:#c8e6c9
     style D fill:#fff3e0
-</Mermaid>
+```
 
 従来のテキスト表現：
 ```

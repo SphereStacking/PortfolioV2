@@ -1,36 +1,28 @@
 <script setup>
-import CyberpunkGradient from './css/CyberpunkGradient.vue'
-import HolographicGradient from './css/HolographicGradient.vue'
-import NeoBrutalismGradient from './css/NeoBrutalismGradient.vue'
-import RippleGradient from './css/RippleGradient.vue'
-import CosmosGradient from './css/CosmosGradient.vue'
-import RetrowaveGradient from './css/RetrowaveGradient.vue'
-import MistGradient from './css/MistGradient.vue'
-import MoireGradient from './css/MoireGradient.vue'
-import FrostGlassGradient from './css/FrostGlassGradient.vue'
-import FireGradient from './css/FireGradient.vue'
-
-// 追加のグラデーション - コスモス、ファイア、ダイナミックアート系
-import BlackholeGradient from './css/BlackholeGradient.vue'
-import AuroraGradient from './css/AuroraGradient.vue'
-import MagmaGradient from './css/MagmaGradient.vue'
-import BlueFireGradient from './css/BlueFireGradient.vue'
-import InkSplashGradient from './css/InkSplashGradient.vue'
-import GlitchArtGradient from './css/GlitchArtGradient.vue'
-
-// 追加のグラデーション - 自然系、抽象芸術系、工業/都市系
-import CrystalGradient from './css/CrystalGradient.vue'
-import CloudyGradient from './css/CloudyGradient.vue'
-import NeonCityGradient from './css/NeonCityGradient.vue'
-import UrbanGradient from './css/UrbanGradient.vue'
-import TechGradient from './css/TechGradient.vue'
-
-// 追加のグラデーション - 水中/海洋系、四季/季節系
-import DeepOceanGradient from './css/DeepOceanGradient.vue'
-
-// 新しいテーマ
-import SakuraBlizzardGradient from './css/SakuraBlizzardGradient.vue'
-import QuantumRealmGradient from './css/QuantumRealmGradient.vue'
+const CyberpunkGradient = defineAsyncComponent(() => import('./css/CyberpunkGradient.vue'))
+const HolographicGradient = defineAsyncComponent(() => import('./css/HolographicGradient.vue'))
+const NeoBrutalismGradient = defineAsyncComponent(() => import('./css/NeoBrutalismGradient.vue'))
+const RippleGradient = defineAsyncComponent(() => import('./css/RippleGradient.vue'))
+const CosmosGradient = defineAsyncComponent(() => import('./css/CosmosGradient.vue'))
+const RetrowaveGradient = defineAsyncComponent(() => import('./css/RetrowaveGradient.vue'))
+const MistGradient = defineAsyncComponent(() => import('./css/MistGradient.vue'))
+const MoireGradient = defineAsyncComponent(() => import('./css/MoireGradient.vue'))
+const FrostGlassGradient = defineAsyncComponent(() => import('./css/FrostGlassGradient.vue'))
+const FireGradient = defineAsyncComponent(() => import('./css/FireGradient.vue'))
+const BlackholeGradient = defineAsyncComponent(() => import('./css/BlackholeGradient.vue'))
+const AuroraGradient = defineAsyncComponent(() => import('./css/AuroraGradient.vue'))
+const MagmaGradient = defineAsyncComponent(() => import('./css/MagmaGradient.vue'))
+const BlueFireGradient = defineAsyncComponent(() => import('./css/BlueFireGradient.vue'))
+const InkSplashGradient = defineAsyncComponent(() => import('./css/InkSplashGradient.vue'))
+const GlitchArtGradient = defineAsyncComponent(() => import('./css/GlitchArtGradient.vue'))
+const CrystalGradient = defineAsyncComponent(() => import('./css/CrystalGradient.vue'))
+const CloudyGradient = defineAsyncComponent(() => import('./css/CloudyGradient.vue'))
+const NeonCityGradient = defineAsyncComponent(() => import('./css/NeonCityGradient.vue'))
+const UrbanGradient = defineAsyncComponent(() => import('./css/UrbanGradient.vue'))
+const TechGradient = defineAsyncComponent(() => import('./css/TechGradient.vue'))
+const DeepOceanGradient = defineAsyncComponent(() => import('./css/DeepOceanGradient.vue'))
+const SakuraBlizzardGradient = defineAsyncComponent(() => import('./css/SakuraBlizzardGradient.vue'))
+const QuantumRealmGradient = defineAsyncComponent(() => import('./css/QuantumRealmGradient.vue'))
 
 // 選択されているグラデーションのインデックス
 const selectedIndex = ref(0)

@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -96,24 +90,8 @@ const tailwindCode = computed(() => {
 const _svgGradientId = 'gradient-' + Date.now()
 
 // クリップボードにコピー
-const { copy } = useClipboard()
-const { toast } = useToast()
 
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast({
-      description: 'コピーに失敗しました',
-      variant: 'destructive',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // ランダムグラデーション生成
 const generateRandomGradient = () => {
@@ -199,55 +177,57 @@ useSeoMeta({
     </div>
 
     <!-- プリセットセクション -->
-    <Card class="col-span-full">
-      <CardHeader>
-        <CardTitle>プリセット</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-4 gap-3">
-          <button
-            v-for="preset in presets"
-            :key="preset.name"
-            class="group relative h-16 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            @click="applyPreset(preset)">
-            <div
-              class="absolute inset-0"
-              :style="{
-                background: preset.type === 'linear'
-                  ? `linear-gradient(${preset.angle}deg, ${preset.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
-                  : `radial-gradient(circle at center, ${preset.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`,
-              }">
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
-              <span class="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                {{ preset.name }}
-              </span>
-            </div>
-          </button>
-        </div>
-      </CardContent>
-    </Card>
+    <UCard class="col-span-full">
+      <template #header>
+        <h3 class="font-semibold">
+          プリセット
+        </h3>
+      </template>
+      <div class="grid grid-cols-4 gap-3">
+        <button
+          v-for="preset in presets"
+          :key="preset.name"
+          class="group relative h-16 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          @click="applyPreset(preset)">
+          <div
+            class="absolute inset-0"
+            :style="{
+              background: preset.type === 'linear'
+                ? `linear-gradient(${preset.angle}deg, ${preset.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+                : `radial-gradient(circle at center, ${preset.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`,
+            }">
+          </div>
+          <div class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
+            <span class="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              {{ preset.name }}
+            </span>
+          </div>
+        </button>
+      </div>
+    </UCard>
 
     <!-- 左側：コントロールパネル -->
     <div class="space-y-6 col-span-1">
       <!-- グラデーション設定 -->
-      <Card>
-        <CardHeader>
-          <CardTitle>グラデーション設定</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-6">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            グラデーション設定
+          </h3>
+        </template>
+        <div class="space-y-6">
           <!-- グラデーションタイプ -->
           <div>
             <label class="text-sm font-medium mb-2 block">タイプ</label>
             <div class="grid grid-cols-3 gap-2">
-              <Button
+              <UButton
                 v-for="type in ['linear', 'radial', 'conic'] as const"
                 :key="type"
-                :variant="gradientType === type ? 'default' : 'outline'"
+                :variant="gradientType === type ? 'solid' : 'outline'"
                 size="sm"
                 @click="gradientType = type">
                 {{ type.charAt(0).toUpperCase() + type.slice(1) }}
-              </Button>
+              </UButton>
             </div>
           </div>
 
@@ -256,27 +236,27 @@ useSeoMeta({
             <label class="text-sm font-medium mb-2 block">
               角度: {{ angle }}°
             </label>
-            <Slider
-              :model-value="[angle]"
+            <USlider
+              :model-value="angle"
               :min="0"
               :max="360"
               :step="1"
               class="w-full"
-              @update:model-value="angle = $event[0]" />
+              @update:model-value="angle = $event" />
           </div>
 
           <div v-if="gradientType === 'radial'" class="space-y-4">
             <div>
               <label class="text-sm font-medium mb-2 block">形状</label>
               <div class="grid grid-cols-2 gap-2">
-                <Button
+                <UButton
                   v-for="shape in ['circle', 'ellipse'] as const"
                   :key="shape"
-                  :variant="radialShape === shape ? 'default' : 'outline'"
+                  :variant="radialShape === shape ? 'solid' : 'outline'"
                   size="sm"
                   @click="radialShape = shape">
                   {{ shape.charAt(0).toUpperCase() + shape.slice(1) }}
-                </Button>
+                </UButton>
               </div>
             </div>
           </div>
@@ -286,25 +266,25 @@ useSeoMeta({
               <label class="text-sm font-medium mb-2 block">
                 中心 X: {{ centerX }}%
               </label>
-              <Slider
-                :model-value="[centerX]"
+              <USlider
+                :model-value="centerX"
                 :min="0"
                 :max="100"
                 :step="1"
                 class="w-full"
-                @update:model-value="centerX = $event[0]" />
+                @update:model-value="centerX = $event" />
             </div>
             <div>
               <label class="text-sm font-medium mb-2 block">
                 中心 Y: {{ centerY }}%
               </label>
-              <Slider
-                :model-value="[centerY]"
+              <USlider
+                :model-value="centerY"
                 :min="0"
                 :max="100"
                 :step="1"
                 class="w-full"
-                @update:model-value="centerY = $event[0]" />
+                @update:model-value="centerY = $event" />
             </div>
           </div>
 
@@ -312,110 +292,112 @@ useSeoMeta({
             <label class="text-sm font-medium mb-2 block">
               開始角度: {{ angle }}°
             </label>
-            <Slider
-              :model-value="[angle]"
+            <USlider
+              :model-value="angle"
               :min="0"
               :max="360"
               :step="1"
               class="w-full"
-              @update:model-value="angle = $event[0]" />
+              @update:model-value="angle = $event" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
 
       <!-- カラーストップ -->
-      <Card>
-        <CardHeader>
+      <UCard>
+        <template #header>
           <div class="flex items-center justify-between">
-            <CardTitle>カラーストップ</CardTitle>
+            <h3 class="font-semibold">
+              カラーストップ
+            </h3>
             <div class="flex gap-2">
-              <Button
+              <UButton
                 size="sm"
                 variant="outline"
                 @click="generateRandomGradient">
                 <Icon name="heroicons:arrow-path" class="w-4 h-4 mr-1" />
                 ランダム
-              </Button>
-              <Button
+              </UButton>
+              <UButton
                 size="sm"
                 @click="addStop">
                 <Icon name="heroicons:plus" class="w-4 h-4 mr-1" />
                 追加
-              </Button>
+              </UButton>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            <div
-              v-for="(stop, index) in stops"
-              :key="index"
-              class="flex items-center gap-3">
-              <Input
-                v-model="stop.color"
-                type="color"
-                class="w-12 h-10 p-1 cursor-pointer" />
-              <Input
-                v-model="stop.color"
-                type="text"
-                class="w-24"
-                @change="sortStops" />
-              <div class="flex-1 flex items-center gap-2">
-                <Slider
-                  :model-value="[stop.position]"
-                  :min="0"
-                  :max="100"
-                  :step="1"
-                  class="flex-1"
-                  @update:model-value="stop.position = $event[0]; sortStops()" />
-                <span class="text-sm w-12 text-right">{{ stop.position }}%</span>
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                :disabled="stops.length <= 2"
-                @click="removeStop(index)">
-                <Icon name="heroicons:x-mark" class="w-4 h-4" />
-              </Button>
+        </template>
+        <div class="space-y-3">
+          <div
+            v-for="(stop, index) in stops"
+            :key="index"
+            class="flex items-center gap-3">
+            <UInput
+              v-model="stop.color"
+              type="color"
+              class="w-12 h-10 p-1 cursor-pointer" />
+            <UInput
+              v-model="stop.color"
+              type="text"
+              class="w-24"
+              @change="sortStops" />
+            <div class="flex-1 flex items-center gap-2">
+              <USlider
+                :model-value="stop.position"
+                :min="0"
+                :max="100"
+                :step="1"
+                class="flex-1"
+                @update:model-value="stop.position = $event; sortStops()" />
+              <span class="text-sm w-12 text-right">{{ stop.position }}%</span>
             </div>
+            <UButton
+              size="sm"
+              variant="ghost"
+              :disabled="stops.length <= 2"
+              @click="removeStop(index)">
+              <Icon name="heroicons:x-mark" class="w-4 h-4" />
+            </UButton>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
 
     <!-- 右側：プレビューと結果 -->
     <div class="space-y-6 col-span-2">
       <!-- プレビュー -->
-      <Card>
-        <CardHeader>
-          <CardTitle>プレビュー</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div
-            class="aspect-video rounded-lg shadow-inner"
-            :style="{ background: cssGradient }">
-          </div>
-        </CardContent>
-      </Card>
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            プレビュー
+          </h3>
+        </template>
+        <div
+          class="aspect-video rounded-lg shadow-inner"
+          :style="{ background: cssGradient }">
+        </div>
+      </UCard>
 
       <!-- 生成されたコード -->
-      <Card>
-        <CardHeader>
-          <CardTitle>生成されたコード</CardTitle>
-        </CardHeader>
-        <CardContent class="space-y-4">
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">
+            生成されたコード
+          </h3>
+        </template>
+        <div class="space-y-4">
           <!-- CSS -->
           <div>
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-medium">
                 CSS
               </h4>
-              <Button
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(cssCode)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
             <div class="p-3 bg-muted rounded-md">
               <code class="text-sm">{{ cssCode }}</code>
@@ -428,12 +410,12 @@ useSeoMeta({
               <h4 class="text-sm font-medium">
                 Tailwind CSS
               </h4>
-              <Button
+              <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(tailwindCode)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-              </Button>
+              </UButton>
             </div>
             <div class="p-3 bg-muted rounded-md">
               <code class="text-sm">{{ tailwindCode }}</code>
@@ -442,8 +424,8 @@ useSeoMeta({
               ※ 複雑なグラデーションはstyle属性で指定: style="{{ cssGradient }}"
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </UCard>
     </div>
   </div>
 </template>

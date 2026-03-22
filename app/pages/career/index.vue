@@ -83,21 +83,21 @@ const {
         </p>
 
         <div class="relative z-10 mx-auto max-w-2xl">
-          <Input
+          <UInput
             v-model="searchQuery"
             placeholder="会社名、プロジェクト名で検索..."
             variant="outline"
             size="lg" />
           <div class="absolute right-2 top-1/2 flex -translate-y-1/2 items-center">
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="mr-2 animate-spin" />
-            <Button
+            <UButton
               v-if="hasActiveFilters"
               variant="outline"
               size="xs"
-              rounded="full"
+              class="rounded-full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
-            </Button>
+            </UButton>
           </div>
         </div>
       </template>
@@ -105,49 +105,25 @@ const {
 
     <div class="container relative z-10 mx-auto -mt-8 px-4">
       <!-- フィルターエリア -->
-      <Card class="mb-8 p-4">
+      <UCard class="mb-8 p-4">
         <div class="flex flex-wrap gap-4">
           <!-- 年フィルター -->
-          <Select
+          <USelect
             :model-value="selectedYear"
-            @update:model-value="(value) => setYear(value)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="開始年を選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="null">
-                すべての年
-              </SelectItem>
-              <SelectItem
-                v-for="year in availableYears"
-                :key="year"
-                :value="year">
-                {{ year }}年
-              </SelectItem>
-            </SelectContent>
-          </Select>
+            :items="[{ label: 'すべての年', value: null }, ...availableYears.map(y => ({ label: `${y}年`, value: y }))]"
+            placeholder="開始年を選択"
+            class="w-[180px]"
+            @update:model-value="(value) => setYear(value)" />
 
           <!-- スキルフィルター -->
-          <Select
+          <USelect
             :model-value="selectedSkill"
-            @update:model-value="(value) => setSkill(value)">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="スキルを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem :value="null">
-                すべてのスキル
-              </SelectItem>
-              <SelectItem
-                v-for="skill in availableSkills"
-                :key="skill"
-                :value="skill">
-                {{ skill }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
+            :items="[{ label: 'すべてのスキル', value: null }, ...availableSkills.map(s => ({ label: s, value: s }))]"
+            placeholder="スキルを選択"
+            class="w-[180px]"
+            @update:model-value="(value) => setSkill(value)" />
         </div>
-      </Card>
+      </UCard>
 
       <!-- キャリアガントタイムライン -->
       <template v-if="filteredCareers.length > 0">
@@ -163,9 +139,9 @@ const {
         <p class="mx-auto mb-8 max-w-md">
           検索条件を変更してみてください。
         </p>
-        <Button variant="default" color="primary" @click="resetFilters">
+        <UButton variant="solid" color="primary" @click="resetFilters">
           フィルターをリセット
-        </Button>
+        </UButton>
       </div>
     </div>
   </div>

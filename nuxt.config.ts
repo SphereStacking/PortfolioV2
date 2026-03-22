@@ -81,7 +81,6 @@ export default defineNuxtConfig({
   ogImage: {
     fonts: [
       'WDXL+Lubrifont+JP+N:400',
-      'Zen+Maru+Gothic:700',
     ],
   },
   scripts: {

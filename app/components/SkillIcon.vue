@@ -10,8 +10,9 @@ const { getStack } = useMyStack()
 
 const stackData = computed(() => getStack(props.stack))
 
+const NuxtLink = resolveComponent('NuxtLink')
 const component = computed(() => {
-  return stackData.value?.link ? 'NuxtLink' : 'div'
+  return stackData.value?.link ? NuxtLink : 'div'
 })
 </script>
 

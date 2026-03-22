@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({

@@ -1,4 +1,3 @@
-import { ref, onMounted, onUnmounted } from 'vue'
 import type { Ref } from 'vue'
 
 export interface KeyEvent {

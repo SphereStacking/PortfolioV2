@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -375,24 +372,9 @@ const downloadSvg = () => {
 }
 
 // クリップボード
-const { copy } = useClipboard()
 const toast = useToast()
 
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプルSVG
 const sampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100" viewBox="0 0 100 100">

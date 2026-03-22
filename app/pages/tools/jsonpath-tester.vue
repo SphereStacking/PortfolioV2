@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -318,24 +315,8 @@ const _jsonWithLineNumbers = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
 const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // SEO設定
 useSeoMeta({
@@ -510,71 +491,89 @@ useSeoMeta({
           <h3 class="font-semibold text-foreground mb-2">
             基本構文
           </h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>式</TableHead>
-                <TableHead>説明</TableHead>
-                <TableHead>例</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell class="font-mono">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  式
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  説明
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  例
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
                   $
-                </TableCell>
-                <TableCell>ルート要素</TableCell>
-                <TableCell class="font-mono text-xs">
+                </td>
+                <td class="p-2 align-middle">
+                  ルート要素
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
                   $
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
                   .
-                </TableCell>
-                <TableCell>子要素</TableCell>
-                <TableCell class="font-mono text-xs">
+                </td>
+                <td class="p-2 align-middle">
+                  子要素
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
                   $.store
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
                   ..
-                </TableCell>
-                <TableCell>再帰的降下</TableCell>
-                <TableCell class="font-mono text-xs">
+                </td>
+                <td class="p-2 align-middle">
+                  再帰的降下
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
                   $..author
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
                   *
-                </TableCell>
-                <TableCell>ワイルドカード</TableCell>
-                <TableCell class="font-mono text-xs">
+                </td>
+                <td class="p-2 align-middle">
+                  ワイルドカード
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
                   $.store.*
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
                   []
-                </TableCell>
-                <TableCell>配列アクセス</TableCell>
-                <TableCell class="font-mono text-xs">
+                </td>
+                <td class="p-2 align-middle">
+                  配列アクセス
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
                   $.book[0]
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono">
                   [*]
-                </TableCell>
-                <TableCell>全配列要素</TableCell>
-                <TableCell class="font-mono text-xs">
+                </td>
+                <td class="p-2 align-middle">
+                  全配列要素
+                </td>
+                <td class="p-2 align-middle font-mono text-xs">
                   $.book[*]
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <UAlert icon="heroicons:information-circle" description="このツールは基本的なJSONPath機能のみサポートしています。 フィルター式（[?(@.price &lt; 10)]）などの高度な機能は実装されていません。" />

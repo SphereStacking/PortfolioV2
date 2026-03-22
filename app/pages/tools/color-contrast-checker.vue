@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -352,24 +349,7 @@ const cssVariables = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // 色覚異常タイプ
 const colorBlindTypes = [
@@ -527,12 +507,12 @@ useSeoMeta({
         </div>
         <div class="flex justify-center gap-4 mb-6">
           <UBadge
-            :variant="wcagLevels.aa.passed ? 'default' : 'destructive'"
+            :color="wcagLevels.aa.passed ? 'neutral' : 'error'"
             class="text-lg px-4 py-2">
             WCAG AA: {{ wcagLevels.aa.passed ? '合格' : '不合格' }}
           </UBadge>
           <UBadge
-            :variant="wcagLevels.aaa.passed ? 'default' : 'destructive'"
+            :color="wcagLevels.aaa.passed ? 'neutral' : 'error'"
             class="text-lg px-4 py-2">
             WCAG AAA: {{ wcagLevels.aaa.passed ? '合格' : '不合格' }}
           </UBadge>
@@ -707,42 +687,58 @@ useSeoMeta({
         </h3>
       </template>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>基準</TableHead>
-            <TableHead>通常のテキスト</TableHead>
-            <TableHead>大きなテキスト</TableHead>
-            <TableHead>現在の状態</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell class="font-medium">
+      <table class="w-full caption-bottom text-sm">
+        <thead class="[&_tr]:border-b">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              基準
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              通常のテキスト
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              大きなテキスト
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              現在の状態
+            </th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr:last-child]:border-0">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <td class="p-2 align-middle font-medium">
               WCAG AA
-            </TableCell>
-            <TableCell>4.5:1 以上</TableCell>
-            <TableCell>3:1 以上</TableCell>
-            <TableCell>
-              <UBadge :variant="wcagLevels.aa.passed ? 'default' : 'destructive'">
+            </td>
+            <td class="p-2 align-middle">
+              4.5:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              3:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              <UBadge :color="wcagLevels.aa.passed ? 'neutral' : 'error'">
                 {{ wcagLevels.aa.passed ? '合格' : '不合格' }}
               </UBadge>
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell class="font-medium">
+            </td>
+          </tr>
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <td class="p-2 align-middle font-medium">
               WCAG AAA
-            </TableCell>
-            <TableCell>7:1 以上</TableCell>
-            <TableCell>4.5:1 以上</TableCell>
-            <TableCell>
-              <UBadge :variant="wcagLevels.aaa.passed ? 'default' : 'destructive'">
+            </td>
+            <td class="p-2 align-middle">
+              7:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              4.5:1 以上
+            </td>
+            <td class="p-2 align-middle">
+              <UBadge :color="wcagLevels.aaa.passed ? 'neutral' : 'error'">
                 {{ wcagLevels.aaa.passed ? '合格' : '不合格' }}
               </UBadge>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <div class="mt-4 text-sm text-muted-foreground">
         <p>※ 大きなテキスト: 24px以上、または18px以上の太字</p>
       </div>

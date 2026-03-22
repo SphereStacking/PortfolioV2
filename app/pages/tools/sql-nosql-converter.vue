@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -385,24 +382,8 @@ const generateExecutionExample = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
 const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // SEO設定
 useSeoMeta({
@@ -539,105 +520,111 @@ useSeoMeta({
         </h3>
       </template>
       <div class="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>SQL操作</TableHead>
-              <TableHead>MongoDB操作</TableHead>
-              <TableHead>説明</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+        <table class="w-full caption-bottom text-sm">
+          <thead class="[&_tr]:border-b">
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                SQL操作
+              </th>
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                MongoDB操作
+              </th>
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                説明
+              </th>
+            </tr>
+          </thead>
+          <tbody class="[&_tr:last-child]:border-0">
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 SELECT
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 find()
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 ドキュメントの検索
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 INSERT
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 insertOne() / insertMany()
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 ドキュメントの挿入
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 UPDATE
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 updateOne() / updateMany()
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 ドキュメントの更新
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 DELETE
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 deleteOne() / deleteMany()
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 ドキュメントの削除
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 WHERE
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 filter条件
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 検索条件の指定
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 ORDER BY
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 sort()
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 結果のソート（1:昇順, -1:降順）
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 LIMIT
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 limit()
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 結果件数の制限
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell class="font-mono text-sm">
+              </td>
+            </tr>
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 JOIN
-              </TableCell>
-              <TableCell class="font-mono text-sm">
+              </td>
+              <td class="p-2 align-middle font-mono text-sm">
                 $lookup (集約パイプライン)
-              </TableCell>
-              <TableCell class="text-sm">
+              </td>
+              <td class="p-2 align-middle text-sm">
                 コレクション間の結合
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </UCard>
 

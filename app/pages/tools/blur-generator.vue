@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
 import { useSeoMeta } from '#imports'
 
 definePageMeta({
@@ -443,24 +441,8 @@ const loadSampleImage = async (url: string) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
 const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // ダウンロード
 const downloadImage = () => {

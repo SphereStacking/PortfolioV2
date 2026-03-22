@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -138,24 +135,7 @@ const bitInfo = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string, label: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: `${label}をクリップボードにコピーしました`,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプル値
 const samples = [
@@ -376,54 +356,68 @@ useSeoMeta({
           <h3 class="font-semibold text-foreground mb-2">
             プログラミングでの表記
           </h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>進数</TableHead>
-                <TableHead>JavaScript/TypeScript</TableHead>
-                <TableHead>Python</TableHead>
-                <TableHead>C/C++</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>2進数</TableCell>
-                <TableCell class="font-mono">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  進数
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  JavaScript/TypeScript
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  Python
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  C/C++
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle">
+                  2進数
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0b1010
-                </TableCell>
-                <TableCell class="font-mono">
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0b1010
-                </TableCell>
-                <TableCell class="font-mono">
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0b1010
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>8進数</TableCell>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle">
+                  8進数
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0o12
-                </TableCell>
-                <TableCell class="font-mono">
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0o12
-                </TableCell>
-                <TableCell class="font-mono">
+                </td>
+                <td class="p-2 align-middle font-mono">
                   012
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>16進数</TableCell>
-                <TableCell class="font-mono">
+                </td>
+              </tr>
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle">
+                  16進数
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0xA
-                </TableCell>
-                <TableCell class="font-mono">
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0xA
-                </TableCell>
-                <TableCell class="font-mono">
+                </td>
+                <td class="p-2 align-middle font-mono">
                   0xA
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </UCard>

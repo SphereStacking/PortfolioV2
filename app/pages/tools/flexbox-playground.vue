@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -172,26 +169,7 @@ const applyPreset = (preset: typeof presets[0]) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async () => {
-  try {
-    await copy(cssCode.value)
-    toast.add({
-      title: 'コピーしました',
-      description: 'CSSコードをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // SEO設定
 useSeoMeta({
@@ -456,7 +434,7 @@ useSeoMeta({
             <UButton
               size="sm"
               variant="ghost"
-              @click="copyToClipboard">
+              @click="copyToClipboard(cssCode)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
             </UButton>
           </div>

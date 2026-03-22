@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -93,24 +90,8 @@ const tailwindCode = computed(() => {
 const _svgGradientId = 'gradient-' + Date.now()
 
 // クリップボードにコピー
-const { copy } = useClipboard()
-const toast = useToast()
 
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // ランダムグラデーション生成
 const generateRandomGradient = () => {

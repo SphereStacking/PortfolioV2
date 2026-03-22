@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -271,26 +268,14 @@ const loadSampleImage = async (url: string) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
-const copyToClipboard = async () => {
-  try {
-    const textToCopy = colorMode.value === 'mono'
-      ? asciiArt.value
-      : asciiArt.value.replace(/<[^>]*>/g, '') // HTMLタグを除去
-    await copy(textToCopy)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
+const copyAsciiArt = () => {
+  if (!asciiArt.value) return
+  const textToCopy = colorMode.value === 'mono'
+    ? asciiArt.value
+    : asciiArt.value.replace(/<[^>]*>/g, '')
+  copyToClipboard(textToCopy)
 }
 
 // テキストファイルとしてダウンロード
@@ -589,7 +574,7 @@ useSeoMeta({
             <UButton
               size="sm"
               variant="outline"
-              @click="copyToClipboard">
+              @click="copyAsciiArt">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-2" />
               コピー
             </UButton>

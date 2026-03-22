@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
 
-const { copy } = useClipboard()
 const toast = useToast()
 
 const input = ref('')
@@ -43,15 +40,7 @@ const decodeUrl = () => {
   }
 }
 
-const copyToClipboard = async (text: string) => {
-  if (!text) return
-
-  await copy(text)
-  toast.add({
-    title: 'コピーしました',
-    description: 'クリップボードにコピーしました',
-  })
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const clearAll = () => {
   input.value = ''

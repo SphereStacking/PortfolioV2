@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useNavigation } from '~/composables/useNavigation'
-
 const {
   aboutComponents,
   contentsComponents,

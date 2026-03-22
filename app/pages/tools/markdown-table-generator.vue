@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -164,24 +161,7 @@ const loadFile = (event: Event) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプルテーブル
 const sampleTables = [
@@ -424,22 +404,22 @@ useSeoMeta({
           プレビュー
         </h3>
       </template>
-      <Table>
-        <TableHeader v-if="hasHeader">
-          <TableRow>
-            <TableHead v-for="(header, index) in previewHeaders" :key="index">
+      <table class="w-full caption-bottom text-sm">
+        <thead v-if="hasHeader" class="[&_tr]:border-b">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <th v-for="(header, index) in previewHeaders" :key="index" class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
               {{ header }}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="(row, rowIndex) in previewRows" :key="rowIndex">
-            <TableCell v-for="(cell, cellIndex) in row" :key="cellIndex">
+            </th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr:last-child]:border-0">
+          <tr v-for="(row, rowIndex) in previewRows" :key="rowIndex" class="border-b border-border transition-colors hover:bg-muted/50">
+            <td v-for="(cell, cellIndex) in row" :key="cellIndex" class="p-2 align-middle">
               {{ cell }}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </UCard>
   </div>
 </template>

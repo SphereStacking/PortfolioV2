@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -211,26 +208,7 @@ const unescapeJson = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      title: 'コピーしました',
-      description: 'JSONをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const pasteFromClipboard = async () => {
   try {

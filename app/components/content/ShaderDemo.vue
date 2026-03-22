@@ -1,6 +1,4 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-
 const props = defineProps({
   type: {
     type: String,

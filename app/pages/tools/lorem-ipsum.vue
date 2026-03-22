@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -164,26 +161,7 @@ const generateText = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async () => {
-  try {
-    await copy(generatedText.value)
-    toast.add({
-      title: 'コピーしました',
-      description: 'テキストをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // ダウンロード
 const downloadText = () => {
@@ -467,7 +445,7 @@ useSeoMeta({
               size="sm"
               variant="outline"
               :disabled="!generatedText"
-              @click="copyToClipboard">
+              @click="copyToClipboard(generatedText)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
               コピー
             </UButton>

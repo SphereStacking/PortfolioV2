@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -713,24 +710,8 @@ const reset = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
+const { copyToClipboard } = useCopyToClipboard()
 const toast = useToast()
-
-const copyToClipboard = async () => {
-  try {
-    await copy(generatedGitignore.value)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
 
 // ダウンロード
 const downloadGitignore = () => {
@@ -1034,7 +1015,7 @@ useSeoMeta({
                 <UButton
                   size="sm"
                   variant="ghost"
-                  @click="copyToClipboard">
+                  @click="copyToClipboard(generatedGitignore)">
                   <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
                 </UButton>
                 <UButton

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -180,26 +177,7 @@ const formatJSON = (obj: unknown) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string, name: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      title: 'コピーしました',
-      description: `${name}をクリップボードにコピーしました`,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // サンプルJWT
 const sampleJWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5MTYyMzkwMjIsImF1ZCI6WyJhcGkxIiwiYXBpMiJdLCJpc3MiOiJodHRwczovL2V4YW1wbGUuY29tIn0.5mhBHqs5_DTLdINd9p5m7ZJ6XD0Xc55kIaCRY5r6HRA'
@@ -261,7 +239,7 @@ useSeoMeta({
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <Icon
-              :name="tokenStatus.status === 'valid' ? 'CheckCircle' : tokenStatus.status === 'expired' ? 'XCircle' : 'AlertCircle'"
+              :name="tokenStatus.status === 'valid' ? 'i-heroicons-check-circle' : tokenStatus.status === 'expired' ? 'i-heroicons-x-circle' : 'i-heroicons-exclamation-circle'"
               :class="[
                 'w-5 h-5',
                 tokenStatus.status === 'valid' ? 'text-green-600' : tokenStatus.status === 'expired' ? 'text-destructive' : 'text-yellow-600',

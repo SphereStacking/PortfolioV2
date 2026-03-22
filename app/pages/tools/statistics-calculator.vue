@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -533,44 +532,46 @@ useSeoMeta({
         </div>
       </template>
       <div class="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>階級</TableHead>
-              <TableHead class="text-right">
+        <table class="w-full caption-bottom text-sm">
+          <thead class="[&_tr]:border-b">
+            <tr class="border-b border-border transition-colors hover:bg-muted/50">
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                階級
+              </th>
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground text-right">
                 度数
-              </TableHead>
-              <TableHead class="text-right">
+              </th>
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground text-right">
                 相対度数
-              </TableHead>
-              <TableHead class="text-right">
+              </th>
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground text-right">
                 累積度数
-              </TableHead>
-              <TableHead class="text-right">
+              </th>
+              <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground text-right">
                 累積相対度数
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="(bin, index) in frequencyDistribution" :key="index">
-              <TableCell class="font-mono text-sm">
+              </th>
+            </tr>
+          </thead>
+          <tbody class="[&_tr:last-child]:border-0">
+            <tr v-for="(bin, index) in frequencyDistribution" :key="index" class="border-b border-border transition-colors hover:bg-muted/50">
+              <td class="p-2 align-middle font-mono text-sm">
                 {{ bin.range }}
-              </TableCell>
-              <TableCell class="text-right">
+              </td>
+              <td class="p-2 align-middle text-right">
                 {{ bin.frequency }}
-              </TableCell>
-              <TableCell class="text-right">
+              </td>
+              <td class="p-2 align-middle text-right">
                 {{ (bin.relativeFrequency * 100).toFixed(2) }}%
-              </TableCell>
-              <TableCell class="text-right">
+              </td>
+              <td class="p-2 align-middle text-right">
                 {{ bin.cumulativeFrequency }}
-              </TableCell>
-              <TableCell class="text-right">
+              </td>
+              <td class="p-2 align-middle text-right">
                 {{ (bin.cumulativeRelative * 100).toFixed(2) }}%
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </UCard>
 

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -163,26 +160,7 @@ const handleDrop = (e: DragEvent) => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async () => {
-  try {
-    await copy(base64Output.value)
-    toast.add({
-      title: 'コピーしました',
-      description: 'Base64データをクリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // ダウンロード
 const downloadBase64 = () => {
@@ -330,7 +308,7 @@ useSeoMeta({
             <UButton
               size="sm"
               variant="outline"
-              @click="copyToClipboard">
+              @click="copyToClipboard(base64Output)">
               <Icon name="heroicons:clipboard-document" class="w-4 h-4 mr-1" />
               コピー
             </UButton>

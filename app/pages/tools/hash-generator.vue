@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -211,29 +209,12 @@ watch(inputType, () => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
+const { copyToClipboard } = useCopyToClipboard()
 
 // 大文字・小文字変換
 const displayHash = (hash: string) => {
   if (!hash) return ''
   return uppercase.value ? hash.toUpperCase() : hash.toLowerCase()
-}
-
-const copyToClipboard = async (text: string, label: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: `${label}をクリップボードにコピーしました`,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
 }
 
 // サンプルデータ
@@ -511,7 +492,7 @@ useSeoMeta({
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="font-medium">{{ algo.label }}</span>
-              <UBadge v-if="algo.deprecated" variant="destructive" class="text-xs">
+              <UBadge v-if="algo.deprecated" color="error" class="text-xs">
                 非推奨
               </UBadge>
               <UBadge v-if="algo.recommended" variant="solid" class="text-xs">
@@ -583,35 +564,39 @@ useSeoMeta({
         </h3>
       </template>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ファイル名</TableHead>
-            <TableHead>SHA-256</TableHead>
-            <TableHead class="w-[100px]">
+      <table class="w-full caption-bottom text-sm">
+        <thead class="[&_tr]:border-b">
+          <tr class="border-b border-border transition-colors hover:bg-muted/50">
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              ファイル名
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+              SHA-256
+            </th>
+            <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[100px]">
               アクション
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="result in batchResults" :key="result.fileName">
-            <TableCell class="font-medium">
+            </th>
+          </tr>
+        </thead>
+        <tbody class="[&_tr:last-child]:border-0">
+          <tr v-for="result in batchResults" :key="result.fileName" class="border-b border-border transition-colors hover:bg-muted/50">
+            <td class="p-2 align-middle font-medium">
               {{ result.fileName }}
-            </TableCell>
-            <TableCell class="font-mono text-sm">
+            </td>
+            <td class="p-2 align-middle font-mono text-sm">
               {{ displayHash(result.hashes.SHA256) }}
-            </TableCell>
-            <TableCell>
+            </td>
+            <td class="p-2 align-middle">
               <UButton
                 size="sm"
                 variant="ghost"
                 @click="copyToClipboard(result.hashes.SHA256, `${result.fileName} - SHA-256`)">
                 <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
               </UButton>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </UCard>
 
     <!-- 説明 -->

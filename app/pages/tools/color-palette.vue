@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -194,26 +191,8 @@ const generatePalette = computed(() => {
 })
 
 // クリップボードにコピー
-const { copy } = useClipboard()
-const toast = useToast()
 
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      title: 'コピーしました',
-      description: text,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 const copyPalette = () => {
   const paletteText = generatePalette.value.join(', ')

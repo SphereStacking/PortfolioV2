@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import ToolsSidebar from '~/components/tools/ToolsSidebar.vue'
-</script>
-
 <template>
   <div class="min-h-screen flex flex-col relative bg-background">
     <div class="flex w-full">

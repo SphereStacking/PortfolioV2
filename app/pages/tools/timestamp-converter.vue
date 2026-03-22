@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard, useIntervalFn } from '@vueuse/core'
+import { useIntervalFn } from '@vueuse/core'
 
 definePageMeta({
   layout: 'tools',
@@ -238,26 +237,7 @@ const clearInput = () => {
 }
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string, name: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      title: 'コピーしました',
-      description: `${name}をクリップボードにコピーしました`,
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      title: 'エラー',
-      description: 'クリップボードへのコピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // 入力タイプの切り替え時
 watch(inputType, () => {

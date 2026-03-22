@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -507,33 +506,33 @@ useSeoMeta({
         </template>
 
         <div class="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead v-for="header in headers.slice(0, 6)" :key="header">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th v-for="header in headers.slice(0, 6)" :key="header" class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
                   {{ header }}
-                </TableHead>
-                <TableHead v-if="headers.length > 6">
+                </th>
+                <th v-if="headers.length > 6" class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
                   ...
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="(row, index) in parsedData.slice(0, 10)" :key="index">
-                <TableCell v-for="(cell, cellIndex) in row.slice(0, 6)" :key="cellIndex" class="max-w-32 truncate">
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr v-for="(row, index) in parsedData.slice(0, 10)" :key="index" class="border-b border-border transition-colors hover:bg-muted/50">
+                <td v-for="(cell, cellIndex) in row.slice(0, 6)" :key="cellIndex" class="p-2 align-middle max-w-32 truncate">
                   {{ cell }}
-                </TableCell>
-                <TableCell v-if="row.length > 6">
+                </td>
+                <td v-if="row.length > 6" class="p-2 align-middle">
                   ...
-                </TableCell>
-              </TableRow>
-              <TableRow v-if="parsedData.length > 10">
-                <TableCell :colspan="Math.min(headers.length, 7)" class="text-center text-muted-foreground">
+                </td>
+              </tr>
+              <tr v-if="parsedData.length > 10" class="border-b border-border transition-colors hover:bg-muted/50">
+                <td :colspan="Math.min(headers.length, 7)" class="p-2 align-middle text-center text-muted-foreground">
                   ...他 {{ parsedData.length - 10 }}行
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </UCard>
 

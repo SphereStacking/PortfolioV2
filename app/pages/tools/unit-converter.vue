@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-
 definePageMeta({
   layout: 'tools',
 })
@@ -291,24 +288,7 @@ const conversionTable = computed(() => {
 })
 
 // クリップボード操作
-const { copy } = useClipboard()
-const toast = useToast()
-
-const copyToClipboard = async (text: string) => {
-  try {
-    await copy(text)
-    toast.add({
-      description: 'クリップボードにコピーしました',
-    })
-  }
-  catch (err) {
-    console.error('Failed to copy:', err)
-    toast.add({
-      description: 'コピーに失敗しました',
-      color: 'error',
-    })
-  }
-}
+const { copyToClipboard } = useCopyToClipboard()
 
 // リセット
 const reset = () => {
@@ -485,24 +465,28 @@ useSeoMeta({
             </h3>
           </template>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{{ currentUnits[fromUnit]?.name }}</TableHead>
-                <TableHead class="text-right">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  {{ currentUnits[fromUnit]?.name }}
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground text-right">
                   {{ currentUnits[toUnit]?.name }}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="row in conversionTable" :key="row.input">
-                <TableCell>{{ row.input }}</TableCell>
-                <TableCell class="text-right font-mono">
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr v-for="row in conversionTable" :key="row.input" class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle">
+                  {{ row.input }}
+                </td>
+                <td class="p-2 align-middle text-right font-mono">
                   {{ row.output }}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </UCard>
       </div>
 

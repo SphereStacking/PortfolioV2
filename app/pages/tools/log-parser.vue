@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -625,46 +624,58 @@ useSeoMeta({
 
         <!-- ログテーブル -->
         <div class="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>時刻</TableHead>
-                <TableHead>IP</TableHead>
-                <TableHead>メソッド</TableHead>
-                <TableHead>URL</TableHead>
-                <TableHead>ステータス</TableHead>
-                <TableHead>サイズ</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="(log, index) in filteredLogs" :key="index">
-                <TableCell class="font-mono text-xs">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b border-border transition-colors hover:bg-muted/50">
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  時刻
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  IP
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  メソッド
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  URL
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  ステータス
+                </th>
+                <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+                  サイズ
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              <tr v-for="(log, index) in filteredLogs" :key="index" class="border-b border-border transition-colors hover:bg-muted/50">
+                <td class="p-2 align-middle font-mono text-xs">
                   {{ formatDate(log.timestamp) }}
-                </TableCell>
-                <TableCell class="font-mono text-sm">
+                </td>
+                <td class="p-2 align-middle font-mono text-sm">
                   {{ log.ip }}
-                </TableCell>
-                <TableCell>
+                </td>
+                <td class="p-2 align-middle">
                   <UBadge variant="outline" size="sm">
                     {{ log.method }}
                   </UBadge>
-                </TableCell>
-                <TableCell class="max-w-96 truncate">
+                </td>
+                <td class="p-2 align-middle max-w-96 truncate">
                   {{ log.url }}
-                </TableCell>
-                <TableCell>
+                </td>
+                <td class="p-2 align-middle">
                   <UBadge
                     :variant="log.status >= 400 ? 'destructive' : log.status >= 300 ? 'secondary' : 'default'"
                     size="sm">
                     {{ log.status }}
                   </UBadge>
-                </TableCell>
-                <TableCell class="text-right">
+                </td>
+                <td class="p-2 align-middle text-right">
                   {{ log.size.toLocaleString() }}B
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div v-if="filteredLogs.length === 1000" class="text-sm text-muted-foreground text-center">

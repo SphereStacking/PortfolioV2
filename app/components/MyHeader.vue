@@ -16,8 +16,8 @@ const { navigationCategories } = useNavigation()
 
           <!-- デスクトップナビゲーション（sm以上で表示） -->
           <div class="hidden sm:flex items-center gap-3">
-            <MyNavigation />
-            <ColorModeDropdown />
+            <ProjectMyNavigation />
+            <ModulesColorModeDropdown />
             <ProfileLinksDropdown />
           </div>
 
@@ -61,7 +61,7 @@ const { navigationCategories } = useNavigation()
                   <!-- カラーモード切り替え -->
                   <div class="flex items-center justify-between px-4">
                     <span class="text-sm font-medium">カラーモード</span>
-                    <ColorModeDropdown />
+                    <ModulesColorModeDropdown />
                   </div>
 
                   <!-- プロフィールリンク -->

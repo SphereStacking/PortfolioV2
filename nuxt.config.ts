@@ -72,6 +72,12 @@ export default defineNuxtConfig({
       include: ['monaco-editor'],
     },
   },
+  componentMeta: {
+    exclude: [
+      'app/components/Art/',
+      (component: { filePath: string }) => component.filePath.includes('node_modules/@nuxt/ui'),
+    ],
+  },
   eslint: {
     config: {
       stylistic: true,

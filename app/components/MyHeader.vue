@@ -14,15 +14,15 @@ const { navigationCategories } = useNavigation()
             <AppMark />
           </div>
 
-          <!-- デスクトップナビゲーション（sm以上で表示） -->
-          <div class="hidden sm:flex items-center gap-3">
+          <!-- デスクトップナビゲーション（lg以上で表示） -->
+          <div class="hidden lg:flex items-center gap-3">
             <ProjectMyNavigation />
             <ModulesColorModeDropdown />
             <ProfileLinksDropdown />
           </div>
 
-          <!-- モバイルメニュー（sm未満で表示） -->
-          <div class="sm:hidden">
+          <!-- モバイルメニュー（lg未満で表示） -->
+          <div class="lg:hidden">
             <USlideover v-model:open="isOpen" side="top" title="メニュー">
               <UButton
                 variant="ghost" icon="i-heroicons-bars-3" size="md"

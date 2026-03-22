@@ -18,7 +18,6 @@ export default defineNuxtConfig({
     '@barzhsieh/nuxt-content-mermaid',
   ],
   components: {
-    global: true,
     dirs: ['~/components'],
   },
   imports: {

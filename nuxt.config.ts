@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     'nuxt-llms',
     '@barzhsieh/nuxt-content-mermaid',
+    'nuxt-studio',
   ],
   components: {
     dirs: ['~/components'],
@@ -87,6 +88,14 @@ export default defineNuxtConfig({
       googleAnalytics: {
         id: 'G-8BWRNH7DMP',
       },
+    },
+  },
+  studio: {
+    repository: {
+      provider: 'github',
+      owner: 'SphereStacking',
+      repo: 'PortfolioV2',
+      branch: 'main',
     },
   },
   tres: {

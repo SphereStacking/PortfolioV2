@@ -6,7 +6,7 @@
 
 - **フレームワーク**: Nuxt 4 + TypeScript
 - **パッケージマネージャー**: pnpm
-- **UIコンポーネント**: shadcn-vue + reka-ui
+- **UIコンポーネント**: @nuxt/ui
 - **スタイリング**: Tailwind CSS v4
 - **3Dグラフィックス**: TresJS (Three.js)
 - **コンテンツ管理**: @nuxt/content

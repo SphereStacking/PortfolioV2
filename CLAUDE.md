@@ -38,7 +38,7 @@ pnpm textlint:fix
 - **フレームワーク**: Nuxt 4（compatibilityVersion: 4）+ TypeScript
 - **パッケージマネージャー**: pnpm
 - **ビルドツール**: Rolldown-Vite（Vite互換のRust製高速バンドラー）
-- **UIコンポーネント**: shadcn-vue + reka-ui
+- **UIコンポーネント**: @nuxt/ui（v4系）— `UButton`、`UCard`、`UInput`、`UTabs`等を自動インポートで使用
 - **スタイリング**: Tailwind CSS v4
 - **3Dグラフィックス**: @tresjs/nuxt経由のThree.js
 - **コンテンツ**: マークダウンベースの@nuxt/content
@@ -64,14 +64,16 @@ public/               # 静的ファイル
 - **me**: 個人情報と技術スタック（JSONファイル）
 
 ### コンポーネント構成
-- **UIコンポーネント**: `app/components/ui/`にshadcn-vueパターンで配置
+- **UIコンポーネント**: `@nuxt/ui`が提供する`U`プレフィックス付きコンポーネント（自動インポート）
 - **機能コンポーネント**: ドメイン別に整理（career/、project/、content/）
 - **Composables**: `app/composables/`内のカスタムVue composables
 
-### shadcn-vue使用ガイド
-- `app/components/ui/`からshadcn-vueコンポーネントを使用
-- New Yorkスタイルテーマ設定
-- CSS変数でZincを基本色として使用（`app/assets/css/tailwind.css`参照）
+### Nuxt UI使用ガイド
+- `@nuxt/ui`のコンポーネントを使用（`UButton`、`UCard`、`UInput`、`USelect`、`UTabs`、`USlideover`、`UTooltip`等）
+- コンポーネントは自動インポートされるため、明示的なimportは不要
+- `<UApp>`がアプリルートに配置され、`<UToaster>`と`<TooltipProvider>`を内包
+- トースト通知: `const toast = useToast()` → `toast.add({ title, description, color })`（colorは`'error'`、`'success'`等）
+- テーマはCSS変数でZincを基本色として使用（`app/assets/css/tailwind.css`参照）
 
 ### 重要なパターン
 - カラーモードサポートは`app/components/modules/colorMode/`のカスタムモジュールで実装
@@ -87,20 +89,20 @@ public/               # 静的ファイル
 ### Composablesの実装方針
 - **VueUseを優先的に使用**: カスタムcomposableを実装する前に、VueUseに同等の機能があるか確認すること
 - VueUseで利用可能な主要なcomposables:
-  - `useClipboard` - クリップボード操作（`useCopyToClipboard`の代替）
+  - `useClipboard` - クリップボード操作
   - `useLocalStorage` / `useSessionStorage` - ストレージ操作
   - `useDark` - ダークモード管理
   - `useDebounce` / `useThrottle` - パフォーマンス最適化
   - `useFetch` - データフェッチング
   - その他多数のユーティリティ
 - カスタム実装が必要な場合のみ、プロジェクト固有のcomposableを作成
+- `useCopyToClipboard`: クリップボードコピー+トースト通知の薄いラッパー（ツールページで使用）
 
 ### スタイリングガイドライン
 - **Tailwind CSSの使用方法**:
-  - `@apply`ディレクティブは使用しない
+  - `@apply`ディレクティブはコンポーネント内で使用しない（`tailwind.css`のグローバルスタイルは例外）
   - すべてのTailwindクラスはテンプレート内で直接使用する
   - 再利用可能なスタイルはVueコンポーネントとして抽出する
-  - 動的なクラスの組み合わせにはcn()ユーティリティを使用する
 
 - **スタイリングの優先順位**:
   1. **Tailwindクラスを最優先**: 基本的なスタイリングはすべてTailwindクラスで実装
@@ -121,7 +123,6 @@ public/               # 静的ファイル
     - `bg-destructive` / `text-destructive-foreground` - 削除・エラー
   - **Zinc色の使用**: グレースケールが必要な場合は`gray`ではなく`zinc`を使用
   - **ダークモード対応**: `dark:`プレフィックスは不要（CSS変数が自動対応）
-  - **shadcn-vueのガイドライン**: [shadcn-vue](https://www.shadcn-vue.com/)のコンポーネント実装パターンに従う
 
 ## Git運用ルール
 
@@ -179,7 +180,7 @@ git push --force-with-lease origin ブランチ名
 
 #### コミットメッセージの例
 ```
-✨ shadcn-vue の導入
+✨ Nuxt UI の導入
 🎨 レスポンシブデザインを改善
 📝 Git ブランチ戦略のドキュメントを追加
 ```

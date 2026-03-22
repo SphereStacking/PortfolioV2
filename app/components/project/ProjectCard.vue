@@ -91,7 +91,7 @@ const overviewText = computed(() => {
         <UBadge
           v-for="tag in data.tags"
           :key="tag"
-          variant="secondary"
+          color="neutral" variant="subtle"
           class="text-xs">
           {{ tag }}
         </UBadge>

@@ -43,5 +43,3 @@ const myProfile = useMyProfile()
     </div>
   </div>
 </template>
-
-<style scoped></style>

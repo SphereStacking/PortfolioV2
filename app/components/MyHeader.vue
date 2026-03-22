@@ -1,21 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import MyNavigation from './project/MyNavigation.vue'
-import ColorModeDropdown from './modules/colorMode/ColorModeDropdown.vue'
-import ProfileLinksDropdown from './ProfileLinksDropdown.vue'
-import { useNavigation } from '~/composables/useNavigation'
-
-// モバイルメニューの開閉状態
 const isOpen = ref(false)
-
-// コンポーザブルからナビゲーション設定を取得
 const { navigationCategories } = useNavigation()
 </script>
 
 <template>
   <header class="relative backdrop-blur-xs z-50">
     <!-- ヘッダー -->
-    <div class="h-16 sticky top-0 border-b border-zinc-800 dark:border-gray-200">
+    <div class="h-16 sticky top-0 border-b border-border">
       <div class="container h-full md:mx-auto px-2">
         <div class="flex items-center justify-between gap-3 h-full">
           <!-- 左側 -->

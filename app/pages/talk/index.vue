@@ -50,7 +50,7 @@ const {
             <Icon v-if="isLoading" name="heroicons:arrow-path" class="animate-spin mr-2" />
             <UButton
               v-if="searchQuery || selectedYear"
-              variant="outline" size="xs" rounded="full"
+              variant="outline" size="xs" class="rounded-full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
             </UButton>
@@ -102,7 +102,7 @@ const {
           <p class="mb-8 max-w-md mx-auto">
             検索条件を変更してみてください。
           </p>
-          <UButton variant="default" color="primary" @click="resetFilters">
+          <UButton variant="solid" color="primary" @click="resetFilters">
             フィルターをリセット
           </UButton>
         </div>

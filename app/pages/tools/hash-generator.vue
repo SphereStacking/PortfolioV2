@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -515,7 +514,7 @@ useSeoMeta({
               <UBadge v-if="algo.deprecated" variant="destructive" class="text-xs">
                 非推奨
               </UBadge>
-              <UBadge v-if="algo.recommended" variant="default" class="text-xs">
+              <UBadge v-if="algo.recommended" variant="solid" class="text-xs">
                 推奨
               </UBadge>
             </div>

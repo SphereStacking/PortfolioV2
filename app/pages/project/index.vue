@@ -33,7 +33,3 @@ const { data: pinnedProjects } = await useAsyncData(() => queryCollection('proje
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

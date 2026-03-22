@@ -31,7 +31,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      charset: 'utf-16',
+      charset: 'utf-8',
       viewport: 'width=device-width',
       title: 'SphereStacking Portfolio',
       link: [

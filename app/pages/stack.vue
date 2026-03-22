@@ -52,7 +52,7 @@ const handleSelectCategory = (categoryId: string) => {
               v-if="searchQuery || selectedType"
               variant="outline"
               size="xs"
-              rounded="full"
+              class="rounded-full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
             </UButton>

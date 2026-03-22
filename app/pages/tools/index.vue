@@ -81,7 +81,7 @@ useSeoMeta({
                   </div>
                   <UBadge
                     v-if="tool.badge"
-                    variant="secondary"
+                    color="neutral" variant="subtle"
                     class="ml-2">
                     {{ tool.badge }}
                   </UBadge>

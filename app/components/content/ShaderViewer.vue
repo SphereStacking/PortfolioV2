@@ -1045,6 +1045,11 @@ function multiply(a: Float32Array, b: Float32Array): Float32Array {
   return result
 }
 
+// Fullscreen change handler (named function for proper cleanup)
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+}
+
 // Lifecycle
 onMounted(() => {
   initWebGL()
@@ -1052,17 +1057,13 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
 
   // Listen for fullscreen changes
-  document.addEventListener('fullscreenchange', () => {
-    isFullscreen.value = !!document.fullscreenElement
-  })
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
 })
 
 onUnmounted(() => {
   stopRenderLoop()
   window.removeEventListener('resize', handleResize)
-  document.removeEventListener('fullscreenchange', () => {
-    isFullscreen.value = !!document.fullscreenElement
-  })
+  document.removeEventListener('fullscreenchange', handleFullscreenChange)
 
   if (gl && program) {
     gl.deleteProgram(program)

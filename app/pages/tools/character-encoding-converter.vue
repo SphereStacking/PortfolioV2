@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -145,7 +144,7 @@ const stringToBytes = (str: string, encoding: string): Uint8Array => {
 
     return new Uint8Array(bytes)
   }
-  catch {
+  catch (e) {
     console.error('Encoding error:', e)
     throw new Error('エンコードに失敗しました')
   }
@@ -206,7 +205,7 @@ const convert = () => {
       description: `${inputEncoding.value} → ${outputEncoding.value} への変換が完了しました`,
     })
   }
-  catch {
+  catch (e) {
     error.value = e instanceof Error ? e.message : '変換に失敗しました'
     toast.add({
       title: 'エラー',

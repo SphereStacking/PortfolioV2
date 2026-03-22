@@ -39,6 +39,3 @@ const pages = {
     <p>{{ credit }}</p>
   </footer>
 </template>
-
-<style scoped>
-</style>

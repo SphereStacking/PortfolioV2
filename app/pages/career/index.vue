@@ -94,7 +94,7 @@ const {
               v-if="hasActiveFilters"
               variant="outline"
               size="xs"
-              rounded="full"
+              class="rounded-full"
               @click="resetFilters">
               <Icon name="heroicons:x-mark" />
             </UButton>
@@ -139,7 +139,7 @@ const {
         <p class="mx-auto mb-8 max-w-md">
           検索条件を変更してみてください。
         </p>
-        <UButton variant="default" color="primary" @click="resetFilters">
+        <UButton variant="solid" color="primary" @click="resetFilters">
           フィルターをリセット
         </UButton>
       </div>

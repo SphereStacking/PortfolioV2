@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -211,7 +210,7 @@ const executeReplace = () => {
           }
         }
       }
-      catch {
+      catch (err) {
         console.error(`Rule error: ${rule.find}`, err)
         error.value = `ルールエラー: "${rule.find}" - 正規表現が無効です`
       }

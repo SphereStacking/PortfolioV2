@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 definePageMeta({
@@ -588,7 +587,8 @@ useSeoMeta({
           <div class="space-y-2">
             <div class="flex flex-wrap gap-1">
               <UBadge
-                v-for="tag in pair.tags" :key="tag" variant="secondary"
+                v-for="tag in pair.tags" :key="tag" color="neutral"
+                variant="subtle"
                 class="text-xs">
                 {{ tag }}
               </UBadge>

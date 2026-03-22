@@ -42,6 +42,7 @@ pnpm textlint:fix
 - **スタイリング**: Tailwind CSS v4
 - **3Dグラフィックス**: @tresjs/nuxt経由のThree.js
 - **コンテンツ**: マークダウンベースの@nuxt/content
+- **CMS**: nuxt-studio（セルフホスト、`/_studio`でアクセス）
 - **アニメーション**: motion-v、tweakpane
 
 ### ディレクトリ構造（Nuxt 4）
@@ -74,6 +75,13 @@ public/               # 静的ファイル
 - `<UApp>`がアプリルートに配置され、`<UToaster>`と`<TooltipProvider>`を内包
 - トースト通知: `const toast = useToast()` → `toast.add({ title, description, color })`（colorは`'error'`、`'success'`等）
 - テーマはCSS変数でZincを基本色として使用（`app/assets/css/tailwind.css`参照）
+
+### Nuxt Studio（セルフホストCMS）
+- `/_studio`でコンテンツ編集UIにアクセス可能
+- GitHub OAuthで認証（環境変数: `STUDIO_GITHUB_CLIENT_ID`、`STUDIO_GITHUB_CLIENT_SECRET`）
+- `content.config.ts`のスキーマから自動的に編集フォームを生成
+- 変更はGitリポジトリに直接コミットされる
+- SSRデプロイが必須（`nuxt build`）
 
 ### 重要なパターン
 - カラーモードサポートは`app/components/modules/colorMode/`のカスタムモジュールで実装

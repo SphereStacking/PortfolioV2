@@ -29,7 +29,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "@vueuse/core": "^14.2.1",
     "better-sqlite3": "^12.2.0",
-    "eslint": "^9.25.1",
+    "eslint": "^9.39.4",
     "monaco-editor": "^0.53.0",
     "motion-v": "^1.0.1",
     "nuxt": "^4.4.2",

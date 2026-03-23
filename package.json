@@ -47,17 +47,17 @@
   },
   "devDependencies": {
     "@barzhsieh/nuxt-content-mermaid": "^2.2.3",
-    "@nuxt/fonts": "^0.11.4",
+    "@nuxt/fonts": "^0.14.0",
     "@nuxtjs/color-mode": "^3.5.2",
     "@tweakpane/core": "^2.0.5",
     "@types/three": "^0.176.0",
     "dayjs-nuxt": "^2.1.11",
     "lefthook": "^1.12.2",
-    "textlint": "^15.5.1",
+    "textlint": "^15.5.2",
     "textlint-rule-preset-ja-spacing": "^2.4.3",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
     "textlint-rule-prh": "^6.1.0",
-    "vite-plugin-glsl": "^1.5.1"
+    "vite-plugin-glsl": "^1.5.6"
   },
   "pnpm": {
     "overrides": {

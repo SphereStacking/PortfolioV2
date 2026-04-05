@@ -2,7 +2,7 @@
 title: 自分用 .claude/ ディレクトリ構成の指針
 description: Claude Code の .claude/ ディレクトリをどう構成するか、morphink プロジェクトで試行錯誤して落ち着いた形をメモとして残す。
 navigation: true
-draft: true
+draft: false
 created: 2026-04-05
 updated:
 image:

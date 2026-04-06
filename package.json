@@ -22,7 +22,7 @@
     "@nuxt/ui": "^4.5.1",
     "@tanstack/vue-table": "^8.21.3",
     "@tresjs/cientos": "^5.3.0",
-    "@tresjs/nuxt": "^5.2.0",
+    "@tresjs/nuxt": "^5.6.0",
     "@tresjs/post-processing": "^3.3.0",
     "@unhead/vue": "^2.1.12",
     "@vercel/analytics": "^1.5.0",

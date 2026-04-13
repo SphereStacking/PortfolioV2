@@ -24,7 +24,7 @@
     "@tresjs/cientos": "^5.3.0",
     "@tresjs/nuxt": "^5.2.0",
     "@tresjs/post-processing": "^3.3.0",
-    "@unhead/vue": "^2.1.12",
+    "@unhead/vue": "^2.1.13",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "@vueuse/core": "^14.2.1",
